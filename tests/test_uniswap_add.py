@@ -46,6 +46,10 @@ def test_uniswap_add_two_tokens(
     usdc.approve(bank, 2**256-1, {'from': alice})
     usdt.approve(bank, 2**256-1, {'from': alice})
     spell.getAndApprovePair(usdc, usdt, {'from': admin})
+    lp = ufactory.getPair(usdc, usdt)
+    spell.setWhitelistLPTokens([lp], [True], {'from': admin})
+    bank.setWhitelistSpells([spell], [True], {'from': admin})
+    bank.setWhitelistTokens([usdc, usdt], [True, True], {'from': admin})
     tx = bank.execute(
         0,
         spell,
