@@ -9,8 +9,5 @@ in pkgs.mkShell {
   ];
   shellHook = ''
     export PATH="$HOME/.local/bin:$PATH"
-    if [ ! -f "$(which brownie)" ]; then
-      pipx install eth-brownie
-    fi
   '';
 }
