@@ -19,7 +19,21 @@ jobs:
           install_options: "--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve"
           extra_nix_config: |
             experimental-features = nix-command flakes
+      - name: Cache Compiler Installations
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.solcx
+          key: compiler-cache
+      - name: Cache Node Modules
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
       - name: Install Ganache
         run: nix develop -c npm install
+      - name: Build contracts
+        run: nix develop -c brownie compile
       - name: Run tests
         run: nix develop -c brownie test
