@@ -15,6 +15,8 @@ contract MockCErc20_2 is ICErc20_2 {
   uint public totalSupply = 0;
   mapping(address => uint) public override balanceOf;
 
+  uint public constant decimals = 18;
+
   constructor(IERC20 _token) public {
     token = _token;
   }

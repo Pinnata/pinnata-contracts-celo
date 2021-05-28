@@ -7,6 +7,7 @@
     "test": "tests"
   },
   "devDependencies": {
+    "ganache-cli": "^6.12.2",
     "prettier": "2.2.0",
     "prettier-plugin-solidity": "^1.0.0-alpha.59"
   },

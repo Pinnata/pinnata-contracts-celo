@@ -19,7 +19,7 @@ def test_temporary_state(admin, alice, bank, chain, werc20, ufactory, urouter, s
     # execute
     spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
 
     # after execute
     assert bank._GENERAL_LOCK() == _NOT_ENTERED
@@ -44,11 +44,11 @@ def test_next_position_id(admin, alice, bank, werc20, urouter, ufactory, usdc, u
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
     assert bank.nextPositionId() == 1  # initially 1
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
     assert bank.nextPositionId() == 2
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=1)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=1)
     assert bank.nextPositionId() == 2  # doesn't increase due to changing
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
     assert bank.nextPositionId() == 3
 
 
@@ -76,37 +76,34 @@ def test_all_banks(admin, bank, token, cToken, weth, dai, usdt, usdc, MockCErc20
 
 def test_banks(admin, bank, weth, dai, usdt, usdc, token, cToken):
     for ind, coin in enumerate([weth, dai, usdt, usdc]):
-        isListed, index, cToken1, reserve, pendingReserve, totalDebt, totalShare = bank.banks(coin)
+        isListed, index, cToken1, reserve, totalDebt, totalShare = bank.banks(coin)
         assert isListed
         assert index == ind
         assert reserve == 0
-        assert pendingReserve == 0
         assert totalDebt == 0
         assert totalShare == 0
 
     # token is not listed yet
-    isListed, index, cToken1, reserve, pendingReserve, totalDebt, totalShare = bank.banks(token)
+    isListed, index, cToken1, reserve, totalDebt, totalShare = bank.banks(token)
     assert not isListed
     assert index == 0
     assert reserve == 0
-    assert pendingReserve == 0
     assert totalDebt == 0
     assert totalShare == 0
 
     # add bank
     bank.addBank(token, cToken)
-    isListed, index, cToken1, reserve, pendingReserve, totalDebt, totalShare = bank.banks(token)
+    isListed, index, cToken1, reserve, totalDebt, totalShare = bank.banks(token)
     assert isListed
     assert index == 4
     assert reserve == 0
-    assert pendingReserve == 0
     assert totalDebt == 0
     assert totalShare == 0
 
 
 def test_cToken_in_bank(admin, bank, weth, dai, usdt, usdc, token, cToken):
     for ind, coin in enumerate([weth, dai, usdt, usdc]):
-        _, _, cToken1, _, _, _, _ = bank.banks(coin)
+        _, _, cToken1, _, _, _ = bank.banks(coin)
         assert bank.cTokenInBank(cToken1)
 
     assert not bank.cTokenInBank(cToken)
@@ -137,10 +134,10 @@ def test_positions(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, ch
     spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
 
     owner, collToken, collId, collateralSize, debtMap = bank.positions(1)
-    tx = spell.getPair(usdt, usdc, {'from': admin})
+    tx = spell.getAndApprovePair(usdt, usdc, {'from': admin})
     lp = tx.return_value
     assert owner == alice
     assert collToken == werc20
