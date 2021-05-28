@@ -1,0 +1,8 @@
+networks:
+  development:
+    cmd_settings:
+      default_balance: "10000000 ether"
+
+dependencies:
+  - OpenZeppelin/openzeppelin-contracts@3.4.0
+  - OpenZeppelin/openzeppelin-contracts@3.2.0

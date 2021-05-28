@@ -5,4 +5,3 @@ build/
 reports/
 node_modules/
 solc-input-contracts.json
-.pipx
