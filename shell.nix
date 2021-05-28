@@ -10,6 +10,5 @@ in pkgs.mkShell {
   shellHook = ''
     export PATH="$HOME/.local/bin:./node_modules/.bin:$PATH"
     pipx install eth-brownie
-    pipx install pytest
   '';
 }
