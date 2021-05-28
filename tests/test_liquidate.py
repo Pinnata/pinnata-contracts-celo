@@ -48,8 +48,12 @@ def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, cha
     return spell
 
 
-def execute_uniswap_werc20(admin, alice, bank, token0, token1, spell, pos_id=0):
-    spell.getPair(token0, token1, {'from': admin})
+def execute_uniswap_werc20(admin, alice, bank, token0, token1, spell, ufactory, pos_id=0):
+    spell.getAndApprovePair(token0, token1, {'from': admin})
+    lp = ufactory.getPair(token0, token1)
+    spell.setWhitelistLPTokens([lp], [True], {'from': admin})
+    bank.setWhitelistSpells([spell], [True], {'from': admin})
+    bank.setWhitelistTokens([token0, token1], [True, True], {'from': admin})
     tx = bank.execute(
         pos_id,
         spell,
@@ -84,7 +88,7 @@ def test_liquidate(admin, alice, bob, bank, chain, werc20, ufactory, urouter, si
     # execute
     spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
 
     pos_id = 1
 

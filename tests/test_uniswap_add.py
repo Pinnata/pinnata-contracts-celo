@@ -45,7 +45,7 @@ def test_uniswap_add_two_tokens(
     usdt.mint(alice, 10000000 * 10**6, {'from': admin})
     usdc.approve(bank, 2**256-1, {'from': alice})
     usdt.approve(bank, 2**256-1, {'from': alice})
-    spell.getPair(usdc, usdt, {'from': admin})
+    spell.getAndApprovePair(usdc, usdt, {'from': admin})
     tx = bank.execute(
         0,
         spell,

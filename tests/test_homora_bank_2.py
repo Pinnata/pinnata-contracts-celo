@@ -16,7 +16,7 @@ def test_accrue(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain
     spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
 
     _, _, cusdt, _, prevPendingReserve, prevUSDTTotalDebt, prevUSDTTotalShare = bank.banks(usdt)
     print('totalDebt', prevUSDTTotalDebt)
@@ -25,7 +25,7 @@ def test_accrue(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain
     chain.sleep(100000)
 
     # not accrue yet
-    _, _, cusdt, _, curPendingReserve, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
+    _, _, cusdt, _, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
     print('totalDebt', curUSDTTotalDebt)
     print('totalShare', curUSDTTotalShare)
 
@@ -34,7 +34,7 @@ def test_accrue(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain
 
     bank.accrue(usdt)
 
-    _, _, cusdt, _, curPendingReserve, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
+    _, _, cusdt, _, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
     print('totalDebt', curUSDTTotalDebt)
     print('totalShare', curUSDTTotalShare)
 
@@ -52,7 +52,7 @@ def test_accrue_all(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, c
     spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
 
     _, _, cusdt, _, prevUSDTPendingReserve, prevUSDTTotalDebt, prevUSDTTotalShare = bank.banks(usdt)
     print('totalDebt', prevUSDTTotalDebt)
@@ -65,8 +65,8 @@ def test_accrue_all(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, c
     chain.sleep(100000)
 
     # not accrue yet
-    _, _, cusdt, _, curPendingReserve, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
-    _, _, cusdc, _, curUSDCPendingReserve, curUSDCTotalDebt, curUSDCTotalShare = bank.banks(usdc)
+    _, _, cusdt, _, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
+    _, _, cusdc, _, curUSDCTotalDebt, curUSDCTotalShare = bank.banks(usdc)
 
     assert prevUSDTTotalDebt == curUSDTTotalDebt
     assert prevUSDTTotalShare == curUSDTTotalShare
