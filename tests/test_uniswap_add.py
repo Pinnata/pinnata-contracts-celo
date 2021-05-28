@@ -32,7 +32,7 @@ def test_uniswap_add_two_tokens(
     core_oracle.setRoute([usdc, usdt, lp], [simple_oracle, simple_oracle, uniswap_lp_oracle])
     print('lp Px', uniswap_lp_oracle.getETHPx(lp))
 
-    oracle.setOracles(
+    oracle.setTokenFactors(
         [usdc, usdt, lp],
         [
             [10000, 10000, 10000],

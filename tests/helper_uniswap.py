@@ -33,7 +33,7 @@ def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, cha
 
     print('lp Px', uniswap_lp_oracle.getETHPx(lp))
 
-    oracle.setOracles(
+    oracle.setTokenFactors(
         [usdc, usdt, lp],
         [
             [10000, 10000, 10000],

@@ -31,7 +31,7 @@ def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, cha
 
     core_oracle.setRoute([usdc, usdt, lp], [simple_oracle, simple_oracle, uniswap_lp_oracle])
     print('lp Px', uniswap_lp_oracle.getETHPx(lp))
-    oracle.setOracles(
+    oracle.setTokenFactors(
         [usdc, usdt, lp],
         [
             [10000, 10000, 10000],
@@ -98,7 +98,7 @@ def test_liquidate(admin, alice, bob, bank, chain, werc20, ufactory, urouter, si
     # change oracle settings
     lp = ufactory.getPair(usdc, usdt)
     uniswap_lp_oracle = UniswapV2Oracle.deploy(simple_oracle, {'from': admin})
-    oracle.setOracles(
+    oracle.setTokenFactors(
         [lp],
         [
             [10000, 9900, 10500],
@@ -120,7 +120,7 @@ def test_liquidate(admin, alice, bob, bank, chain, werc20, ufactory, urouter, si
     print('collateral value', bank.getCollateralETHValue(pos_id))
     print('borrow value', bank.getBorrowETHValue(pos_id))
 
-    oracle.setOracles(
+    oracle.setTokenFactors(
         [usdt, usdc],
         [
             [10700, 10000, 10300],
