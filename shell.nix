@@ -8,6 +8,6 @@ in pkgs.mkShell {
     yarn
   ];
   shellHook = ''
-    export PATH="$HOME/.local/bin:$PATH"
+    export PATH="$HOME/.local/bin:./node_modules/.bin:$PATH"
   '';
 }
