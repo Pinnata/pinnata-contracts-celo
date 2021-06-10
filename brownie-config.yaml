@@ -8,3 +8,4 @@ networks:
 dependencies:
   - OpenZeppelin/openzeppelin-contracts@3.4.0
   - OpenZeppelin/openzeppelin-contracts@3.2.0
+  - ubeswap/ubeswap@mainnet-v1

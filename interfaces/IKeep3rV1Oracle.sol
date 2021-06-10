@@ -7,7 +7,7 @@ abstract contract IKeep3rV1Oracle {
     uint price1Cumulative;
   }
 
-  function WETH() external pure virtual returns (address);
+  function CELO() external pure virtual returns (address);
 
   function factory() external pure virtual returns (address);
 
