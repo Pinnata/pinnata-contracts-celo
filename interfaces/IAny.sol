@@ -41,7 +41,7 @@ interface IAny {
     uint[] memory
   ) external;
 
-  function getETHPx(address) external view returns (uint);
+  function getCELOPx(address) external view returns (uint);
 
   function balanceOf(address) external view returns (uint);
 

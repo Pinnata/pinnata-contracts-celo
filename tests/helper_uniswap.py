@@ -25,13 +25,13 @@ def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, cha
     print('admin lp bal', interface.IERC20(lp).balanceOf(admin))
     uniswap_lp_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': admin})
 
-    print('usdt Px', simple_oracle.getETHPx(usdt))
-    print('usdc Px', simple_oracle.getETHPx(usdc))
+    print('usdt Px', simple_oracle.getCELOPx(usdt))
+    print('usdc Px', simple_oracle.getCELOPx(usdc))
 
     core_oracle.setRoute([usdc, usdt, lp], [simple_oracle, simple_oracle,
                                             uniswap_lp_oracle], {'from': admin})
 
-    print('lp Px', uniswap_lp_oracle.getETHPx(lp))
+    print('lp Px', uniswap_lp_oracle.getCELOPx(lp))
 
     oracle.setTokenFactors(
         [usdc, usdt, lp],

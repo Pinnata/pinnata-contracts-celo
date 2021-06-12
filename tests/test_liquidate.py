@@ -26,11 +26,11 @@ def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, cha
     print('admin lp bal', interface.IERC20(lp).balanceOf(admin))
     uniswap_lp_oracle = UniswapV2Oracle.deploy(simple_oracle, {'from': admin})
 
-    print('usdt Px', simple_oracle.getETHPx(usdt))
-    print('usdc Px', simple_oracle.getETHPx(usdc))
+    print('usdt Px', simple_oracle.getCELOPx(usdt))
+    print('usdc Px', simple_oracle.getCELOPx(usdc))
 
     core_oracle.setRoute([usdc, usdt, lp], [simple_oracle, simple_oracle, uniswap_lp_oracle])
-    print('lp Px', uniswap_lp_oracle.getETHPx(lp))
+    print('lp Px', uniswap_lp_oracle.getCELOPx(lp))
     oracle.setTokenFactors(
         [usdc, usdt, lp],
         [
@@ -116,10 +116,10 @@ def test_liquidate(admin, alice, bob, bank, chain, werc20, ufactory, urouter, si
     # ready to be liquidated
     bank.liquidate(pos_id, usdt, 100 * 10**6, {'from': bob})
     print('bob lp', werc20.balanceOfERC20(lp, bob))
-    print('calc bob lp', 100 * 10**6 * simple_oracle.getETHPx(usdt) //
-          uniswap_lp_oracle.getETHPx(lp) * 105 // 100)
+    print('calc bob lp', 100 * 10**6 * simple_oracle.getCELOPx(usdt) //
+          uniswap_lp_oracle.getCELOPx(lp) * 105 // 100)
     assert almostEqual(werc20.balanceOfERC20(lp, bob), 100 * 10**6 *
-                       simple_oracle.getETHPx(usdt) // uniswap_lp_oracle.getETHPx(lp) * 105 // 100)
+                       simple_oracle.getCELOPx(usdt) // uniswap_lp_oracle.getCELOPx(lp) * 105 // 100)
 
     print('collateral value', bank.getCollateralETHValue(pos_id))
     print('borrow value', bank.getBorrowETHValue(pos_id))
@@ -142,10 +142,10 @@ def test_liquidate(admin, alice, bob, bank, chain, werc20, ufactory, urouter, si
     bank.liquidate(pos_id, usdc, 300 * 10**6, {'from': bob})
     curBobBal = werc20.balanceOfERC20(lp, bob)
     print('delta bob lp', curBobBal - prevBobBal)
-    print('calc delta bob lp', 300 * 10**6 * simple_oracle.getETHPx(usdc) //
-          uniswap_lp_oracle.getETHPx(lp) * 105 * 101 // 100 // 100)
-    assert almostEqual(curBobBal - prevBobBal, 300 * 10**6 * simple_oracle.getETHPx(usdc) //
-                       uniswap_lp_oracle.getETHPx(lp) * 105 * 101 // 100 // 100)
+    print('calc delta bob lp', 300 * 10**6 * simple_oracle.getCELOPx(usdc) //
+          uniswap_lp_oracle.getCELOPx(lp) * 105 * 101 // 100 // 100)
+    assert almostEqual(curBobBal - prevBobBal, 300 * 10**6 * simple_oracle.getCELOPx(usdc) //
+                       uniswap_lp_oracle.getCELOPx(lp) * 105 * 101 // 100 // 100)
 
     # change usdc price
     simple_oracle.setETHPx([usdc], [2**112 * 10**12 // 500])

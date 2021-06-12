@@ -56,9 +56,9 @@ def sort_tokens(token):
 
 def check_token_prices(band_oracle, link_oracle, simple_oracle, agg_oracle, deployer):
     for idx, token in enumerate(tokens):
-        print('band', token_names[idx], ':', band_oracle.getETHPx(token))
-        print('link', token_names[idx], ':', link_oracle.getETHPx(token))
-        print('agg', token_names[idx], ':', agg_oracle.getETHPx(token))
+        print('band', token_names[idx], ':', band_oracle.getCELOPx(token))
+        print('link', token_names[idx], ':', link_oracle.getCELOPx(token))
+        print('agg', token_names[idx], ':', agg_oracle.getCELOPx(token))
         token0, token1 = sort_tokens(token)
         print(token0, token1)
         agg_price = agg_oracle.getPrice(token0, token1)
@@ -118,15 +118,15 @@ def check_replace_v2_oracle(band_oracle, link_oracle, simple_oracle, agg_oracle,
     core_oracle.setRoute(v2_tokens, [agg_oracle] * len(v2_tokens), {'from': deployer})
 
     # for token in v2_tokens:
-    #     simple_price = simple_oracle_v2.getETHPx(token)
-    #     agg_price = agg_oracle.getETHPx(token)
+    #     simple_price = simple_oracle_v2.getCELOPx(token)
+    #     agg_price = agg_oracle.getCELOPx(token)
     #     print(token, 'diff:', max(simple_price / agg_price, agg_price / simple_price))
 
-    # print(simple_oracle_v2.getETHPx(DAI))
-    # print(agg_oracle.getETHPx(DAI))
+    # print(simple_oracle_v2.getCELOPx(DAI))
+    # print(agg_oracle.getCELOPx(DAI))
 
-    # print(simple_oracle_v2.getETHPx(USDT))
-    # print(agg_oracle.getETHPx(USDT))
+    # print(simple_oracle_v2.getCELOPx(USDT))
+    # print(agg_oracle.getCELOPx(USDT))
 
     # #####################################################################################
     # print('=========================================================================')

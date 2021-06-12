@@ -97,11 +97,11 @@ def test_set_route(admin, core_oracle, weth, dai, usdt, usdc, simple_oracle, Uni
                          [simple_oracle, simple_oracle_1, simple_oracle],
                          {'from': admin})
 
-    assert core_oracle.getETHPx(dai) == 1
-    assert core_oracle.getETHPx(usdc) == 5
-    assert core_oracle.getETHPx(usdt) == 3
+    assert core_oracle.getCELOPx(dai) == 1
+    assert core_oracle.getCELOPx(usdc) == 5
+    assert core_oracle.getCELOPx(usdt) == 3
     try:
-        core_oracle.getETHPx(weth)
+        core_oracle.getCELOPx(weth)
         assert False, 'tx should revert'
     except VirtualMachineError:
         pass
@@ -110,19 +110,19 @@ def test_set_route(admin, core_oracle, weth, dai, usdt, usdc, simple_oracle, Uni
     simple_oracle.setETHPx([dai, usdc, usdt], [7, 8, 9])
     simple_oracle_1.setETHPx([dai, usdc, usdt], [10, 11, 12])
 
-    assert core_oracle.getETHPx(dai) == 7
-    assert core_oracle.getETHPx(usdc) == 11
-    assert core_oracle.getETHPx(usdt) == 9
+    assert core_oracle.getCELOPx(dai) == 7
+    assert core_oracle.getCELOPx(usdc) == 11
+    assert core_oracle.getCELOPx(usdt) == 9
 
     # re-route
     core_oracle.setRoute([dai, usdc, usdt],
                          [simple_oracle_1, '0x0000000000000000000000000000000000000000', simple_oracle_1])
 
-    assert core_oracle.getETHPx(dai) == 10
-    assert core_oracle.getETHPx(usdt) == 12
+    assert core_oracle.getCELOPx(dai) == 10
+    assert core_oracle.getCELOPx(usdt) == 12
 
     try:
-        core_oracle.getETHPx(usdc)
+        core_oracle.getCELOPx(usdc)
         assert False, 'tx should revert'
     except VirtualMachineError:
         pass

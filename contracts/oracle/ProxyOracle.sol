@@ -103,8 +103,8 @@ contract ProxyOracle is IOracle, Governable {
     TokenFactors memory tokenFactorOut = tokenFactors[tokenOutUnderlying];
     require(tokenFactorIn.liqIncentive != 0, 'bad underlying in');
     require(tokenFactorOut.liqIncentive != 0, 'bad underlying out');
-    uint pxIn = source.getETHPx(tokenIn);
-    uint pxOut = source.getETHPx(tokenOutUnderlying);
+    uint pxIn = source.getCELOPx(tokenIn);
+    uint pxOut = source.getCELOPx(tokenOutUnderlying);
     uint amountOut = amountIn.mul(pxIn).div(pxOut);
     amountOut = amountOut.mul(2**112).div(rateUnderlying);
     return
@@ -128,7 +128,7 @@ contract ProxyOracle is IOracle, Governable {
     uint amountUnderlying = amount.mul(rateUnderlying).div(2**112);
     TokenFactors memory tokenFactor = tokenFactors[tokenUnderlying];
     require(tokenFactor.liqIncentive != 0, 'bad underlying collateral');
-    uint ethValue = source.getETHPx(tokenUnderlying).mul(amountUnderlying).div(2**112);
+    uint ethValue = source.getCELOPx(tokenUnderlying).mul(amountUnderlying).div(2**112);
     return ethValue.mul(tokenFactor.collateralFactor).div(10000);
   }
 
@@ -143,14 +143,14 @@ contract ProxyOracle is IOracle, Governable {
   ) external view override returns (uint) {
     TokenFactors memory tokenFactor = tokenFactors[token];
     require(tokenFactor.liqIncentive != 0, 'bad underlying borrow');
-    uint ethValue = source.getETHPx(token).mul(amount).div(2**112);
+    uint ethValue = source.getCELOPx(token).mul(amount).div(2**112);
     return ethValue.mul(tokenFactor.borrowFactor).div(10000);
   }
 
   /// @dev Return whether the ERC20 token is supported
   /// @param token The ERC20 token to check for support
   function support(address token) external view override returns (bool) {
-    try source.getETHPx(token) returns (uint px) {
+    try source.getCELOPx(token) returns (uint px) {
       return px != 0 && tokenFactors[token].liqIncentive != 0;
     } catch {
       return false;
