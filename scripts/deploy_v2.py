@@ -738,7 +738,6 @@ def main():
         uni_oracle,
     ], {'from': deployer})
     #TODO: read into setOracles
-    #TODO: gitBlame
     proxy_oracle.setTokenFactors([
         '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9',  # CELO
         '0x874069fa1eb16d44d622f2e0ca25eea172369bc1',  # cUSD
@@ -757,11 +756,12 @@ def main():
         True,
         {'from': deployer},
     )
-    # TODO: is this the right way to deploy bank
     # 
     # TODO: use proxy openzeppeling contract
+    # bank_impl = HomoraBank.deploy({'from': deployer})
+    # bank_impl.initialize(proxy_oracle, 0, {'from': deployer})
+    # bank = TransparentUpgradableProxy(bank_impl, deployer, {'from': deployer})
     bank = HomoraBank.deploy({'from': deployer})
-    bank.initialize(proxy_oracle, 0, {'from': deployer})
     # bank.setOracle(proxy_oracle, {'from': deployer})
 
     uniswap_spell = UniswapV2SpellV1.deploy(
