@@ -18,7 +18,7 @@ abstract contract BasicSpell is ERC1155NaiveReceiver {
   address public immutable weth;
 
   mapping(address => mapping(address => bool)) public approved; // Mapping from token to (mapping from spender to approve status)
-
+  //TODO: remove eth functionalitys
   constructor(
     IBank _bank,
     address _werc20,

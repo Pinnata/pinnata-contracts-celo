@@ -737,7 +737,9 @@ def main():
         kp3r_oracle,
         uni_oracle,
     ], {'from': deployer})
-    proxy_oracle.setOracles([
+    #TODO: read into setOracles
+    #TODO: gitBlame
+    proxy_oracle.setTokenFactors([
         '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9',  # CELO
         '0x874069fa1eb16d44d622f2e0ca25eea172369bc1',  # cUSD
         '0x10c892A6EC43a53E45D0B916B4b7D383B1b78C0F',  # cEUR
@@ -756,11 +758,14 @@ def main():
         {'from': deployer},
     )
     # TODO: is this the right way to deploy bank
+    # 
+    # TODO: use proxy openzeppeling contract
     bank = HomoraBank.deploy({'from': deployer})
-    bank.setOracle(proxy_oracle, {'from': deployer})
+    bank.initialize(proxy_oracle, 0, {'from': deployer})
+    # bank.setOracle(proxy_oracle, {'from': deployer})
 
     uniswap_spell = UniswapV2SpellV1.deploy(
-        bank, werc20, '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', #TODO: change to ubeswap router contract
+        bank, werc20, '0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121',
         {'from': deployer},
     )
 
