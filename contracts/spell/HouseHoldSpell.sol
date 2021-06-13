@@ -15,20 +15,9 @@ contract HouseHoldSpell is BasicSpell {
     address _weth
   ) public BasicSpell(_bank, _werc20, _weth) {}
 
-  function borrowETH(uint amount) external {
-    doBorrow(weth, amount);
-    doRefundETH();
-  }
-
   function borrow(address token, uint amount) external {
     doBorrow(token, amount);
     doRefund(token);
-  }
-
-  function repayETH(uint amount) external payable {
-    doTransmitETH();
-    doRepay(weth, amount);
-    doRefundETH();
   }
 
   function repay(address token, uint amount) external {
