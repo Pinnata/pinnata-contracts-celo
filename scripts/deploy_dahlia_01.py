@@ -15,17 +15,20 @@ def almostEqual(a, b):
 def test_uniswap_spell(uniswap_spell, homora, oracle):
     alice = accounts[0]
 
-    dai = interface.IERC20Ex('0x6B175474E89094C44Da98b954EedeAC495271d0F')
-    weth = interface.IERC20Ex('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2')
+    celo_addr = '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
+    cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
 
-    mint_tokens(dai, alice)
-    mint_tokens(weth, alice)
+    celo = interface.IERC20Ex(celo_addr)
+    cusd = interface.IERC20Ex(cusd_addr)
 
-    dai.approve(homora, 2**256-1, {'from': alice})
-    weth.approve(homora, 2**256-1, {'from': alice})
+    mint_tokens(celo, alice)
+    mint_tokens(celo, alice)
 
-    prevABal = dai.balanceOf(alice)
-    prevBBal = weth.balanceOf(alice)
+    cusd.approve(homora, 2**256-1, {'from': alice})
+    celo.approve(homora, 2**256-1, {'from': alice})
+
+    prevABal = cusd.balanceOf(alice)
+    prevBBal = celo.balanceOf(alice)
     prevETHBal = alice.balance()
 
     initABal = prevABal
@@ -40,8 +43,8 @@ def test_uniswap_spell(uniswap_spell, homora, oracle):
         0,
         uniswap_spell,
         uniswap_spell.addLiquidityWERC20.encode_input(
-            dai,
-            weth,
+            cusd,
+            celo,
             [10**18,
              10**18,
              0,
@@ -54,14 +57,14 @@ def test_uniswap_spell(uniswap_spell, homora, oracle):
         {'from': alice}
     )
 
-    curABal = dai.balanceOf(alice)
-    curBBal = weth.balanceOf(alice)
+    curABal = cusd.balanceOf(alice)
+    curBBal = celo.balanceOf(alice)
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
 
-    prevABal = dai.balanceOf(alice)
-    prevBBal = weth.balanceOf(alice)
+    prevABal = cusd.balanceOf(alice)
+    prevBBal = celo.balanceOf(alice)
     prevETHBal = alice.balance()
 
     position_id = homora.nextPositionId()
@@ -71,8 +74,8 @@ def test_uniswap_spell(uniswap_spell, homora, oracle):
         position_id - 1,
         uniswap_spell,
         uniswap_spell.removeLiquidityWERC20.encode_input(
-            dai,
-            weth,
+            cusd,
+            celo,
             [2**256-1,
              0,
              2**256-1,
@@ -84,16 +87,16 @@ def test_uniswap_spell(uniswap_spell, homora, oracle):
         {'from': alice}
     )
 
-    curABal = dai.balanceOf(alice)
-    curBBal = weth.balanceOf(alice)
+    curABal = cusd.balanceOf(alice)
+    curBBal = celo.balanceOf(alice)
     curETHBal = alice.balance()
 
     finalABal = curABal
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getCELOPx(dai)
-    tokenBPrice = oracle.getCELOPx(weth)
+    tokenAPrice = oracle.getCELOPx(cusd)
+    tokenBPrice = oracle.getCELOPx(celo)
     tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
@@ -112,17 +115,17 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
     alice = accounts[0]
 
     dpi = interface.IERC20Ex('0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b')
-    weth = interface.IERC20Ex('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2')
+    celo = interface.IERC20Ex('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2')
     index = interface.IERC20Ex('0x0954906da0bf32d5479e25f46056d22f08464cab')
 
     mint_tokens(dpi, alice)
-    mint_tokens(weth, alice)
+    mint_tokens(celo, alice)
 
     dpi.approve(homora, 2**256-1, {'from': alice})
-    weth.approve(homora, 2**256-1, {'from': alice})
+    celo.approve(homora, 2**256-1, {'from': alice})
 
     prevABal = dpi.balanceOf(alice)
-    prevBBal = weth.balanceOf(alice)
+    prevBBal = celo.balanceOf(alice)
     prevETHBal = alice.balance()
 
     initABal = prevABal
@@ -138,7 +141,7 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
         uniswap_spell,
         uniswap_spell.addLiquidityWStakingRewards.encode_input(
             dpi,
-            weth,
+            celo,
             [10**18,
              10**18,
              0,
@@ -153,13 +156,13 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
     )
 
     curABal = dpi.balanceOf(alice)
-    curBBal = weth.balanceOf(alice)
+    curBBal = celo.balanceOf(alice)
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
 
     prevABal = dpi.balanceOf(alice)
-    prevBBal = weth.balanceOf(alice)
+    prevBBal = celo.balanceOf(alice)
     prevETHBal = alice.balance()
 
     position_id = homora.nextPositionId()
@@ -170,7 +173,7 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
         uniswap_spell,
         uniswap_spell.removeLiquidityWStakingRewards.encode_input(
             dpi,
-            weth,
+            celo,
             [2**256-1,
              0,
              0,
@@ -184,7 +187,7 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
     )
 
     curABal = dpi.balanceOf(alice)
-    curBBal = weth.balanceOf(alice)
+    curBBal = celo.balanceOf(alice)
     curETHBal = alice.balance()
 
     finalABal = curABal
@@ -192,7 +195,7 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
     finalETHBal = curETHBal
 
     tokenAPrice = oracle.getCELOPx(dpi)
-    tokenBPrice = oracle.getCELOPx(weth)
+    tokenBPrice = oracle.getCELOPx(celo)
     tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
@@ -209,65 +212,7 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
                        tokenAPrice * finalABal + tokenBPrice * finalBBal + tokenETHPrice * finalETHBal), 'too much value lost'
 
     assert index.balanceOf(alice) > 0, 'should get some INDEX reward'
-
-
-def test_safebox(token, safebox):
-    alice = accounts[1]
-
-    mint_tokens(token, alice)
-
-    token.approve(safebox, 2**256-1, {'from': alice})
-
-    deposit_amt = 100 * 10**token.decimals()
-
-    prevBal = token.balanceOf(alice)
-    safebox.deposit(deposit_amt, {'from': alice})
-    curBal = token.balanceOf(alice)
-
-    assert almostEqual(curBal - prevBal, -deposit_amt), 'incorrect deposit amount'
-
-    withdraw_amt = safebox.balanceOf(alice) // 3
-
-    prevBal = token.balanceOf(alice)
-    safebox.withdraw(withdraw_amt, {'from': alice})
-    curBal = token.balanceOf(alice)
-
-    assert almostEqual(curBal - prevBal, deposit_amt // 3), 'incorrect first withdraw amount'
-
-    withdraw_amt = safebox.balanceOf(alice)
-
-    prevBal = token.balanceOf(alice)
-    safebox.withdraw(withdraw_amt, {'from': alice})
-    curBal = token.balanceOf(alice)
-
-    assert almostEqual(curBal - prevBal, deposit_amt - deposit_amt //
-                       3), 'incorrect second withdraw amount'
-
-
-def test_bank(token, bank):
-    alice = accounts[1]
-
-    uniswap_spell = UniswapV2SpellV1.at('0xc671B7251a789de0835a2fa33c83c8D4afB39092')
-
-    mint_tokens(token, alice)
-
-    token.approve(bank, 2**256-1, {'from': alice})
-
-    weth = interface.IERC20Ex('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2')
-
-    amt = 10000 * 10**token.decimals()
-
-    borrow_amt = 10 * 10**token.decimals()
-
-    prevTokenAlice = token.balanceOf(alice)
-
-    bank.execute(0, uniswap_spell, uniswap_spell.addLiquidityWERC20.encode_input(
-        token, weth, [amt, 0, 0, borrow_amt, 10**18, 0, 0, 0]), {'from': alice})
-
-    curTokenAlice = token.balanceOf(alice)
-
-    assert almostEqual(curTokenAlice - prevTokenAlice, -amt), 'incorrect input amt'
-
+ 
 
 def main():
     # deployer = accounts.at('0xB593d82d53e2c187dc49673709a6E9f806cdC835', force=True)
@@ -280,12 +225,8 @@ def main():
     ube_addr = '0xbe413cdfdad27e71cf533882c760a91ecd02ab27'
     ube_celo_pool_addr = '0xAd2E17dad4aE46C8e797316ad44BEEF21D105624'
     ube_router_addr = '0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121'
-    #TODO: update addresses once fountain deployed
-    cycelo_addr = '0x48759F220ED983dB51fA7A8C0D2AAb8f3ce4166a'
-    cycusd_addr = '0x76Eb2FE28b36B3ee97F3Adae0C69606eeDB2A37c'
-    cyceur_addr = '0xFa3472f7319477c9bFEcdD66E4B948569E7621b9'
 
-    # TODO: add ubeswap farming position
+    # TODO: add ubeswap farming position 
     # wsube = WStakingRewards.deploy(
     #     '0xB93b505Ed567982E2b6756177ddD23ab5745f309',
     #     '0x4d5ef58aAc27d99935E5b6B4A6778ff292059991',  # UNI DPI-WETH
@@ -334,13 +275,13 @@ def main():
     # bank_impl.initialize(proxy_oracle, 0, {'from': deployer})
     # bank = TransparentUpgradableProxy(bank_impl, deployer, {'from': deployer})
     bank = HomoraBank.deploy({'from': deployer})
+    bank.initialize(proxy_oracle, 0, {'from': deployer})
     # bank.setOracle(proxy_oracle, {'from': deployer})
 
     uniswap_spell = UniswapV2SpellV1.deploy(
         bank, werc20, ube_router_addr,
         {'from': deployer},
     )
-
 
     print('DONE')
 
@@ -354,56 +295,3 @@ def main():
     # test_balancer_spell(balancer_spell, bank, core_oracle)
     # test_balancer_spell_wstaking(balancer_spell, bank, wsperp, core_oracle)
     # test_curve_spell_wgauge(curve_spell, bank, core_oracle)
-
-# deploy safeboxes
-
-    celo = interface.IERC20Ex(celo_addr)
-    cusd = interface.IERC20Ex(cusd_addr)
-    ceur = interface.IERC20Ex(ceur_addr)
-    
-    # TODO: uncomment when fountain of youth is deployed
-
-    # cycelo = interface.IERC20Ex(cycelo_addr)
-    # cycusd = interface.IERC20Ex(cycusd_addr)
-    # cyceur = interface.IERC20Ex(cyceur_addr)
-
-    # safebox_celo = SafeBox.deploy(
-    #     cycelo, 'Interest Bearing Celo', 'dCELO', {'from': deployer})
-    # safebox_cusd = SafeBox.deploy(
-    #     cycusd, 'Interest Bearing Celo US Dollar', 'dcUSD', {'from': deployer})
-    # safebox_ceur = SafeBox.deploy(
-    #     cyceur, 'Interest Bearing Celo Euro', 'dcEUR', {'from': deployer})
-
-    # # add banks
-    # bank.addBank(celo, cycelo_addr, {'from': deployer})
-    # bank.addBank(cusd, cycusd_addr, {'from': deployer})
-    # bank.addBank(ceur, cyceur_addr, {'from': deployer})
-
-
-    ###########################################################
-    # test cyToken
-
-    # for token in [cyusdt, cyusdc, cyyfi]:
-    #     assert interface.IERC20Ex(token).symbol() == 'cy' + \
-    #         interface.IERC20Ex(interface.IERC20Ex(token).underlying()).symbol()
-
-    ###########################################################
-    # test safeboxes
-
-    # dai = interface.IERC20Ex('0x6B175474E89094C44Da98b954EedeAC495271d0F')
-    # usdt = interface.IERC20Ex('0xdAC17F958D2ee523a2206206994597C13D831ec7')
-    # usdc = interface.IERC20Ex('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48')
-    # yfi = interface.IERC20Ex('0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e')
-
-    # test_safebox_eth(safebox_eth)
-    # test_safebox(dai, safebox_dai)
-    # test_safebox(usdt, safebox_usdt)
-    # test_safebox(usdc, safebox_usdc)
-    # test_safebox(yfi, safebox_yfi)
-
-    ###########################################################
-    # test banks with uniswap spell
-    # print('============ testing banks =============')
-
-    # test_bank(usdt, bank)
-    # test_bank(usdc, bank)
