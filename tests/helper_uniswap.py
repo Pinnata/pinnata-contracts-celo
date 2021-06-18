@@ -3,8 +3,8 @@ from brownie import interface
 import brownie
 
 
-def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, cusd, ceur, chain, UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle):
-    spell = UniswapV2SpellV1.deploy(bank, werc20, urouter, {'from': admin})
+def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain, UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle):
+    spell = UniswapV2SpellV1.deploy(bank, werc20, urouter, celo, {'from': admin})
     cusd.mint(admin, 10000000 * 10**6, {'from': admin})
     ceur.mint(admin, 10000000 * 10**6, {'from': admin})
     cusd.approve(urouter, 2**256-1, {'from': admin})
