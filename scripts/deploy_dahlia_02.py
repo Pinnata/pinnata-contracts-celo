@@ -92,8 +92,6 @@ def main():
     cusd = interface.IERC20Ex(cusd_addr)
     ceur = interface.IERC20Ex(ceur_addr)
 
-    # TODO: uncomment when fountain of youth is deployed
-
     bank = HomoraBank.at(homorabank_addr)
 
     cycelo = interface.IERC20Ex(cycelo_addr)

@@ -9,7 +9,7 @@ contract SimpleOracle is IBaseOracle, Governable {
   mapping(address => uint) public prices; // Mapping from token to price in ETH (times 2**112).
 
   /// The governor sets oracle price for a token.
-  event SetETHPx(address token, uint px);
+  event SetCELOPx(address token, uint px);
 
   /// @dev Create the contract and initialize the first governor.
   constructor() public {
@@ -27,11 +27,11 @@ contract SimpleOracle is IBaseOracle, Governable {
   /// @dev Set the prices of the given token addresses.
   /// @param tokens The token addresses to set the prices.
   /// @param pxs The price data points, representing token value in ETH times 2**112.
-  function setETHPx(address[] memory tokens, uint[] memory pxs) external onlyGov {
+  function setCELOPx(address[] memory tokens, uint[] memory pxs) external onlyGov {
     require(tokens.length == pxs.length, 'inconsistent length');
     for (uint idx = 0; idx < tokens.length; idx++) {
       prices[tokens[idx]] = pxs[idx];
-      emit SetETHPx(tokens[idx], pxs[idx]);
+      emit SetCELOPx(tokens[idx], pxs[idx]);
     }
   }
 }
