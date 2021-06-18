@@ -279,7 +279,7 @@ def main():
     # bank.setOracle(proxy_oracle, {'from': deployer})
 
     uniswap_spell = UniswapV2SpellV1.deploy(
-        bank, werc20, ube_router_addr,
+        bank, werc20, ube_router_addr, celo_addr,
         {'from': deployer},
     )
 
