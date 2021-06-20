@@ -116,7 +116,7 @@ def main():
     else:
         prevBRes, prevARes, _ = interface.IUniswapV2Pair(lp).getReserves()
 
-    usdt_amt = 400 * 10**6
+    usdt_amt = 400 * 10**18
     weth_amt = 10 ** 18
     lp_amt = 1 * 10**16
     borrow_usdt_amt = 0

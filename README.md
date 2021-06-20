@@ -12,6 +12,19 @@ Celo SafeBox: 0x8743E3ae32eD5864813d19b1469FdF901ACAbE9b
 cUSD SafeBox: 0xceB8F9fC011235937f5bEE012eBB7727391Cd6c8
 cEUR SafeBox: 0x49c13A1569d2eeA45d68732a99d09ce748C2719c
 
+## Mock Alfajores Addresses (simple oracle used instead of k3pr and ubeswap oracle)
+CoreOracle deployed at: 0xc8bFb0364F9cf20ffb9B730267896D94cFea654c
+ProxyOracle deployed at: 0x5ccae309944f0fE07a59255925011aD16B61C832
+HomoraBank deployed at: 0xCD9fe42a21DCC22C4BEB11B2e89750870288Fe51
+UniswapV2SpellV1 deployed at: 0x5F6a662cAc69fE3A0dD22d971F09d49d5AA6fEA9
+Comptroller: 0x115308bBCBd3917033EcE55aC35C92a279A7055D
+dCELO: 0x9Ce844b3A315FE2CBB22b88B3Eb0921dD7a2e018
+dcUSD: 0xE5283EAE77252275e6207AC25AAF7A0A4004EEFe
+dcEUR: 0xEb1944A6deD42d0947371039B2078C76c3A62085
+celo SafeBox deployed at: 0x547352E82223589Af563502C215381caf0460EE7
+cusd SafeBox deployed at: 0x14d17712f73D483130BC1F0d084c3b4C7D9b1d72
+ceur SafeBox deployed at: 0x88d1ad95D6f56C52b401f79367b1C10d0DD82138
+
 TL;DR. Here's what V2 will support:
 
 - Multi assets lending and borrowing (with huge leverage for stablecoin farming!)

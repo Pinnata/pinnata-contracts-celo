@@ -1,7 +1,7 @@
 from brownie import (
     accounts, ERC20KP3ROracle, UniswapV2Oracle, BalancerPairOracle, ProxyOracle, CoreOracle,
     HomoraBank, CurveOracle, UniswapV2SpellV1, WERC20, WLiquidityGauge, WMasterChef,
-    WStakingRewards, SushiswapSpellV1, BalancerSpellV1, CurveSpellV1, UbeswapV1Oracle, SafeBox
+    WStakingRewards, SushiswapSpellV1, BalancerSpellV1, CurveSpellV1, UbeswapV1Oracle, SafeBox, SimpleOracle
 )
 from brownie import interface
 from .utils import *
@@ -21,11 +21,10 @@ def test_uniswap_spell(uniswap_spell, homora, oracle):
     celo = interface.IERC20Ex(celo_addr)
     cusd = interface.IERC20Ex(cusd_addr)
 
-    mint_tokens(celo, alice)
-    mint_tokens(celo, alice)
-
     cusd.approve(homora, 2**256-1, {'from': alice})
     celo.approve(homora, 2**256-1, {'from': alice})
+
+    
 
     prevABal = cusd.balanceOf(alice)
     prevBBal = celo.balanceOf(alice)
@@ -223,7 +222,8 @@ def main():
     cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
     ceur_addr = '0x10c892A6EC43a53E45D0B916B4b7D383B1b78C0F'
     ube_addr = '0xbe413cdfdad27e71cf533882c760a91ecd02ab27'
-    ube_celo_pool_addr = '0xAd2E17dad4aE46C8e797316ad44BEEF21D105624'
+    celo_cusd_pool_addr = '0xe952fe9608a20f80f009a43AEB6F422750285638'
+    celo_ube_pool_addr = '0xAd2E17dad4aE46C8e797316ad44BEEF21D105624'
     ube_router_addr = '0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121'
 
     # TODO: add ubeswap farming position 
@@ -233,43 +233,51 @@ def main():
     #     '0x0954906da0Bf32d5479e25f46056d22f08464cab',  # INDEX
     #     {'from': deployer},
     # )
-    ubeswap_oracle = UbeswapV1Oracle.deploy({'from': deployer})
-    kp3r_oracle = ERC20KP3ROracle.deploy(ubeswap_oracle, {'from': deployer})
+
+    simple_oracle = SimpleOracle.deploy({'from': deployer})
+    simple_oracle.setCELOPx([celo_addr, cusd_addr, ceur_addr, ube_addr], [2**112, .5*2**112, .5*2**112, .5*2**112])
     core_oracle = CoreOracle.deploy({'from': deployer})
     uni_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
     proxy_oracle = ProxyOracle.deploy(core_oracle, {'from': deployer})
+
     core_oracle.setRoute([
         celo_addr,
         cusd_addr,
         ceur_addr,
         ube_addr,
-        ube_celo_pool_addr,
+        celo_cusd_pool_addr,
+        celo_ube_pool_addr,
     ], [
-        kp3r_oracle,
-        kp3r_oracle,
-        kp3r_oracle,
-        kp3r_oracle,
+        simple_oracle,
+        simple_oracle,
+        simple_oracle,
+        simple_oracle,
+        uni_oracle,
         uni_oracle,
     ], {'from': deployer})
+
     proxy_oracle.setTokenFactors([
         celo_addr,
         cusd_addr,
         ceur_addr,
         ube_addr,
-        ube_celo_pool_addr,
+        celo_cusd_pool_addr,
+        celo_ube_pool_addr,
     ], [
         [12500, 8000, 10250],
         [10500, 9500, 10250],
         [10500, 9500, 10250],
         [12500, 8000, 10250],
         [50000, 0, 10250],
+        [50000, 0, 10250],
     ], {'from': deployer})
+
     proxy_oracle.setWhitelistERC1155(
         [werc20],
         True,
         {'from': deployer},
     )
-    # 
+
     # TODO: use proxy openzeppeling contract
     # bank_impl = HomoraBank.deploy({'from': deployer})
     # bank_impl.initialize(proxy_oracle, 0, {'from': deployer})
@@ -278,10 +286,15 @@ def main():
     bank.initialize(proxy_oracle, 0, {'from': deployer})
     # bank.setOracle(proxy_oracle, {'from': deployer})
 
+    ube_router = 
+
     uniswap_spell = UniswapV2SpellV1.deploy(
         bank, werc20, ube_router_addr, celo_addr,
         {'from': deployer},
     )
+
+    bank.setWhitelistSpells([uniswap_spell], [True], {'from': deployer})
+    uniswap_spell.setWhitelistLPTokens([celo_cusd_pool_addr], [True], {'from': deployer})
 
     print('DONE')
 

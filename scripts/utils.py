@@ -40,6 +40,10 @@ wNXM = '0x0d438f3b5175bebc262bf23753c1e53d03432bde'
 renBTC = '0xeb4c2781e4eba804ce9a9803c67d0893436bb27d'
 CRV = '0xD533a949740bb3306d119CC777fa900bA034cd52'
 INDEX = '0x0954906da0Bf32d5479e25f46056d22f08464cab'
+CELO = '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
+CUSD = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
+CEUR = '0x10c892A6EC43a53E45D0B916B4b7D383B1b78C0F'
+UBE = '0xbe413cdfdad27e71cf533882c760a91ecd02ab27'
 
 
 def is_uni_lp(token):
@@ -71,6 +75,10 @@ def mint_tokens(token, to, amount=None):
         master_minter = token.masterMinter()
         token.configureMinter(master_minter, 2**256-1, {'from': master_minter})
         token.mint(to, amount, {'from': master_minter})
+    elif token == CELO:
+        auth = '0x0000000000000000000000000000000000000000'
+        token.mint(to, amount, {'from': auth})
+
     elif token == DAI:
         auth = '0x9759a6ac90977b93b58547b4a71c78317f391a28'
         token.mint(to, amount, {'from': auth})
