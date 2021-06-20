@@ -293,7 +293,6 @@ def main():
     # bank = TransparentUpgradableProxy(bank_impl, deployer, {'from': deployer})
     bank = HomoraBank.deploy({'from': deployer})
     bank.initialize(proxy_oracle, 0, {'from': deployer})
-    # bank.setOracle(proxy_oracle, {'from': deployer})
 
     uniswap_spell = UniswapV2SpellV1.deploy(
         bank, werc20, ube_router_addr, celo_addr,
