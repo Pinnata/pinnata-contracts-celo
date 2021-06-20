@@ -28,8 +28,13 @@ def main():
         {'from': deployer},
     )
 
-    celo_cusd_lp = uniswap_spell.getAndApprovePair(celo, cusd, {'from': deployer})
-    celo_ube_lp = uniswap_spell.getAndApprovePair(celo, ube, {'from': deployer})
+    uniswap_spell.getAndApprovePair(celo, cusd, {'from': deployer})
+    uniswap_spell.getAndApprovePair(celo, ube, {'from': deployer})
+
+    ube_factory_address = ube_router.factory()
+    ube_factory = interface.IUniswapV2Factory(ube_factory_address)
+    celo_cusd_lp = ube_factory.getPair(celo, cusd)
+    celo_ube_lp = ube_factory.getPair(celo, ube)
 
     uniswap_spell.setWhitelistLPTokens([celo_cusd_lp], [True], {'from': deployer})
     uniswap_spell.setWhitelistLPTokens([celo_ube_lp], [True], {'from': deployer})
