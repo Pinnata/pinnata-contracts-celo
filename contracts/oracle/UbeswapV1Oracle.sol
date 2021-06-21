@@ -8,6 +8,7 @@ import 'OpenZeppelin/openzeppelin-contracts@3.4.0/contracts/access/Ownable.sol';
 import './UniswapV2OracleLibrary.sol';
 import '../utils/FixedPoint.sol';
 import '../../interfaces/IKeep3rV1Oracle.sol';
+import '../../interfaces/IUbeswapV1Oracle.sol';
 
 // sliding oracle that uses observations collected to provide moving price averages in the past
 contract UbeswapV1Oracle is Ownable {
