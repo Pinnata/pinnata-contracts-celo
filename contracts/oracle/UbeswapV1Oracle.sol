@@ -11,7 +11,7 @@ import '../../interfaces/IKeep3rV1Oracle.sol';
 import '../../interfaces/IUbeswapV1Oracle.sol';
 
 // sliding oracle that uses observations collected to provide moving price averages in the past
-contract UbeswapV1Oracle is Ownable {
+contract UbeswapV1Oracle is IUbeswapV1Oracle, Ownable {
   using SafeMath for uint;
   using FixedPoint for *;
 

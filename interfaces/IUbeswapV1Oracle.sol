@@ -32,8 +32,10 @@ interface IUbeswapV1Oracle {
 
   function addPair(address tokenA, address tokenB) external;
 
+  // TODO: also think this is causing an error
   function work() external view;
   
+  // TODO: pretty sure the error is here, return type does not match the actual contract
   function lastObservation(address pair) external view
     returns (
         uint timestamp, 
