@@ -24,6 +24,7 @@ def withdraw(bob, token, safebox):
 
 
 def main():
+    admin = accounts.load('gh')
     alice = accounts.load('alice')
     bob = accounts.load('bob')
 
@@ -47,13 +48,13 @@ def main():
     celo_safebox = SafeBox.at(celo_safebox_addr)
     cusd_safebox = SafeBox.at(cusd_safebox_addr)
 
-    lend(bob, celo, celo_safebox)
-    lend(bob, cusd, cusd_safebox)
+    # lend(bob, celo, celo_safebox)
+    # lend(bob, cusd, cusd_safebox)
 
-    celo.approve(dahlia_bank, 2**256-1, {'from': alice})
-    cusd.approve(dahlia_bank, 2**256-1, {'from': alice})
-    celo.approve(cycelo, 2**256-1, {'from': alice})
-    cusd.approve(cycusd, 2**256-1, {'from': alice})
+    # celo.approve(dahlia_bank, 2**256-1, {'from': alice})
+    # cusd.approve(dahlia_bank, 2**256-1, {'from': alice})
+    celo.approve(celo_safebox_addr, 2**256-1, {'from': alice})
+    cusd.approve(cusd_safebox_addr, 2**256-1, {'from': alice})
 
     prevABal = celo.balanceOf(alice)
     prevBBal = cusd.balanceOf(alice)
@@ -66,6 +67,15 @@ def main():
     print('prev A bal', prevABal)
     print('prev B bal', prevBBal)
 
+    print('safebox celo bal', celo_safebox.balanceOf(bob, {'from': admin}))
+    print('safebox cusd bal', cusd_safebox.balanceOf(bob, {'from': admin}))
+
+    print('homora cycelo bal', cycelo.balanceOf(dahlia_bank_addr, {'from': admin}))
+    print('homora cycusd bal', cycusd.balanceOf(dahlia_bank_addr, {'from': admin}))
+
+    print('homora cycelo bal', cycelo.balanceOf(celo_safebox_addr, {'from': admin}))
+    print('homora cycusd bal', cycusd.balanceOf(cusd_safebox_addr, {'from': admin}))
+
     # open a position
     dahlia_bank.execute(
         0,
@@ -76,13 +86,15 @@ def main():
             [10**9,
              10**9,
              0,
-             10**5,
-             10**5,
+             10**2,
+             10**2,
              0,
              0,
              0],
         ),
-        {'from': alice}
+        {
+            'from': alice, 
+        }
     )
 
     curABal = celo.balanceOf(alice)
