@@ -2,6 +2,12 @@
 
 ## Alfajores Addresses 
 
+celo_addr = '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
+
+cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
+
+ube_addr = '0xbe413cdfdad27e71cf533882c760a91ecd02ab27'
+
 HomoraBank: 0x0460878568C92D877f5544a2F3a1523E6c2bB1CA
 
 CoreOracle deployed at: 0x384f6e069aC3726E1894A30D0d46021c5f5E8acA
@@ -25,6 +31,8 @@ cusd SafeBox deployed at: 0x2FF09993ebA7292fb93d3F2F87ec498B5c361c64
 ube SafeBox deployed at: 0x7a2477b1B274715D5fC7f386366f2D7Db8f5ACe9
 
 Comptroller: 0x115308bBCBd3917033EcE55aC35C92a279A7055D
+
+(The next ones are the cy tokens deployed from the fountain of youth)
 
 dCELO: 0x9Ce844b3A315FE2CBB22b88B3Eb0921dD7a2e018
 
