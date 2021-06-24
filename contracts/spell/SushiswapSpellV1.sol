@@ -30,8 +30,9 @@ contract SushiswapSpellV1 is WhitelistSpell {
     IBank _bank,
     address _werc20,
     IUniswapV2Router02 _router,
-    address _wmasterchef
-  ) public WhitelistSpell(_bank, _werc20, _router.WETH()) {
+    address _wmasterchef, 
+    address _celo
+  ) public WhitelistSpell(_bank, _werc20, _celo) {
     router = _router;
     factory = IUniswapV2Factory(_router.factory());
     wmasterchef = IWMasterChef(_wmasterchef);
@@ -124,7 +125,6 @@ contract SushiswapSpellV1 is WhitelistSpell {
     require(whitelistedLpTokens[lp], 'lp token not whitelisted');
 
     // 1. Get user input amounts
-    doTransmitETH();
     doTransmit(tokenA, amt.amtAUser);
     doTransmit(tokenB, amt.amtBUser);
     doTransmit(lp, amt.amtLPUser);
@@ -191,7 +191,6 @@ contract SushiswapSpellV1 is WhitelistSpell {
     doPutCollateral(lp, IERC20(lp).balanceOf(address(this)));
 
     // 7. Refund leftovers to users
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
   }
@@ -231,7 +230,6 @@ contract SushiswapSpellV1 is WhitelistSpell {
     bank.putCollateral(address(wmasterchef), id, amount);
 
     // 8. Refund leftovers to users
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
 
@@ -332,7 +330,6 @@ contract SushiswapSpellV1 is WhitelistSpell {
     require(IERC20(lp).balanceOf(address(this)) >= amt.amtLPWithdraw);
 
     // 8. Refund leftover
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
     doRefund(lp);

@@ -15,19 +15,16 @@ abstract contract BasicSpell is ERC1155NaiveReceiver {
 
   IBank public immutable bank;
   IWERC20 public immutable werc20;
-  address public immutable weth;
 
   mapping(address => mapping(address => bool)) public approved; // Mapping from token to (mapping from spender to approve status)
-
   constructor(
     IBank _bank,
     address _werc20,
-    address _weth
+    address _celo
   ) public {
     bank = _bank;
     werc20 = IWERC20(_werc20);
-    weth = _weth;
-    ensureApprove(_weth, address(_bank));
+    ensureApprove(_celo, address(_bank));
     IWERC20(_werc20).setApprovalForAll(address(_bank), true);
   }
 
@@ -41,14 +38,7 @@ abstract contract BasicSpell is ERC1155NaiveReceiver {
       approved[token][spender] = true;
     }
   }
-
-  /// @dev Internal call to convert msg.value ETH to WETH inside the contract.
-  function doTransmitETH() internal {
-    if (msg.value > 0) {
-      IWETH(weth).deposit{value: msg.value}();
-    }
-  }
-
+  
   /// @dev Internal call to transmit tokens from the bank if amount is positive.
   /// @param token The token to perform the transmit action.
   /// @param amount The amount to transmit.
@@ -65,16 +55,6 @@ abstract contract BasicSpell is ERC1155NaiveReceiver {
     uint balance = IERC20(token).balanceOf(address(this));
     if (balance > 0) {
       IERC20(token).safeTransfer(bank.EXECUTOR(), balance);
-    }
-  }
-
-  /// @dev Internal call to refund all WETH to the current executor as native ETH.
-  function doRefundETH() internal {
-    uint balance = IWETH(weth).balanceOf(address(this));
-    if (balance > 0) {
-      IWETH(weth).withdraw(balance);
-      (bool success, ) = bank.EXECUTOR().call{value: balance}(new bytes(0));
-      require(success, 'refund ETH failed');
     }
   }
 
@@ -122,8 +102,9 @@ abstract contract BasicSpell is ERC1155NaiveReceiver {
     }
   }
 
-  /// @dev Fallback function. Can only receive ETH from WETH contract.
-  receive() external payable {
-    require(msg.sender == weth, 'ETH must come from WETH');
-  }
+//TODO: do we need this function
+//   /// @dev Fallback function. Can only receive ETH from WETH contract.
+//   receive() external payable {
+//     require(msg.sender == weth, 'ETH must come from WETH');
+//   }
 }

@@ -81,62 +81,62 @@ def test_governor_set_twice(admin, alice, eve, core_oracle):
     assert core_oracle.pendingGovernor() == '0x0000000000000000000000000000000000000000'
 
 
-def test_set_route(admin, core_oracle, weth, dai, usdt, usdc, simple_oracle, UniswapV2Oracle, SimpleOracle):
-    assert core_oracle.routes(dai) == '0x0000000000000000000000000000000000000000'
-    assert core_oracle.routes(usdt) == '0x0000000000000000000000000000000000000000'
-    assert core_oracle.routes(usdc) == '0x0000000000000000000000000000000000000000'
+def test_set_route(admin, core_oracle, celo, cusd, ceur, ube, simple_oracle, UniswapV2Oracle, SimpleOracle):
+    assert core_oracle.routes(cusd) == '0x0000000000000000000000000000000000000000'
+    assert core_oracle.routes(ceur) == '0x0000000000000000000000000000000000000000'
+    assert core_oracle.routes(ube) == '0x0000000000000000000000000000000000000000'
 
-    simple_oracle.setETHPx([dai, usdc, usdt], [1, 2, 3])
+    simple_oracle.setCELOPx([cusd, ceur, ube], [1, 2, 3])
 
-    # test multiple sources
+    # test multiple sourcesc
     simple_oracle_1 = SimpleOracle.deploy({'from': admin})
 
-    simple_oracle_1.setETHPx([dai, usdc, usdt], [4, 5, 6])
+    simple_oracle_1.setCELOPx([cusd, ceur, ube], [4, 5, 6])
 
-    core_oracle.setRoute([dai, usdc, usdt],
+    core_oracle.setRoute([cusd, ceur, ube],
                          [simple_oracle, simple_oracle_1, simple_oracle],
                          {'from': admin})
 
-    assert core_oracle.getETHPx(dai) == 1
-    assert core_oracle.getETHPx(usdc) == 5
-    assert core_oracle.getETHPx(usdt) == 3
+    assert core_oracle.getCELOPx(cusd) == 1
+    assert core_oracle.getCELOPx(ceur) == 5
+    assert core_oracle.getCELOPx(ube) == 3
     try:
-        core_oracle.getETHPx(weth)
+        core_oracle.getCELOPx(celo)
         assert False, 'tx should revert'
     except VirtualMachineError:
         pass
 
     # re-set prices
-    simple_oracle.setETHPx([dai, usdc, usdt], [7, 8, 9])
-    simple_oracle_1.setETHPx([dai, usdc, usdt], [10, 11, 12])
+    simple_oracle.setCELOPx([cusd, ceur, ube], [7, 8, 9])
+    simple_oracle_1.setCELOPx([cusd, ceur, ube], [10, 11, 12])
 
-    assert core_oracle.getETHPx(dai) == 7
-    assert core_oracle.getETHPx(usdc) == 11
-    assert core_oracle.getETHPx(usdt) == 9
+    assert core_oracle.getCELOPx(cusd) == 7
+    assert core_oracle.getCELOPx(ceur) == 11
+    assert core_oracle.getCELOPx(ube) == 9
 
     # re-route
-    core_oracle.setRoute([dai, usdc, usdt],
+    core_oracle.setRoute([cusd, ceur, ube],
                          [simple_oracle_1, '0x0000000000000000000000000000000000000000', simple_oracle_1])
 
-    assert core_oracle.getETHPx(dai) == 10
-    assert core_oracle.getETHPx(usdt) == 12
+    assert core_oracle.getCELOPx(cusd) == 10
+    assert core_oracle.getCELOPx(ube) == 12
 
     try:
-        core_oracle.getETHPx(usdc)
+        core_oracle.getCELOPx(ceur)
         assert False, 'tx should revert'
     except VirtualMachineError:
         pass
 
 
-def test_set_route_require(admin, core_oracle, simple_oracle, dai, usdt):
+def test_set_route_require(admin, core_oracle, simple_oracle, cusd, ube):
     core_oracle.setRoute([], [])
 
     with brownie.reverts('inconsistent length'):
-        core_oracle.setRoute([dai], [])
+        core_oracle.setRoute([cusd], [])
 
     with brownie.reverts('inconsistent length'):
-        core_oracle.setRoute([dai], ['0x0000000000000000000000000000000000000000',
+        core_oracle.setRoute([cusd], ['0x0000000000000000000000000000000000000000',
                                      '0x0000000000000000000000000000000000000000'])
 
     with brownie.reverts('inconsistent length'):
-        core_oracle.setRoute([dai, usdt], ['0x0000000000000000000000000000000000000000'])
+        core_oracle.setRoute([cusd, ube], ['0x0000000000000000000000000000000000000000'])

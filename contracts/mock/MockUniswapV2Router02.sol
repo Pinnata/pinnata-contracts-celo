@@ -118,8 +118,6 @@ interface MockUniswapV2Router02IUniswapV2Pair {
 interface MockUniswapV2Router02IUniswapV2Router01 {
   function factory() external pure returns (address);
 
-  function WETH() external pure returns (address);
-
   function addLiquidity(
     address tokenA,
     address tokenB,
@@ -137,22 +135,6 @@ interface MockUniswapV2Router02IUniswapV2Router01 {
       uint liquidity
     );
 
-  function addLiquidityETH(
-    address token,
-    uint amountTokenDesired,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline
-  )
-    external
-    payable
-    returns (
-      uint amountToken,
-      uint amountETH,
-      uint liquidity
-    );
-
   function removeLiquidity(
     address tokenA,
     address tokenB,
@@ -162,15 +144,6 @@ interface MockUniswapV2Router02IUniswapV2Router01 {
     address to,
     uint deadline
   ) external returns (uint amountA, uint amountB);
-
-  function removeLiquidityETH(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline
-  ) external returns (uint amountToken, uint amountETH);
 
   function removeLiquidityWithPermit(
     address tokenA,
@@ -185,19 +158,6 @@ interface MockUniswapV2Router02IUniswapV2Router01 {
     bytes32 r,
     bytes32 s
   ) external returns (uint amountA, uint amountB);
-
-  function removeLiquidityETHWithPermit(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external returns (uint amountToken, uint amountETH);
 
   function swapExactTokensForTokens(
     uint amountIn,
@@ -214,36 +174,6 @@ interface MockUniswapV2Router02IUniswapV2Router01 {
     address to,
     uint deadline
   ) external returns (uint[] memory amounts);
-
-  function swapExactETHForTokens(
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external payable returns (uint[] memory amounts);
-
-  function swapTokensForExactETH(
-    uint amountOut,
-    uint amountInMax,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external returns (uint[] memory amounts);
-
-  function swapExactTokensForETH(
-    uint amountIn,
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external returns (uint[] memory amounts);
-
-  function swapETHForExactTokens(
-    uint amountOut,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external payable returns (uint[] memory amounts);
 
   function quote(
     uint amountA,
@@ -275,44 +205,8 @@ interface MockUniswapV2Router02IUniswapV2Router01 {
 }
 
 interface MockUniswapV2Router02IUniswapV2Router02 is MockUniswapV2Router02IUniswapV2Router01 {
-  function removeLiquidityETHSupportingFeeOnTransferTokens(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline
-  ) external returns (uint amountETH);
-
-  function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external returns (uint amountETH);
 
   function swapExactTokensForTokensSupportingFeeOnTransferTokens(
-    uint amountIn,
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external;
-
-  function swapExactETHForTokensSupportingFeeOnTransferTokens(
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external payable;
-
-  function swapExactTokensForETHSupportingFeeOnTransferTokens(
     uint amountIn,
     uint amountOutMin,
     address[] calldata path,
@@ -348,32 +242,18 @@ interface IERC20 {
   ) external returns (bool);
 }
 
-interface MockUniswapV2Router02IWETH {
-  function deposit() external payable;
-
-  function transfer(address to, uint value) external returns (bool);
-
-  function withdraw(uint) external;
-}
-
 contract MockUniswapV2Router02 is MockUniswapV2Router02IUniswapV2Router02 {
   using MockUniswapV2Router02SafeMath for uint;
 
   address public immutable override factory;
-  address public immutable override WETH;
 
   modifier ensure(uint deadline) {
     require(deadline >= block.timestamp, 'UniswapV2Router: EXPIRED');
     _;
   }
 
-  constructor(address _factory, address _WETH) public {
+  constructor(address _factory) public {
     factory = _factory;
-    WETH = _WETH;
-  }
-
-  receive() external payable {
-    assert(msg.sender == WETH); // only accept ETH via fallback from the WETH contract
   }
 
   // **** ADD LIQUIDITY ****
@@ -443,43 +323,6 @@ contract MockUniswapV2Router02 is MockUniswapV2Router02IUniswapV2Router02 {
     liquidity = MockUniswapV2Router02IUniswapV2Pair(pair).mint(to);
   }
 
-  function addLiquidityETH(
-    address token,
-    uint amountTokenDesired,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline
-  )
-    external
-    payable
-    virtual
-    override
-    ensure(deadline)
-    returns (
-      uint amountToken,
-      uint amountETH,
-      uint liquidity
-    )
-  {
-    (amountToken, amountETH) = _addLiquidity(
-      token,
-      WETH,
-      amountTokenDesired,
-      msg.value,
-      amountTokenMin,
-      amountETHMin
-    );
-    address pair = MockUniswapV2Router02UniswapV2Library.pairFor(factory, token, WETH);
-    MockUniswapV2Router02TransferHelper.safeTransferFrom(token, msg.sender, pair, amountToken);
-    MockUniswapV2Router02IWETH(WETH).deposit{value: amountETH}();
-    assert(MockUniswapV2Router02IWETH(WETH).transfer(pair, amountETH));
-    liquidity = MockUniswapV2Router02IUniswapV2Pair(pair).mint(to);
-    // refund dust eth, if any
-    if (msg.value > amountETH)
-      MockUniswapV2Router02TransferHelper.safeTransferETH(msg.sender, msg.value - amountETH);
-  }
-
   // **** REMOVE LIQUIDITY ****
   function removeLiquidity(
     address tokenA,
@@ -497,28 +340,6 @@ contract MockUniswapV2Router02 is MockUniswapV2Router02IUniswapV2Router02 {
     (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
     require(amountA >= amountAMin, 'UniswapV2Router: INSUFFICIENT_A_AMOUNT');
     require(amountB >= amountBMin, 'UniswapV2Router: INSUFFICIENT_B_AMOUNT');
-  }
-
-  function removeLiquidityETH(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline
-  ) public virtual override ensure(deadline) returns (uint amountToken, uint amountETH) {
-    (amountToken, amountETH) = removeLiquidity(
-      token,
-      WETH,
-      liquidity,
-      amountTokenMin,
-      amountETHMin,
-      address(this),
-      deadline
-    );
-    MockUniswapV2Router02TransferHelper.safeTransfer(token, to, amountToken);
-    MockUniswapV2Router02IWETH(WETH).withdraw(amountETH);
-    MockUniswapV2Router02TransferHelper.safeTransferETH(to, amountETH);
   }
 
   function removeLiquidityWithPermit(
@@ -556,98 +377,8 @@ contract MockUniswapV2Router02 is MockUniswapV2Router02IUniswapV2Router02 {
     );
   }
 
-  function removeLiquidityETHWithPermit(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external virtual override returns (uint amountToken, uint amountETH) {
-    address pair = MockUniswapV2Router02UniswapV2Library.pairFor(factory, token, WETH);
-    uint value = approveMax ? uint(-1) : liquidity;
-    MockUniswapV2Router02IUniswapV2Pair(pair).permit(
-      msg.sender,
-      address(this),
-      value,
-      deadline,
-      v,
-      r,
-      s
-    );
-    (amountToken, amountETH) = removeLiquidityETH(
-      token,
-      liquidity,
-      amountTokenMin,
-      amountETHMin,
-      to,
-      deadline
-    );
-  }
 
   // **** REMOVE LIQUIDITY (supporting fee-on-transfer tokens) ****
-  function removeLiquidityETHSupportingFeeOnTransferTokens(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline
-  ) public virtual override ensure(deadline) returns (uint amountETH) {
-    (, amountETH) = removeLiquidity(
-      token,
-      WETH,
-      liquidity,
-      amountTokenMin,
-      amountETHMin,
-      address(this),
-      deadline
-    );
-    MockUniswapV2Router02TransferHelper.safeTransfer(
-      token,
-      to,
-      IERC20(token).balanceOf(address(this))
-    );
-    MockUniswapV2Router02IWETH(WETH).withdraw(amountETH);
-    MockUniswapV2Router02TransferHelper.safeTransferETH(to, amountETH);
-  }
-
-  function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
-    address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
-    address to,
-    uint deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external virtual override returns (uint amountETH) {
-    address pair = MockUniswapV2Router02UniswapV2Library.pairFor(factory, token, WETH);
-    uint value = approveMax ? uint(-1) : liquidity;
-    MockUniswapV2Router02IUniswapV2Pair(pair).permit(
-      msg.sender,
-      address(this),
-      value,
-      deadline,
-      v,
-      r,
-      s
-    );
-    amountETH = removeLiquidityETHSupportingFeeOnTransferTokens(
-      token,
-      liquidity,
-      amountTokenMin,
-      amountETHMin,
-      to,
-      deadline
-    );
-  }
 
   // **** SWAP ****
   // requires the initial amount to have already been sent to the first pair
@@ -712,95 +443,6 @@ contract MockUniswapV2Router02 is MockUniswapV2Router02IUniswapV2Router02 {
     _swap(amounts, path, to);
   }
 
-  function swapExactETHForTokens(
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external payable virtual override ensure(deadline) returns (uint[] memory amounts) {
-    require(path[0] == WETH, 'UniswapV2Router: INVALID_PATH');
-    amounts = MockUniswapV2Router02UniswapV2Library.getAmountsOut(factory, msg.value, path);
-    require(
-      amounts[amounts.length - 1] >= amountOutMin,
-      'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
-    );
-    MockUniswapV2Router02IWETH(WETH).deposit{value: amounts[0]}();
-    assert(
-      MockUniswapV2Router02IWETH(WETH).transfer(
-        MockUniswapV2Router02UniswapV2Library.pairFor(factory, path[0], path[1]),
-        amounts[0]
-      )
-    );
-    _swap(amounts, path, to);
-  }
-
-  function swapTokensForExactETH(
-    uint amountOut,
-    uint amountInMax,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external virtual override ensure(deadline) returns (uint[] memory amounts) {
-    require(path[path.length - 1] == WETH, 'UniswapV2Router: INVALID_PATH');
-    amounts = MockUniswapV2Router02UniswapV2Library.getAmountsIn(factory, amountOut, path);
-    require(amounts[0] <= amountInMax, 'UniswapV2Router: EXCESSIVE_INPUT_AMOUNT');
-    MockUniswapV2Router02TransferHelper.safeTransferFrom(
-      path[0],
-      msg.sender,
-      MockUniswapV2Router02UniswapV2Library.pairFor(factory, path[0], path[1]),
-      amounts[0]
-    );
-    _swap(amounts, path, address(this));
-    MockUniswapV2Router02IWETH(WETH).withdraw(amounts[amounts.length - 1]);
-    MockUniswapV2Router02TransferHelper.safeTransferETH(to, amounts[amounts.length - 1]);
-  }
-
-  function swapExactTokensForETH(
-    uint amountIn,
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external virtual override ensure(deadline) returns (uint[] memory amounts) {
-    require(path[path.length - 1] == WETH, 'UniswapV2Router: INVALID_PATH');
-    amounts = MockUniswapV2Router02UniswapV2Library.getAmountsOut(factory, amountIn, path);
-    require(
-      amounts[amounts.length - 1] >= amountOutMin,
-      'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
-    );
-    MockUniswapV2Router02TransferHelper.safeTransferFrom(
-      path[0],
-      msg.sender,
-      MockUniswapV2Router02UniswapV2Library.pairFor(factory, path[0], path[1]),
-      amounts[0]
-    );
-    _swap(amounts, path, address(this));
-    MockUniswapV2Router02IWETH(WETH).withdraw(amounts[amounts.length - 1]);
-    MockUniswapV2Router02TransferHelper.safeTransferETH(to, amounts[amounts.length - 1]);
-  }
-
-  function swapETHForExactTokens(
-    uint amountOut,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external payable virtual override ensure(deadline) returns (uint[] memory amounts) {
-    require(path[0] == WETH, 'UniswapV2Router: INVALID_PATH');
-    amounts = MockUniswapV2Router02UniswapV2Library.getAmountsIn(factory, amountOut, path);
-    require(amounts[0] <= msg.value, 'UniswapV2Router: EXCESSIVE_INPUT_AMOUNT');
-    MockUniswapV2Router02IWETH(WETH).deposit{value: amounts[0]}();
-    assert(
-      MockUniswapV2Router02IWETH(WETH).transfer(
-        MockUniswapV2Router02UniswapV2Library.pairFor(factory, path[0], path[1]),
-        amounts[0]
-      )
-    );
-    _swap(amounts, path, to);
-    // refund dust eth, if any
-    if (msg.value > amounts[0])
-      MockUniswapV2Router02TransferHelper.safeTransferETH(msg.sender, msg.value - amounts[0]);
-  }
-
   // **** SWAP (supporting fee-on-transfer tokens) ****
   // requires the initial amount to have already been sent to the first pair
   function _swapSupportingFeeOnTransferTokens(address[] memory path, address _to) internal virtual {
@@ -856,49 +498,6 @@ contract MockUniswapV2Router02 is MockUniswapV2Router02IUniswapV2Router02 {
     );
   }
 
-  function swapExactETHForTokensSupportingFeeOnTransferTokens(
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external payable virtual override ensure(deadline) {
-    require(path[0] == WETH, 'UniswapV2Router: INVALID_PATH');
-    uint amountIn = msg.value;
-    MockUniswapV2Router02IWETH(WETH).deposit{value: amountIn}();
-    assert(
-      MockUniswapV2Router02IWETH(WETH).transfer(
-        MockUniswapV2Router02UniswapV2Library.pairFor(factory, path[0], path[1]),
-        amountIn
-      )
-    );
-    uint balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
-    _swapSupportingFeeOnTransferTokens(path, to);
-    require(
-      IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,
-      'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
-    );
-  }
-
-  function swapExactTokensForETHSupportingFeeOnTransferTokens(
-    uint amountIn,
-    uint amountOutMin,
-    address[] calldata path,
-    address to,
-    uint deadline
-  ) external virtual override ensure(deadline) {
-    require(path[path.length - 1] == WETH, 'UniswapV2Router: INVALID_PATH');
-    MockUniswapV2Router02TransferHelper.safeTransferFrom(
-      path[0],
-      msg.sender,
-      MockUniswapV2Router02UniswapV2Library.pairFor(factory, path[0], path[1]),
-      amountIn
-    );
-    _swapSupportingFeeOnTransferTokens(path, address(this));
-    uint amountOut = IERC20(WETH).balanceOf(address(this));
-    require(amountOut >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
-    MockUniswapV2Router02IWETH(WETH).withdraw(amountOut);
-    MockUniswapV2Router02TransferHelper.safeTransferETH(to, amountOut);
-  }
 
   // **** LIBRARY FUNCTIONS ****
   function quote(
@@ -1118,8 +717,4 @@ library MockUniswapV2Router02TransferHelper {
     );
   }
 
-  function safeTransferETH(address to, uint value) internal {
-    (bool success, ) = to.call{value: value}(new bytes(0));
-    require(success, 'MockUniswapV2Router02TransferHelper: ETH_TRANSFER_FAILED');
-  }
 }

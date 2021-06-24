@@ -57,12 +57,12 @@ def to_float(x):
 def check_token_prices(band_oracle, link_oracle, simple_oracle, agg_oracle, deployer):
     for idx, token in enumerate(tokens):
         try:
-            band_price = to_float(band_oracle.getETHPx(token))
+            band_price = to_float(band_oracle.getCELOPx(token))
             print('band', token_names[idx], ':', band_price)
         except:
             pass
         try:
-            link_price = to_float(link_oracle.getETHPx(token))
+            link_price = to_float(link_oracle.getCELOPx(token))
             print('link', token_names[idx], ':', link_price)
         except:
             pass
@@ -70,7 +70,7 @@ def check_token_prices(band_oracle, link_oracle, simple_oracle, agg_oracle, depl
             print('diff', max(band_price / link_price, link_price/band_price))
         except:
             pass
-        print('agg', token_names[idx], ':', agg_oracle.getETHPx(token))
+        print('agg', token_names[idx], ':', agg_oracle.getCELOPx(token))
         token0, token1 = sort_tokens(token)
         print(token0, token1)
         agg_price = to_float(agg_oracle.getPrice(token0, token1)[0])
@@ -127,11 +127,11 @@ def check_replace_v2_oracle(band_oracle, link_oracle, simple_oracle, agg_oracle,
     # set route
     core_oracle.setRoute(tokens, [agg_oracle] * len(tokens), {'from': deployer, 'gas_price': gas_strategy})
 
-    print(simple_oracle_v2.getETHPx(DAI))
-    print(agg_oracle.getETHPx(DAI))
+    print(simple_oracle_v2.getCELOPx(DAI))
+    print(agg_oracle.getCELOPx(DAI))
 
-    print(simple_oracle_v2.getETHPx(USDT))
-    print(agg_oracle.getETHPx(USDT))
+    print(simple_oracle_v2.getCELOPx(USDT))
+    print(agg_oracle.getCELOPx(USDT))
 
     #####################################################################################
     print('=========================================================================')

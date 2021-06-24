@@ -10,91 +10,91 @@ def test_reinitialize(admin, bank, oracle):
         bank.initialize(oracle, 2000, {'from': admin})
 
 
-def test_accrue(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+def test_accrue(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                 UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle):
 
-    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, cusd, ceur, spell, ufactory, pos_id=0)
 
-    _, _, cusdt, _, prevUSDTTotalDebt, prevUSDTTotalShare = bank.banks(usdt)
-    print('totalDebt', prevUSDTTotalDebt)
-    print('totalShare', prevUSDTTotalShare)
+    _, _, cceur, _, prevceurTotalDebt, prevceurTotalShare = bank.banks(ceur)
+    print('totalDebt', prevceurTotalDebt)
+    print('totalShare', prevceurTotalShare)
 
     chain.sleep(100000)
 
     # not accrue yet
-    _, _, cusdt, _, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
-    print('totalDebt', curUSDTTotalDebt)
-    print('totalShare', curUSDTTotalShare)
+    _, _, cceur, _, curceurTotalDebt, curceurTotalShare = bank.banks(ceur)
+    print('totalDebt', curceurTotalDebt)
+    print('totalShare', curceurTotalShare)
 
-    assert prevUSDTTotalDebt == curUSDTTotalDebt
-    assert prevUSDTTotalShare == curUSDTTotalShare
+    assert prevceurTotalDebt == curceurTotalDebt
+    assert prevceurTotalShare == curceurTotalShare
 
-    bank.accrue(usdt)
+    bank.accrue(ceur)
 
-    _, _, cusdt, _, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
-    print('totalDebt', curUSDTTotalDebt)
-    print('totalShare', curUSDTTotalShare)
+    _, _, cceur, _, curceurTotalDebt, curceurTotalShare = bank.banks(ceur)
+    print('totalDebt', curceurTotalDebt)
+    print('totalShare', curceurTotalShare)
 
-    assert prevUSDTTotalShare == curUSDTTotalShare
+    assert prevceurTotalShare == curceurTotalShare
 
-    usdt_interest = curUSDTTotalDebt - prevUSDTTotalDebt
-    usdt_fee = usdt_interest * bank.feeBps() // 10000  # 20%
+    ceur_interest = curceurTotalDebt - prevceurTotalDebt
+    ceur_fee = ceur_interest * bank.feeBps() // 10000  # 20%
 
 
-def test_accrue_all(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+def test_accrue_all(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                     UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle):
 
-    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, cusd, ceur, spell, ufactory, pos_id=0)
 
-    _, _, cusdt, _, prevUSDTTotalDebt, prevUSDTTotalShare = bank.banks(usdt)
-    print('totalDebt', prevUSDTTotalDebt)
-    print('totalShare', prevUSDTTotalShare)
+    _, _, cceur, _, prevceurTotalDebt, prevceurTotalShare = bank.banks(ceur)
+    print('totalDebt', prevceurTotalDebt)
+    print('totalShare', prevceurTotalShare)
 
-    _, _, cusdc, _, prevUSDCTotalDebt, prevUSDCTotalShare = bank.banks(usdc)
-    print('totalDebt', prevUSDCTotalDebt)
-    print('totalShare', prevUSDCTotalShare)
+    _, _, ccusd, _, prevcusdTotalDebt, prevcusdTotalShare = bank.banks(cusd)
+    print('totalDebt', prevcusdTotalDebt)
+    print('totalShare', prevcusdTotalShare)
 
     chain.sleep(100000)
 
     # not accrue yet
-    _, _, cusdt, _, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
-    _, _, cusdc, _, curUSDCTotalDebt, curUSDCTotalShare = bank.banks(usdc)
+    _, _, cceur, _, curceurTotalDebt, curceurTotalShare = bank.banks(ceur)
+    _, _, ccusd, _, curcusdTotalDebt, curcusdTotalShare = bank.banks(cusd)
 
-    assert prevUSDTTotalDebt == curUSDTTotalDebt
-    assert prevUSDTTotalShare == curUSDTTotalShare
+    assert prevceurTotalDebt == curceurTotalDebt
+    assert prevceurTotalShare == curceurTotalShare
 
-    assert prevUSDCTotalDebt == curUSDCTotalDebt
-    assert prevUSDCTotalShare == curUSDCTotalShare
+    assert prevcusdTotalDebt == curcusdTotalDebt
+    assert prevcusdTotalShare == curcusdTotalShare
 
-    # accrue usdt, usdc
-    bank.accrueAll([usdt, usdc])
+    # accrue ceur, cusd
+    bank.accrueAll([ceur, cusd])
 
-    _, _, cusdt, _, curUSDTTotalDebt, curUSDTTotalShare = bank.banks(usdt)
-    print('totalDebt', curUSDTTotalDebt)
-    print('totalShare', curUSDTTotalShare)
+    _, _, cceur, _, curceurTotalDebt, curceurTotalShare = bank.banks(ceur)
+    print('totalDebt', curceurTotalDebt)
+    print('totalShare', curceurTotalShare)
 
-    assert prevUSDTTotalShare == curUSDTTotalShare
+    assert prevceurTotalShare == curceurTotalShare
 
-    usdt_interest = curUSDTTotalDebt - prevUSDTTotalDebt
-    usdt_fee = usdt_interest * bank.feeBps() // 10000  # 20%
-
-    # TODO: this test is broken.
-    # assert almostEqual(usdt_interest, 200000000 * 10 // 100 * 100000 // (365*86400))
-
-    _, _, cusdc, _, curUSDCTotalDebt, curUSDCTotalShare = bank.banks(usdc)
-    print('totalDebt', curUSDCTotalDebt)
-    print('totalShare', curUSDCTotalShare)
-
-    assert prevUSDCTotalShare == curUSDCTotalShare
-
-    usdc_interest = curUSDCTotalDebt - prevUSDCTotalDebt
-    usdc_fee = usdc_interest * bank.feeBps() // 10000  # 20%
+    ceur_interest = curceurTotalDebt - prevceurTotalDebt
+    ceur_fee = ceur_interest * bank.feeBps() // 10000  # 20%
 
     # TODO: this test is broken.
-    # assert almostEqual(usdc_interest, 1000000000 * 10 // 100 * 100000 // (365*86400))
+    # assert almostEqual(ceur_interest, 200000000 * 10 // 100 * 100000 // (365*86400))
+
+    _, _, ccusd, _, curcusdTotalDebt, curcusdTotalShare = bank.banks(cusd)
+    print('totalDebt', curcusdTotalDebt)
+    print('totalShare', curcusdTotalShare)
+
+    assert prevcusdTotalShare == curcusdTotalShare
+
+    cusd_interest = curcusdTotalDebt - prevcusdTotalDebt
+    cusd_fee = cusd_interest * bank.feeBps() // 10000  # 20%
+
+    # TODO: this test is broken.
+    # assert almostEqual(cusd_interest, 1000000000 * 10 // 100 * 100000 // (365*86400))

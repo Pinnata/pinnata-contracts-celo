@@ -105,9 +105,9 @@ def test_uniswap_spell(uniswap_spell, homora, oracle, token0, token1):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(token0)
-    tokenBPrice = oracle.getETHPx(token1)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(token0)
+    tokenBPrice = oracle.getCELOPx(token1)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -204,9 +204,9 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(dpi)
-    tokenBPrice = oracle.getETHPx(weth)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(dpi)
+    tokenBPrice = oracle.getCELOPx(weth)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -310,9 +310,9 @@ def test_sushiswap_spell(sushiswap_spell, homora, oracle, token0, token1):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(token0)
-    tokenBPrice = oracle.getETHPx(token1)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(token0)
+    tokenBPrice = oracle.getCELOPx(token1)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -416,9 +416,9 @@ def test_sushiswap_spell_wmasterchef(sushiswap_spell, homora, oracle, token0, to
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(token0)
-    tokenBPrice = oracle.getETHPx(token1)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(token0)
+    tokenBPrice = oracle.getCELOPx(token1)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -513,9 +513,9 @@ def test_balancer_spell(balancer_spell, homora, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(dai)
-    tokenBPrice = oracle.getETHPx(weth)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(dai)
+    tokenBPrice = oracle.getCELOPx(weth)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -608,9 +608,9 @@ def test_balancer_spell_wstaking(balancer_spell, homora, wstaking, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(perp)
-    tokenBPrice = oracle.getETHPx(usdc)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(perp)
+    tokenBPrice = oracle.getCELOPx(usdc)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -710,10 +710,10 @@ def test_curve_spell_wgauge(curve_spell, homora, oracle):
     finalCBal = curCBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(dai)
-    tokenBPrice = oracle.getETHPx(usdc)
-    tokenCPrice = oracle.getETHPx(usdt)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(dai)
+    tokenBPrice = oracle.getCELOPx(usdc)
+    tokenCPrice = oracle.getCELOPx(usdt)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)

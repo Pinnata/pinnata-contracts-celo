@@ -78,7 +78,7 @@ contract AggregatorOracle is IBaseOracle, Governable {
   /// @dev Return token price relative to ETH, multiplied by 2**112
   /// @param token Token to get price of
   /// NOTE: Support at most 3 oracle sources per token
-  function getETHPx(address token) public view override returns (uint) {
+  function getCELOPx(address token) public view override returns (uint) {
     uint candidateSourceCount = primarySourceCount[token];
     require(candidateSourceCount > 0, 'no primary source');
     uint[] memory prices = new uint[](candidateSourceCount);
@@ -86,7 +86,7 @@ contract AggregatorOracle is IBaseOracle, Governable {
     // Get valid oracle sources
     uint validSourceCount = 0;
     for (uint idx = 0; idx < candidateSourceCount; idx++) {
-      try primarySources[token][idx].getETHPx(token) returns (uint px) {
+      try primarySources[token][idx].getCELOPx(token) returns (uint px) {
         prices[validSourceCount++] = px;
       } catch {}
     }
@@ -140,9 +140,9 @@ contract AggregatorOracle is IBaseOracle, Governable {
   function getPrice(address token0, address token1) external view returns (uint, uint) {
     require(token0 == WETH || token1 == WETH, 'one of the requested tokens must be ETH or WETH');
     if (token0 == WETH) {
-      return (uint(2**112).mul(1e18).div(getETHPx(token1)), block.timestamp);
+      return (uint(2**112).mul(1e18).div(getCELOPx(token1)), block.timestamp);
     } else {
-      return (getETHPx(token0).mul(1e18).div(2**112), block.timestamp);
+      return (getCELOPx(token0).mul(1e18).div(2**112), block.timestamp);
     }
   }
 }

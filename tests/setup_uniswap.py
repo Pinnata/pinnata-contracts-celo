@@ -7,5 +7,5 @@ def ufactory(a, MockUniswapV2Factory):
 
 
 @pytest.fixture(scope='function')
-def urouter(a, ufactory, weth, MockUniswapV2Router02):
-    return MockUniswapV2Router02.deploy(ufactory, weth, {'from': a[0]})
+def urouter(a, ufactory, MockUniswapV2Router02):
+    return MockUniswapV2Router02.deploy(ufactory, {'from': a[0]})

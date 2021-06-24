@@ -4,7 +4,7 @@ import brownie
 from helper_uniswap import *
 
 
-def test_temporary_state(admin, alice, bank, chain, werc20, ufactory, urouter, simple_oracle, core_oracle, oracle, usdc, usdt, UniswapV2SpellV1, UniswapV2Oracle):
+def test_temporary_state(admin, alice, bank, chain, werc20, ufactory, urouter, simple_oracle, core_oracle, oracle, celo, cusd, ceur, UniswapV2SpellV1, UniswapV2Oracle):
     _NOT_ENTERED = 1
     _ENTERED = 2
     _NO_ID = 2**256 - 1
@@ -17,9 +17,9 @@ def test_temporary_state(admin, alice, bank, chain, werc20, ufactory, urouter, s
     assert bank.SPELL() == _NO_ADDRESS
 
     # execute
-    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, cusd, ceur, spell, ufactory, pos_id=0)
 
     # after execute
     assert bank._GENERAL_LOCK() == _NOT_ENTERED
@@ -38,26 +38,26 @@ def test_feeBps(bank):
     assert bank.feeBps() == 2000  # initially set to 2000
 
 
-def test_next_position_id(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+def test_next_position_id(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle):
-    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
     assert bank.nextPositionId() == 1  # initially 1
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, cusd, ceur, spell, ufactory, pos_id=0)
     assert bank.nextPositionId() == 2
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=1)
+    execute_uniswap_werc20(admin, alice, bank, cusd, ceur, spell, ufactory, pos_id=1)
     assert bank.nextPositionId() == 2  # doesn't increase due to changing
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, cusd, ceur, spell, ufactory, pos_id=0)
     assert bank.nextPositionId() == 3
 
 
-def test_all_banks(admin, bank, token, cToken, weth, dai, usdt, usdc, MockCErc20_2):
+def test_all_banks(admin, bank, token, cToken, celo, cusd, ceur, ube, MockCErc20_2):
     # from setup_basic
-    assert bank.allBanks(0) == weth
-    assert bank.allBanks(1) == dai
-    assert bank.allBanks(2) == usdt
-    assert bank.allBanks(3) == usdc
+    assert bank.allBanks(0) == celo
+    assert bank.allBanks(1) == cusd
+    assert bank.allBanks(2) == ceur
+    assert bank.allBanks(3) == ube
 
     with brownie.reverts():
         bank.allBanks(4)
@@ -74,8 +74,8 @@ def test_all_banks(admin, bank, token, cToken, weth, dai, usdt, usdc, MockCErc20
         bank.addBank(token, cToken_1)
 
 
-def test_banks(admin, bank, weth, dai, usdt, usdc, token, cToken):
-    for ind, coin in enumerate([weth, dai, usdt, usdc]):
+def test_banks(admin, bank, celo, cusd, ceur, ube, token, cToken):
+    for ind, coin in enumerate([celo, cusd, ceur, ube,]):
         isListed, index, cToken1, reserve, totalDebt, totalShare = bank.banks(coin)
         assert isListed
         assert index == ind
@@ -101,8 +101,8 @@ def test_banks(admin, bank, weth, dai, usdt, usdc, token, cToken):
     assert totalShare == 0
 
 
-def test_cToken_in_bank(admin, bank, weth, dai, usdt, usdc, token, cToken):
-    for ind, coin in enumerate([weth, dai, usdt, usdc]):
+def test_cToken_in_bank(admin, bank, celo, cusd, ceur, ube, token, cToken):
+    for ind, coin in enumerate([celo, cusd, ceur, ube]):
         _, _, cToken1, _, _, _ = bank.banks(coin)
         assert bank.cTokenInBank(cToken1)
 
@@ -111,7 +111,7 @@ def test_cToken_in_bank(admin, bank, weth, dai, usdt, usdc, token, cToken):
     assert bank.cTokenInBank(cToken)
 
 
-def test_positions(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+def test_positions(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                    UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle):
 
     # position 0 not exist
@@ -131,16 +131,16 @@ def test_positions(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, ch
     assert debtMap == 0
 
     # create position 1
-    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, usdc, usdt, chain,
+    spell = setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur, chain,
                           UniswapV2Oracle, UniswapV2SpellV1, simple_oracle, core_oracle, oracle)
 
-    execute_uniswap_werc20(admin, alice, bank, usdc, usdt, spell, ufactory, pos_id=0)
+    execute_uniswap_werc20(admin, alice, bank, cusd, ceur, spell, ufactory, pos_id=0)
 
     owner, collToken, collId, collateralSize, debtMap = bank.positions(1)
-    tx = spell.getAndApprovePair(usdt, usdc, {'from': admin})
+    tx = spell.getAndApprovePair(ceur, cusd, {'from': admin})
     lp = tx.return_value
     assert owner == alice
     assert collToken == werc20
     assert collId == int(lp, 0)  # convert address to uint
     assert collateralSize > 0
-    assert debtMap == (1 << 2) + (1 << 3)  # usdt, usdc are at index 2,3
+    assert debtMap == (1 << 2) + (1 << 1)  # usdt, usdc are at index 2,3

@@ -76,9 +76,9 @@ def main():
     print('=========================================================================')
     print('Case 1.')
 
-    lp_price = balancer_oracle.getETHPx(lp)
-    dai_price = simple_oracle.getETHPx(dai)
-    weth_price = simple_oracle.getETHPx(weth)
+    lp_price = balancer_oracle.getCELOPx(lp)
+    dai_price = simple_oracle.getCELOPx(dai)
+    weth_price = simple_oracle.getCELOPx(weth)
 
     print('lp price', lp_price)
     print('dai price', dai_price)

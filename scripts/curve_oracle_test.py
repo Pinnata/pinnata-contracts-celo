@@ -79,10 +79,10 @@ def main():
 
     print('pool virtual price', pool.get_virtual_price())
 
-    lp_price = curve_oracle.getETHPx(lp)
-    dai_price = simple_oracle.getETHPx(dai)
-    usdt_price = simple_oracle.getETHPx(usdt)
-    usdc_price = simple_oracle.getETHPx(usdc)
+    lp_price = curve_oracle.getCELOPx(lp)
+    dai_price = simple_oracle.getCELOPx(dai)
+    usdt_price = simple_oracle.getCELOPx(usdt)
+    usdc_price = simple_oracle.getCELOPx(usdc)
 
     print('lp price', lp_price)
     print('dai price', dai_price)

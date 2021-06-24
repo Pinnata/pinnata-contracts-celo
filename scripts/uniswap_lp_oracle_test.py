@@ -37,15 +37,15 @@ def main():
     uniswap_oracle = UniswapV2Oracle.deploy(simple_oracle, {'from': admin})
 
     # expected ~100k * 2**112
-    print('ETH-USDT LP:', uniswap_oracle.getETHPx(eth_usdt))
+    print('ETH-USDT LP:', uniswap_oracle.getCELOPx(eth_usdt))
     # expected ~100k * 2**112
-    print('ETH-USDC LP:', uniswap_oracle.getETHPx(eth_usdc))
+    print('ETH-USDC LP:', uniswap_oracle.getCELOPx(eth_usdc))
     # expected ~3.8e9 * 2**112
-    print('USDT-USDC LP:', uniswap_oracle.getETHPx(usdt_usdc))
+    print('USDT-USDC LP:', uniswap_oracle.getCELOPx(usdt_usdc))
 
-    assert almostEqual(uniswap_oracle.getETHPx(
+    assert almostEqual(uniswap_oracle.getCELOPx(
         eth_usdt), weth.balanceOf(eth_usdt) * 2 * 2 ** 112 // eth_usdt.totalSupply())
-    assert almostEqual(uniswap_oracle.getETHPx(
+    assert almostEqual(uniswap_oracle.getCELOPx(
         eth_usdc), weth.balanceOf(eth_usdc) * 2 * 2 ** 112 // eth_usdc.totalSupply())
-    assert almostEqual(uniswap_oracle.getETHPx(
-        usdt_usdc), usdt.balanceOf(usdt_usdc) * 2 * simple_oracle.getETHPx(usdt) // usdt_usdc.totalSupply())
+    assert almostEqual(uniswap_oracle.getCELOPx(
+        usdt_usdc), usdt.balanceOf(usdt_usdc) * 2 * simple_oracle.getCELOPx(usdt) // usdt_usdc.totalSupply())

@@ -25,8 +25,10 @@ contract UniswapV2SpellV1 is WhitelistSpell {
   constructor(
     IBank _bank,
     address _werc20,
-    IUniswapV2Router02 _router
-  ) public WhitelistSpell(_bank, _werc20, _router.WETH()) {
+    IUniswapV2Router02 _router, 
+    address _celo
+    // TODO: create dynamic CELO address
+  ) public WhitelistSpell(_bank, _werc20, _celo) {
     router = _router;
     factory = IUniswapV2Factory(_router.factory());
   }
@@ -116,7 +118,6 @@ contract UniswapV2SpellV1 is WhitelistSpell {
     require(whitelistedLpTokens[lp], 'lp token not whitelisted');
 
     // 1. Get user input amounts
-    doTransmitETH();
     doTransmit(tokenA, amt.amtAUser);
     doTransmit(tokenB, amt.amtBUser);
     doTransmit(lp, amt.amtLPUser);
@@ -183,7 +184,6 @@ contract UniswapV2SpellV1 is WhitelistSpell {
     doPutCollateral(lp, IERC20(lp).balanceOf(address(this)));
 
     // 7. Refund leftovers to users
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
   }
@@ -224,7 +224,6 @@ contract UniswapV2SpellV1 is WhitelistSpell {
     bank.putCollateral(address(wstaking), id, amount);
 
     // 8. Refund leftovers to users
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
 
@@ -325,7 +324,6 @@ contract UniswapV2SpellV1 is WhitelistSpell {
     require(IERC20(lp).balanceOf(address(this)) >= amt.amtLPWithdraw);
 
     // 8. Refund leftover
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
     doRefund(lp);

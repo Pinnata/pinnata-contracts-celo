@@ -58,7 +58,6 @@ contract BalancerSpellV1 is WhitelistSpell {
     (address tokenA, address tokenB) = getAndApprovePair(lp);
 
     // 1. Get user input amounts
-    doTransmitETH();
     doTransmit(tokenA, amt.amtAUser);
     doTransmit(tokenB, amt.amtBUser);
     doTransmit(lp, amt.amtLPUser);
@@ -110,7 +109,6 @@ contract BalancerSpellV1 is WhitelistSpell {
 
     // 6. Refund leftovers to users
     (address tokenA, address tokenB) = getAndApprovePair(lp);
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
   }
@@ -147,7 +145,6 @@ contract BalancerSpellV1 is WhitelistSpell {
 
     // 7. Refund leftovers to users
     (address tokenA, address tokenB) = getAndApprovePair(lp);
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
 
@@ -233,7 +230,6 @@ contract BalancerSpellV1 is WhitelistSpell {
     require(IERC20(lp).balanceOf(address(this)) >= amt.amtLPWithdraw);
 
     // 6. Refund leftover
-    doRefundETH();
     doRefund(tokenA);
     doRefund(tokenB);
     doRefund(lp);

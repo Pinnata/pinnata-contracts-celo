@@ -7,7 +7,7 @@ from brownie import interface
 from .utils import *
 
 
-KP3R_NETWORK = '0x73353801921417F465377c8d898c6f4C0270282C'
+KP3R_NETWORK = '0x73353801921417F465377c8d898c6f4C0270282C' #brian changed this
 CRV_REGISTRY = '0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c'
 CRV_TOKEN = '0xD533a949740bb3306d119CC777fa900bA034cd52'
 MASTERCHEF = '0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd'
@@ -99,9 +99,9 @@ def test_uniswap_spell(uniswap_spell, homora, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(yfi)
-    tokenBPrice = oracle.getETHPx(weth)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(yfi)
+    tokenBPrice = oracle.getCELOPx(weth)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -198,9 +198,9 @@ def test_uniswap_spell_wstaking(uniswap_spell, homora, wstaking, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(dpi)
-    tokenBPrice = oracle.getETHPx(weth)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(dpi)
+    tokenBPrice = oracle.getCELOPx(weth)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -297,9 +297,9 @@ def test_sushiswap_spell(sushiswap_spell, homora, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(usdt)
-    tokenBPrice = oracle.getETHPx(weth)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(usdt)
+    tokenBPrice = oracle.getCELOPx(weth)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -394,9 +394,9 @@ def test_sushiswap_spell_wmasterchef(sushiswap_spell, homora, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(usdt)
-    tokenBPrice = oracle.getETHPx(weth)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(usdt)
+    tokenBPrice = oracle.getCELOPx(weth)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -491,9 +491,9 @@ def test_balancer_spell(balancer_spell, homora, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(dai)
-    tokenBPrice = oracle.getETHPx(weth)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(dai)
+    tokenBPrice = oracle.getCELOPx(weth)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -586,9 +586,9 @@ def test_balancer_spell_wstaking(balancer_spell, homora, wstaking, oracle):
     finalBBal = curBBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(perp)
-    tokenBPrice = oracle.getETHPx(usdc)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(perp)
+    tokenBPrice = oracle.getCELOPx(usdc)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -688,10 +688,10 @@ def test_curve_spell_wgauge(curve_spell, homora, oracle):
     finalCBal = curCBal
     finalETHBal = curETHBal
 
-    tokenAPrice = oracle.getETHPx(dai)
-    tokenBPrice = oracle.getETHPx(usdc)
-    tokenCPrice = oracle.getETHPx(usdt)
-    tokenETHPrice = oracle.getETHPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+    tokenAPrice = oracle.getCELOPx(dai)
+    tokenBPrice = oracle.getCELOPx(usdc)
+    tokenCPrice = oracle.getCELOPx(usdt)
+    tokenETHPrice = oracle.getCELOPx('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
