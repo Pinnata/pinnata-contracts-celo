@@ -30,13 +30,14 @@ def main():
 
     celo_addr = '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
     cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
-    cycelo_addr = '0x9Ce844b3A315FE2CBB22b88B3Eb0921dD7a2e018'
-    cycusd_addr = '0xE5283EAE77252275e6207AC25AAF7A0A4004EEFe'
-    dahlia_bank_addr = '0x0460878568C92D877f5544a2F3a1523E6c2bB1CA'
-    uniswap_spell_addr = '0xe53ef2fC19F8e905F372432834eED212C692A8F9'
-    core_oracle_addr = '0x384f6e069aC3726E1894A30D0d46021c5f5E8acA'
-    celo_safebox_addr = '0x47c91f227d04B19E43604F3141779f91feD4f8ad'
-    cusd_safebox_addr = '0x2FF09993ebA7292fb93d3F2F87ec498B5c361c64'
+    cycelo_addr = '0xB01BCdB6e90C216Ee2Cb15bF97B97283c70932d6'
+    cycusd_addr = '0x0A59FBA6810D5208b26CE294f5Eb2D121673D782'
+    dahlia_bank_addr = '0x8772D538785f9dc2a8b1356D4550320E93f4A616'
+    uniswap_spell_addr = '0x9F9C8Fe9BC1f28370d947bce6a264aFa4feD5Ec8'
+    core_oracle_addr = '0x0286530271720D1B4538e92c7Cc0922D68A053f2'
+    celo_safebox_addr = '0x970e26ff0b86145b919e4a54B8a25e4677b0beBC'
+    cusd_safebox_addr = '0x461ca72eF491B00b0Ac6f6f9Fe30359ef187a6D9'
+    comptroller_addr = '0x115308bBCBd3917033EcE55aC35C92a279A7055D'
 
     celo = interface.IERC20Ex(celo_addr)
     cusd = interface.IERC20Ex(cusd_addr)
@@ -48,13 +49,15 @@ def main():
     celo_safebox = SafeBox.at(celo_safebox_addr)
     cusd_safebox = SafeBox.at(cusd_safebox_addr)
 
-    # lend(bob, celo, celo_safebox)
-    # lend(bob, cusd, cusd_safebox)
+    lend(bob, celo, celo_safebox)
+    lend(bob, cusd, cusd_safebox)
 
-    # celo.approve(dahlia_bank, 2**256-1, {'from': alice})
-    # cusd.approve(dahlia_bank, 2**256-1, {'from': alice})
+    celo.approve(dahlia_bank, 2**256-1, {'from': alice})
+    cusd.approve(dahlia_bank, 2**256-1, {'from': alice})
     celo.approve(celo_safebox_addr, 2**256-1, {'from': alice})
     cusd.approve(cusd_safebox_addr, 2**256-1, {'from': alice})
+    celo.approve(cycelo, 2**256-1, {'from': alice})
+    cusd.approve(cycusd, 2**256-1, {'from': alice})
 
     prevABal = celo.balanceOf(alice)
     prevBBal = cusd.balanceOf(alice)
@@ -76,6 +79,8 @@ def main():
     print('homora cycelo bal', cycelo.balanceOf(celo_safebox_addr, {'from': admin}))
     print('homora cycusd bal', cycusd.balanceOf(cusd_safebox_addr, {'from': admin}))
 
+    print('credit limit', interface.IComptroller(comptroller_addr).creditLimits(dahlia_bank_addr, {'from': admin}))
+
     # open a position
     dahlia_bank.execute(
         0,
@@ -83,11 +88,11 @@ def main():
         uniswap_spell.addLiquidityWERC20.encode_input(
             celo,
             cusd,
-            [10**9,
-             10**9,
+            [10**18, # collateral amount celo
+             10**18, # collateral amount cusd
              0,
-             10**2,
-             10**2,
+             10**2, # borrow amount celo
+             10**2, # borrow amount cusd
              0,
              0,
              0],
@@ -116,10 +121,10 @@ def main():
         uniswap_spell.removeLiquidityWERC20.encode_input(
             celo,
             cusd,
-            [2**256-1,
-             0,
-             0,
-             0,
+            [2**256-1, #lp to remove
+             0, # lp to keep    
+             2**256-1, #repay celo
+             2**256-1, #repay cusd
              0,
              0,
              0],

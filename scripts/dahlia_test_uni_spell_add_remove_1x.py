@@ -15,9 +15,9 @@ def main():
 
     celo_addr = '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
     cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
-    dahlia_bank_addr = '0x0460878568C92D877f5544a2F3a1523E6c2bB1CA'
-    uniswap_spell_addr = '0xe53ef2fC19F8e905F372432834eED212C692A8F9'
-    core_oracle_addr = '0x384f6e069aC3726E1894A30D0d46021c5f5E8acA'
+    dahlia_bank_addr = '0x8772D538785f9dc2a8b1356D4550320E93f4A616'
+    uniswap_spell_addr = '0x9F9C8Fe9BC1f28370d947bce6a264aFa4feD5Ec8'
+    core_oracle_addr = '0x0286530271720D1B4538e92c7Cc0922D68A053f2'
 
     celo = interface.IERC20Ex(celo_addr)
     cusd = interface.IERC20Ex(cusd_addr)

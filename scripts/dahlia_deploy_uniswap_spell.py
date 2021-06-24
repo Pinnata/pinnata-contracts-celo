@@ -13,8 +13,8 @@ def main():
     cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
     ube_addr = '0xbe413cdfdad27e71cf533882c760a91ecd02ab27'
     ube_router_addr = '0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121'
-    werc20_addr = '0x38E04E9c49844aF8123da9475576cdD1195e0916'
-    dahlia_bank_addr = '0x0460878568C92D877f5544a2F3a1523E6c2bB1CA'
+    werc20_addr = '0x219F5B0BCBCb2B86068DC97BbdF1b4672d19Aa2c'
+    dahlia_bank_addr = '0x8772D538785f9dc2a8b1356D4550320E93f4A616'
 
     celo = interface.IERC20Ex(celo_addr)
     cusd = interface.IERC20Ex(cusd_addr)
