@@ -13,8 +13,8 @@ def main():
     bob = accounts.load('bob')
 
     cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
-    cycusd_addr = '0xE5283EAE77252275e6207AC25AAF7A0A4004EEFe'
-    cusd_safebox_addr = '0x2FF09993ebA7292fb93d3F2F87ec498B5c361c64'
+    cycusd_addr = '0x0A59FBA6810D5208b26CE294f5Eb2D121673D782'
+    cusd_safebox_addr = '0x461ca72eF491B00b0Ac6f6f9Fe30359ef187a6D9'
 
     cusd = interface.IERC20Ex(cusd_addr)
     cycusd = interface.IERC20Ex(cycusd_addr)

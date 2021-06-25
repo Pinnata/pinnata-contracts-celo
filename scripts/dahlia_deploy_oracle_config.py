@@ -9,8 +9,8 @@ from .utils import *
 def main():
     deployer = accounts.load('gh')
 
-    core_oracle_addr = '0x384f6e069aC3726E1894A30D0d46021c5f5E8acA'
-    proxy_oracle_addr = '0x31ac8Ac2BC3025de9aA9f3EC5dC9db2dc1B5A6E3'
+    core_oracle_addr = '0x0286530271720D1B4538e92c7Cc0922D68A053f2'
+    proxy_oracle_addr = '0x4cf091fd046B6f21Dd5bdf490Fb274315e77f028'
     celo_addr = '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
     cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
     ube_addr = '0xbe413cdfdad27e71cf533882c760a91ecd02ab27'
@@ -61,8 +61,8 @@ def main():
         [12500, 8000, 10250],
         [10500, 9500, 10250],
         [12500, 8000, 10250],
-        [50000, 0, 10250],
-        [50000, 0, 10250],
+        [50000, 6970, 10250],
+        [50000, 6970, 10250],
     ], {'from': deployer})
 
     werc20 = WERC20.deploy({'from': deployer})
