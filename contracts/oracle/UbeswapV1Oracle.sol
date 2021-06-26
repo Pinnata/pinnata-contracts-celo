@@ -26,7 +26,7 @@ contract UbeswapV1Oracle is IUbeswapV1Oracle, Ownable {
     return _pairs;
   }
 
-  mapping(address => Observation[]) public override observations;
+  mapping(address => Observation[]) public observations;
   
   function observationLength(address pair) external view override returns (uint) {
     return observations[pair].length;

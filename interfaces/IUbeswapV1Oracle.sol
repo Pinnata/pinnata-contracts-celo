@@ -13,13 +13,13 @@ interface IUbeswapV1Oracle {
         uint price1Cumulative;
     }
 
+  // TODO: no function for the observation mapping
+
   function factory() external pure returns (address);
 
   function periodSize() external pure returns (uint);
 
   function pairs() external view returns (address[] memory);
-
-  function observations(address) external view returns (Observation[] memory);
 
   function observationLength(address pair) external view returns (uint);
   
