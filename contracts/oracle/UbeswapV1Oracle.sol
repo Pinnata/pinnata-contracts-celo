@@ -11,51 +11,45 @@ import '../../interfaces/IKeep3rV1Oracle.sol';
 import '../../interfaces/IUbeswapV1Oracle.sol';
 
 // sliding oracle that uses observations collected to provide moving price averages in the past
-contract UbeswapV1Oracle is Ownable {
+contract UbeswapV1Oracle is IUbeswapV1Oracle, Ownable {
   using SafeMath for uint;
   using FixedPoint for *;
-
-  struct Observation {
-    uint timestamp;
-    uint price0Cumulative;
-    uint price1Cumulative;
-  }
   
-  address public constant factory = 0x62d5b84bE28a183aBB507E125B384122D2C25fAE;
+  address public constant override factory = 0x62d5b84bE28a183aBB507E125B384122D2C25fAE;
   // this is redundant with granularity and windowSize, but stored for gas savings & informational purposes.
-  uint public constant periodSize = 1800; // 30 minutes
+  uint public constant override periodSize = 1800; // 30 minutes
 
   address[] internal _pairs;
   mapping(address => bool) internal _known;
 
-  function pairs() external view returns (address[] memory) {
+  function pairs() external view override returns (address[] memory) {
     return _pairs;
   }
 
   mapping(address => Observation[]) public observations;
   
-  function observationLength(address pair) external view returns (uint) {
+  function observationLength(address pair) external view override returns (uint) {
     return observations[pair].length;
   }
   
-  function pairFor(address tokenA, address tokenB) external pure returns (address) {
+  function pairFor(address tokenA, address tokenB) external pure override returns (address) {
     return UniswapV2Library.pairFor(factory, tokenA, tokenB);
   }
   
-  function pairForCELO(address tokenA) external pure returns (address) {
+  function pairForCELO(address tokenA) external pure override returns (address) {
     return UniswapV2Library.pairFor(factory, tokenA, CELO());
   }
 
-  function updatePair(address pair) external onlyOwner returns (bool) {
+  function updatePair(address pair) external onlyOwner override returns (bool) {
     return _update(pair);
   }
 
-  function update(address tokenA, address tokenB) external onlyOwner returns (bool) {
+  function update(address tokenA, address tokenB) external onlyOwner override returns (bool) {
     address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
     return _update(pair);
   }
 
-  function addPair(address tokenA, address tokenB) onlyOwner external {
+  function addPair(address tokenA, address tokenB) onlyOwner external override {
     address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
     require(!_known[pair], "known");
     _known[pair] = true;
@@ -65,12 +59,12 @@ contract UbeswapV1Oracle is Ownable {
     observations[pair].push(Observation(block.timestamp, price0Cumulative, price1Cumulative));
   }
 
-  function work() public onlyOwner {
+  function work() public onlyOwner override {
     bool worked = _updateAll();
     require(worked, "UniswapV2Oracle: !work");
   }
   
-  function lastObservation(address pair) public view returns (Observation memory) {
+  function lastObservation(address pair) public view override returns (Observation memory) {
     return observations[pair][observations[pair].length-1];
   }
 
@@ -82,7 +76,7 @@ contract UbeswapV1Oracle is Ownable {
     }
   }
 
-  function updateFor(uint i, uint length) external onlyOwner returns (bool updated) {
+  function updateFor(uint i, uint length) external onlyOwner override returns (bool updated) {
     for (; i < length; i++) {
       if (_update(_pairs[i])) {
         updated = true;
@@ -90,11 +84,11 @@ contract UbeswapV1Oracle is Ownable {
     }
   }
 
-  function workable(address pair) public view returns (bool) {
+  function workable(address pair) public view override returns (bool) {
     return (block.timestamp - lastObservation(pair).timestamp) > periodSize;
   }
 
-  function workable() external view returns (bool) {
+  function workable() external view override returns (bool) {
     for (uint i = 0; i < _pairs.length; i++) {
       if (workable(_pairs[i])) {
         return true;
@@ -126,7 +120,7 @@ contract UbeswapV1Oracle is Ownable {
     amountOut = priceAverage.mul(amountIn).decode144();
   }
 
-  function CELO() public pure returns (address) {
+  function CELO() public pure override returns (address) {
     uint256 chainId = computeChainId();
     if (chainId == 42220) {
       return 0x471EcE3750Da237f93B8E339c536989b8978a438;

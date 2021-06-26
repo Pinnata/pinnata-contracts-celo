@@ -7,18 +7,19 @@ pragma experimental ABIEncoderV2;
 // sliding oracle that uses observations collected to provide moving price averages in the past
 interface IUbeswapV1Oracle {
 
+    struct Observation {
+        uint timestamp;
+        uint price0Cumulative;
+        uint price1Cumulative;
+    }
+
+  // TODO: no function for the observation mapping
+
   function factory() external pure returns (address);
 
   function periodSize() external pure returns (uint);
 
   function pairs() external view returns (address[] memory);
-
-  function observations(address) external view 
-    returns (
-        uint timestamp, 
-        uint price0Cumulative,
-        uint price1Cumulative
-    );
 
   function observationLength(address pair) external view returns (uint);
   
@@ -32,14 +33,12 @@ interface IUbeswapV1Oracle {
 
   function addPair(address tokenA, address tokenB) external;
 
-  function work() external view;
+  // TODO: also think this is causing an error
+  function work() external;
   
+  // TODO: pretty sure the error is here, return type does not match the actual contract
   function lastObservation(address pair) external view
-    returns (
-        uint timestamp, 
-        uint price0Cumulative,
-        uint price1Cumulative
-    );
+    returns (Observation memory);
 
   function updateFor(uint i, uint length) external returns (bool updated);
 
