@@ -1,0 +1,29 @@
+{
+    "alfajores": {
+        "celo_addr": "0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9",
+        "cusd_addr": "0x874069fa1eb16d44d622f2e0ca25eea172369bc1",
+        "ube_addr": "0xbe413cdfdad27e71cf533882c760a91ecd02ab27",
+        "btc_addr": "0xd629eb00deced2a080b7ec630ef6ac117e614f1b",
+        "mcusd_addr": "0x64defa3544c695db8c535d289d843a189aa26b98",
+        "mceur_addr": "0xa8d0e6799ff3fd19c6459bf02689ae09c4d78ba7",
+        "scelo_addr": "0x2879bfd5e7c4ef331384e908aaa3bd3014b703fa",
+        "dahlia_bank_addr": "0x8772D538785f9dc2a8b1356D4550320E93f4A616",
+        "core_oracle_addr": "0x0286530271720D1B4538e92c7Cc0922D68A053f2",
+        "proxy_oracle_addr": "0x4cf091fd046B6f21Dd5bdf490Fb274315e77f028",
+        "uni_oracle_addr": "0xda6Cb2cB539257108780e3eE728b0005DedD3152",
+        "ube_oracle_addr": "0xe425a51a129FDeE65bcc2F7b477634E2724c007e",
+        "kp3r_oracle_addr": "0xde98f3348C35DB4E2F1757C511e0960c8797Db4D",
+        "cycelo_addr": "0xB01BCdB6e90C216Ee2Cb15bF97B97283c70932d6",
+        "cycusd_addr": "0x0A59FBA6810D5208b26CE294f5Eb2D121673D782",
+        "cyube_addr": "0x60403187a1850688deE07C8BdeBE4355Ced1d081",
+        "cybtc_addr": "",
+        "celo_safebox_addr": "0x970e26ff0b86145b919e4a54B8a25e4677b0beBC",
+        "cusd_safebox_addr": "0x461ca72eF491B00b0Ac6f6f9Fe30359ef187a6D9",
+        "cube_safebox_addr": "0x8FaADa58C2605f7884340EF36eD4C48eEC9e7D2C",
+        "werc20_addr": "0x219F5B0BCBCb2B86068DC97BbdF1b4672d19Aa2c",
+        "ube_router_addr": "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121"
+    }, 
+    "mainnet": {
+
+    }
+}
