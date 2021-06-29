@@ -1,6 +1,7 @@
 from brownie import (SafeBox, HomoraBank)
 from brownie import accounts, interface, chain
 from .utils import *
+import json
 
 
 def almostEqual(a, b):
@@ -11,14 +12,12 @@ def almostEqual(a, b):
 def main():
     alice = accounts.load('alice')
     bob = accounts.load('bob')
+    f = open('dahlia_addresses.json')
+    addr = json.loads(f)['alfajores']
 
-    cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
-    cycusd_addr = '0x0A59FBA6810D5208b26CE294f5Eb2D121673D782'
-    cusd_safebox_addr = '0x461ca72eF491B00b0Ac6f6f9Fe30359ef187a6D9'
-
-    cusd = interface.IERC20Ex(cusd_addr)
-    cycusd = interface.IERC20Ex(cycusd_addr)
-    cusd_safebox = SafeBox.at(cusd_safebox_addr)
+    cusd = interface.IERC20Ex(addr['cusd'])
+    cycusd = interface.IERC20Ex(addr['cycusd'])
+    cusd_safebox = SafeBox.at(addr['cusd_safebox'])
 
     # approve dai
     cusd.approve(cusd_safebox, 2**256-1, {'from': alice})
