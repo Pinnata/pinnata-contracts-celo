@@ -1,6 +1,6 @@
 from brownie import accounts, interface, Contract
 from brownie import (
-    HomoraBank, ProxyOracle, CoreOracle, UniswapV2Oracle, SimpleOracle, UniswapV2SpellV1, WERC20, SafeBox
+    HomoraBank, ProxyOracle, CoreOracle, UniswapV2Oracle, SimpleOracle, UniswapV2SpellV1, WERC20, SafeBox, WStakingRewards
 )
 from .utils import *
 import json
@@ -37,6 +37,7 @@ def main():
     core_oracle = CoreOracle.at(addr['core_oracle'])
     celo_safebox = SafeBox.at(addr['celo_safebox'])
     ube_safebox = SafeBox.at(addr['ube_safebox'])
+    wstaking = WStakingRewards.at(addr['ube_celo_staking'])
 
     lend(bob, celo, celo_safebox)
     lend(bob, ube, ube_safebox)
@@ -57,17 +58,18 @@ def main():
     dahlia_bank.execute(
         0,
         uniswap_spell,
-        uniswap_spell.addLiquidityWERC20.encode_input(
+        uniswap_spell.addLiquidityWStakingRewards.encode_input(
             celo,
             ube,
-            [10**18, # collateral amount celo
-             10**18, # collateral amount ube
+            [10**18,
+             10**18,
              0,
-             10**2, # borrow amount celo
-             10**2, # borrow amount ube
+             0,
+             5 * 10**7,
              0,
              0,
              0],
+            wstaking
         ),
         {
             'from': alice, 
@@ -89,16 +91,17 @@ def main():
     dahlia_bank.execute(
         position_id - 1,
         uniswap_spell,
-        uniswap_spell.removeLiquidityWERC20.encode_input(
+        uniswap_spell.removeLiquidityWStakingRewards.encode_input(
             celo,
             ube,
-            [2**256-1, #lp to remove
-             0, # lp to keep    
-             2**256-1, #repay celo
-             2**256-1, #repay ube
+            [2**256-1,
+             0,
+             0,
+             2**256-1,
              0,
              0,
              0],
+            wstaking
         ),
         {'from': alice}
     )

@@ -1,40 +1,7 @@
 # Alpha Homora v2 🧙‍♂️
-
-## Alfajores Addresses 
-
-celo_addr = '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
-
-cusd_addr = '0x874069fa1eb16d44d622f2e0ca25eea172369bc1'
-
-ube_addr = '0xbe413cdfdad27e71cf533882c760a91ecd02ab27'
-
-  HomoraBank deployed at: 0x8772D538785f9dc2a8b1356D4550320E93f4A616
-
-  CoreOracle deployed at: 0x0286530271720D1B4538e92c7Cc0922D68A053f2
-
- ProxyOracle deployed at: 0x4cf091fd046B6f21Dd5bdf490Fb274315e77f028
-
-  UniswapV2Oracle deployed at: 0xda6Cb2cB539257108780e3eE728b0005DedD3152
-
-  UbeswapV1Oracle deployed at: 0xe425a51a129FDeE65bcc2F7b477634E2724c007e
-
-  ERC20KP3ROracle deployed at: 0xde98f3348C35DB4E2F1757C511e0960c8797Db4D
-
-  WERC20 deployed at: 0x219F5B0BCBCb2B86068DC97BbdF1b4672d19Aa2c
-
-  UniswapV2SpellV1 deployed at: 0x9F9C8Fe9BC1f28370d947bce6a264aFa4feD5Ec8
-
-  celo   SafeBox deployed at: 0x970e26ff0b86145b919e4a54B8a25e4677b0beBC
-
-  cusd   SafeBox deployed at: 0x461ca72eF491B00b0Ac6f6f9Fe30359ef187a6D9
-
-  cube   SafeBox deployed at: 0x8FaADa58C2605f7884340EF36eD4C48eEC9e7D2C
-
-
-Comptroller: 0x115308bBCBd3917033EcE55aC35C92a279A7055D
-dCELO: 0xB01BCdB6e90C216Ee2Cb15bF97B97283c70932d6
-dcUSD: 0x0A59FBA6810D5208b26CE294f5Eb2D121673D782
-dUBE: 0x60403187a1850688deE07C8BdeBE4355Ced1d081
+TODO:
+test: bank hack, lp oracle
+finalize deployment address
 
 TL;DR. Here's what V2 will support:
 
