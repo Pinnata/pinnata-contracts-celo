@@ -8,8 +8,8 @@ import json
 
 def main():
     deployer = accounts.load('gh')
-    f = open('dahlia_addresses.json')
-    addr = json.loads(f)['alfajores']
+    f = open('scripts/dahlia_addresses.json')
+    addr = json.load(f)['alfajores']
 
     core_oracle = CoreOracle.at(addr['core_oracle'])
     proxy_oracle = ProxyOracle.at(addr['proxy_oracle'])

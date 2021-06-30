@@ -8,8 +8,8 @@ import json
 def main():
     # deployer = accounts.at('0xB593d82d53e2c187dc49673709a6E9f806cdC835', force=True)
     deployer = accounts.load('gh')
-    f = open('dahlia_addresses.json')
-    addr = json.loads(f)['alfajores']
+    f = open('scripts/dahlia_addresses.json')
+    addr = json.load(f)['alfajores']
 
     celo = interface.IERC20Ex(addr['celo'])
     ube = interface.IERC20Ex(addr['ube'])

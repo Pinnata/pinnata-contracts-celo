@@ -12,50 +12,50 @@ def almostEqual(a, b):
 def main():
     alice = accounts.load('alice')
     bob = accounts.load('bob')
-    f = open('dahlia_addresses.json')
-    addr = json.loads(f)['alfajores']
+    f = open('scripts/dahlia_addresses.json')
+    addr = json.load(f)['alfajores']
 
-    cusd = interface.IERC20Ex(addr['cusd'])
-    cycusd = interface.IERC20Ex(addr['cycusd'])
-    cusd_safebox = SafeBox.at(addr['cusd_safebox'])
+    ube = interface.IERC20Ex(addr['ube'])
+    cyube = interface.IERC20Ex(addr['cyube'])
+    ube_safebox = SafeBox.at(addr['ube_safebox'])
 
     # approve dai
-    cusd.approve(cusd_safebox, 2**256-1, {'from': alice})
-    cusd.approve(cusd_safebox, 2**256-1, {'from': bob})
+    ube.approve(ube_safebox, 2**256-1, {'from': alice})
+    ube.approve(ube_safebox, 2**256-1, {'from': bob})
 
     #################################################################
     # deposit
     print('====================================')
     print('Case 1. deposit')
 
-    prevDAIAlice = cusd.balanceOf(alice)
-    prevDAIBob = cusd.balanceOf(bob)
-    prevIBDAIAlice = cusd_safebox.balanceOf(alice)
-    prevIBDAIBob = cusd_safebox.balanceOf(bob)
+    prevDAIAlice = ube.balanceOf(alice)
+    prevDAIBob = ube.balanceOf(bob)
+    prevIBDAIAlice = ube_safebox.balanceOf(alice)
+    prevIBDAIBob = ube_safebox.balanceOf(bob)
 
     alice_amt = 10**18
     bob_amt = 10**18
-    cusd_safebox.deposit(alice_amt, {'from': alice})
-    cusd_safebox.deposit(bob_amt, {'from': bob})
+    ube_safebox.deposit(alice_amt, {'from': alice})
+    ube_safebox.deposit(bob_amt, {'from': bob})
 
-    curDAIAlice = cusd.balanceOf(alice)
-    curDAIBob = cusd.balanceOf(bob)
-    curIBDAIAlice = cusd_safebox.balanceOf(alice)
-    curIBDAIBob = cusd_safebox.balanceOf(bob)
+    curDAIAlice = ube.balanceOf(alice)
+    curDAIBob = ube.balanceOf(bob)
+    curIBDAIAlice = ube_safebox.balanceOf(alice)
+    curIBDAIBob = ube_safebox.balanceOf(bob)
 
     print('∆ dai alice', curDAIAlice - prevDAIAlice)
     print('∆ dai bob', curDAIBob - prevDAIBob)
     print('∆ ibDAI bal alice', curIBDAIAlice - prevIBDAIAlice)
     print('∆ ibDAI bal bob', curIBDAIBob - prevIBDAIBob)
-    print('calculated ibDAI alice', alice_amt * 10**18 // cycusd.exchangeRateStored())
-    print('calculated ibDAI bob', bob_amt * 10**18 // cycusd.exchangeRateStored())
+    print('calculated ibDAI alice', alice_amt * 10**18 // cyube.exchangeRateStored())
+    print('calculated ibDAI bob', bob_amt * 10**18 // cyube.exchangeRateStored())
 
     assert curDAIAlice - prevDAIAlice == -alice_amt, 'incorrect alice amount'
     assert curDAIBob - prevDAIBob == -bob_amt, 'incorrect bob amount'
     assert almostEqual(curIBDAIAlice - prevIBDAIAlice,
-                       alice_amt * 10**18 // cycusd.exchangeRateStored())
+                       alice_amt * 10**18 // cyube.exchangeRateStored())
     assert almostEqual(curIBDAIBob - prevIBDAIBob,
-                       bob_amt * 10**18 // cycusd.exchangeRateStored())
+                       bob_amt * 10**18 // cyube.exchangeRateStored())
 
 
     #################################################################
@@ -63,22 +63,22 @@ def main():
     print('====================================')
     print('Case 2. withdraw')
 
-    alice_withdraw_1 = cusd_safebox.balanceOf(alice) // 3
-    alice_withdraw_2 = cusd_safebox.balanceOf(alice) - alice_withdraw_1
-    bob_withdraw = cusd_safebox.balanceOf(bob)
+    alice_withdraw_1 = ube_safebox.balanceOf(alice) // 3
+    alice_withdraw_2 = ube_safebox.balanceOf(alice) - alice_withdraw_1
+    bob_withdraw = ube_safebox.balanceOf(bob)
 
-    prevDAIAlice = cusd.balanceOf(alice)
-    prevDAIBob = cusd.balanceOf(bob)
-    prevIBDAIAlice = cusd_safebox.balanceOf(alice)
-    prevIBDAIBob = cusd_safebox.balanceOf(bob)
+    prevDAIAlice = ube.balanceOf(alice)
+    prevDAIBob = ube.balanceOf(bob)
+    prevIBDAIAlice = ube_safebox.balanceOf(alice)
+    prevIBDAIBob = ube_safebox.balanceOf(bob)
 
-    cusd_safebox.withdraw(alice_withdraw_1, {'from': alice})
-    cusd_safebox.withdraw(bob_withdraw, {'from': bob})
+    ube_safebox.withdraw(alice_withdraw_1, {'from': alice})
+    ube_safebox.withdraw(bob_withdraw, {'from': bob})
 
-    curDAIAlice = cusd.balanceOf(alice)
-    curDAIBob = cusd.balanceOf(bob)
-    curIBDAIAlice = cusd_safebox.balanceOf(alice)
-    curIBDAIBob = cusd_safebox.balanceOf(bob)
+    curDAIAlice = ube.balanceOf(alice)
+    curDAIBob = ube.balanceOf(bob)
+    curIBDAIAlice = ube_safebox.balanceOf(alice)
+    curIBDAIBob = ube_safebox.balanceOf(bob)
 
     print('∆ dai alice', curDAIAlice - prevDAIAlice)
     print('∆ dai bob', curDAIBob - prevDAIBob)
@@ -91,13 +91,13 @@ def main():
     assert curIBDAIAlice - prevIBDAIAlice == -alice_withdraw_1, 'incorrect alice ∆ibDAI'
     assert curIBDAIBob - prevIBDAIBob == -bob_withdraw, 'incorrect bob ∆ibDAI'
 
-    prevDAIAlice = cusd.balanceOf(alice)
-    prevIBDAIAlice = cusd_safebox.balanceOf(alice)
+    prevDAIAlice = ube.balanceOf(alice)
+    prevIBDAIAlice = ube_safebox.balanceOf(alice)
 
-    cusd_safebox.withdraw(alice_withdraw_2, {'from': alice})
+    ube_safebox.withdraw(alice_withdraw_2, {'from': alice})
 
-    curDAIAlice = cusd.balanceOf(alice)
-    curIBDAIAlice = cusd_safebox.balanceOf(alice)
+    curDAIAlice = ube.balanceOf(alice)
+    curIBDAIAlice = ube_safebox.balanceOf(alice)
 
     print('∆ dai alice', curDAIAlice - prevDAIAlice)
     print('∆ dai bob', curDAIBob - prevDAIBob)
@@ -107,5 +107,8 @@ def main():
     assert almostEqual(curDAIAlice - prevDAIAlice, alice_amt * 2 //
                        3), 'incorrect alice second withdraw dai amount'
     assert curIBDAIAlice - prevIBDAIAlice == -alice_withdraw_2, 'incorrect alice second ∆ibDAI '
+
+    ube.approve(ube_safebox, 0, {'from': alice})
+    ube.approve(ube_safebox, 0, {'from': bob})
 
     print('Done!')
