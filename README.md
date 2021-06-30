@@ -1,6 +1,6 @@
 # Alpha Homora v2 🧙‍♂️
 TODO:
-test: bank, oracle, bank hack, staking, lp oracle
+test: bank hack, lp oracle
 finalize deployment address
 
 TL;DR. Here's what V2 will support:

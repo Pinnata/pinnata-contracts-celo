@@ -32,8 +32,6 @@ def main():
 
     celo = interface.IERC20Ex(addr['celo'])
     ube = interface.IERC20Ex(addr['ube'])
-    cycelo = interface.IERC20Ex(addr['cycelo'])
-    cyube = interface.IERC20Ex(addr['cyube'])
     dahlia_bank = HomoraBank.at(addr['dahlia_bank'])
     uniswap_spell = UniswapV2SpellV1.at(addr['uniswap_spell'])
     core_oracle = CoreOracle.at(addr['core_oracle'])
@@ -45,8 +43,6 @@ def main():
 
     celo.approve(dahlia_bank, 2**256-1, {'from': alice})
     ube.approve(dahlia_bank, 2**256-1, {'from': alice})
-    # celo.approve(cycelo, 2**256-1, {'from': alice})
-    # ube.approve(cyube, 2**256-1, {'from': alice})
 
     prevABal = celo.balanceOf(alice)
     prevBBal = ube.balanceOf(alice)

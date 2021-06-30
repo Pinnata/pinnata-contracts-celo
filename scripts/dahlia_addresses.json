@@ -17,6 +17,7 @@
         "werc20": "0x4E97917b560bb30d76FB934a2739Dc0d077C4ACa",
         "uniswap_spell": "0xC795cD11A170DCD3edFF42263eb8291E2D8565ed",
         "ube_router": "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121",
+        "ube_factory": "0x62d5b84bE28a183aBB507E125B384122D2C25fAE",
         "comptroller": "0x8237EC1B2Cb012fdf49453AEF8197B1fF18EA157"
     }, 
     "mainnet": {

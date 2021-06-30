@@ -14,7 +14,10 @@ def main():
 
     ubeswap_oracle = UbeswapV1Oracle.at(addr['ube_oracle'])
 
-    ubeswap_oracle.update(addr['celo'], addr['cusd'], {'from': deployer})
-    ubeswap_oracle.update(addr['celo'], addr['ube'], {'from': deployer})
+    if ubeswap_oracle.workable():
+        ubeswap_oracle.work({'from': deployer})
+        print("work")
+    else:
+        print("no work")
 
     print('Done!')
