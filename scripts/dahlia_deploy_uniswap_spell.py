@@ -12,11 +12,9 @@ def main():
 
     celo = interface.IERC20Ex(addr['celo'])
     ube = interface.IERC20Ex(addr['ube'])
-    btc = interface.IERC20Ex(addr['btc'])
     mcusd = interface.IERC20Ex(addr['mcusd'])
-    mceur = interface.IERC20Ex(addr['mceur'])
     scelo = interface.IERC20Ex(addr['scelo'])
-    ube_router = interface.IUniswapV2Router02(addr['ube'])
+    ube_router = interface.IUniswapV2Router02(addr['ube_router'])
     werc20 = WERC20.at(addr['werc20'])
     dahlia_bank = HomoraBank.at(addr['dahlia_bank'])
 
@@ -26,20 +24,16 @@ def main():
     )
 
     uniswap_spell.getAndApprovePair(celo, ube, {'from': deployer})
-    uniswap_spell.getAndApprovePair(mcusd, btc, {'from': deployer})
     uniswap_spell.getAndApprovePair(celo, mcusd, {'from': deployer})
     uniswap_spell.getAndApprovePair(scelo, celo, {'from': deployer})
-    uniswap_spell.getAndApprovePair(celo, mceur, {'from': deployer})
 
     ube_factory_address = ube_router.factory()
     ube_factory = interface.IUniswapV2Factory(ube_factory_address)
     celo_ube_lp = ube_factory.getPair(celo, ube)
-    mcusd_btc_lp = ube_factory.getPair(mcusd, btc)
     celo_mcusd_lp = ube_factory.getPair(celo, mcusd)
     scelo_celo_lp = ube_factory.getPair(scelo, celo)
-    celo_mceur_lp = ube_factory.getPair(celo, mceur)
 
-    uniswap_spell.setWhitelistLPTokens([celo_ube_lp, mcusd_btc_lp, celo_mcusd_lp, scelo_celo_lp, celo_mceur_lp], [True, True, True, True, True], {'from': deployer})
+    uniswap_spell.setWhitelistLPTokens([celo_ube_lp, celo_mcusd_lp, scelo_celo_lp,], [True, True, True], {'from': deployer})
 
     dahlia_bank.setWhitelistSpells([uniswap_spell], [True], {'from': deployer})
 
