@@ -28,7 +28,7 @@ def main():
     alice = accounts.load('alice')
     bob = accounts.load('bob')
     f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['alfajores']
+    addr = json.load(f)['mainnet']
 
     celo = interface.IERC20Ex(addr['celo'])
     ube = interface.IERC20Ex(addr['ube'])
@@ -124,5 +124,5 @@ def main():
     celo.approve(dahlia_bank, 0, {'from': alice})
     ube.approve(dahlia_bank, 0, {'from': alice})
 
-    withdraw(bob, celo, celo_safebox)
-    withdraw(bob, ube, ube_safebox)
+    # withdraw(bob, celo, celo_safebox)
+    # withdraw(bob, ube, ube_safebox)

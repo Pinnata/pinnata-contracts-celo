@@ -29,7 +29,7 @@ def main():
     alice = accounts.load('alice')
     bob = accounts.load('bob')
     f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['alfajores']
+    addr = json.load(f)['mainnet']
     
     celo = interface.IERC20Ex(addr['celo'])
     mcusd = interface.IERC20Ex(addr['mcusd'])
@@ -38,7 +38,7 @@ def main():
     core_oracle = CoreOracle.at(addr['core_oracle'])
     celo_safebox = SafeBox.at(addr['celo_safebox'])
 
-    lend(bob, celo, celo_safebox)
+    # lend(bob, celo, celo_safebox)
 
     celo.approve(dahlia_bank, 2**256-1, {'from': alice})
     mcusd.approve(dahlia_bank, 2**256-1, {'from': alice})
@@ -59,7 +59,7 @@ def main():
         uniswap_spell.addLiquidityWERC20.encode_input(
             celo,
             mcusd,
-            [10**18, # collateral amount celo
+            [10**10, # collateral amount celo
              0, # collateral amount mcusd
              0,
              10**2, # borrow amount celo

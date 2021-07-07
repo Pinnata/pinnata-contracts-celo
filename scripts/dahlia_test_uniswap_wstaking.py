@@ -28,7 +28,7 @@ def main():
     alice = accounts.load('alice')
     bob = accounts.load('bob')
     f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['alfajores']
+    addr = json.load(f)['mainnet']
 
     celo = interface.IERC20Ex(addr['celo'])
     ube = interface.IERC20Ex(addr['ube'])
@@ -37,10 +37,10 @@ def main():
     core_oracle = CoreOracle.at(addr['core_oracle'])
     celo_safebox = SafeBox.at(addr['celo_safebox'])
     ube_safebox = SafeBox.at(addr['ube_safebox'])
-    wstaking = WStakingRewards.at(addr['ube_celo_staking'])
+    wstaking = WStakingRewards.at(addr['ube_celo_w_staking'])
 
-    lend(bob, celo, celo_safebox)
-    lend(bob, ube, ube_safebox)
+    # lend(bob, celo, celo_safebox)
+    # lend(bob, ube, ube_safebox)
 
     celo.approve(dahlia_bank, 2**256-1, {'from': alice})
     ube.approve(dahlia_bank, 2**256-1, {'from': alice})
@@ -61,11 +61,11 @@ def main():
         uniswap_spell.addLiquidityWStakingRewards.encode_input(
             celo,
             ube,
-            [10**18,
-             10**18,
+            [10**10,
+             10**10,
              0,
              0,
-             5 * 10**7,
+             5 * 10**4,
              0,
              0,
              0],
@@ -127,5 +127,5 @@ def main():
     celo.approve(dahlia_bank, 0, {'from': alice})
     ube.approve(dahlia_bank, 0, {'from': alice})
 
-    withdraw(bob, celo, celo_safebox)
-    withdraw(bob, ube, ube_safebox)
+    # withdraw(bob, celo, celo_safebox)
+    # withdraw(bob, ube, ube_safebox)

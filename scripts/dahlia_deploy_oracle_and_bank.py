@@ -6,7 +6,7 @@ from brownie import interface
 from .utils import *
 
 def main():
-    deployer = accounts.load('gh')
+    deployer = accounts.load('admin')
 
     core_oracle = CoreOracle.deploy({'from': deployer})
     proxy_oracle = ProxyOracle.deploy(core_oracle, {'from': deployer})

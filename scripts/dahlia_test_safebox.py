@@ -13,7 +13,7 @@ def main():
     alice = accounts.load('alice')
     bob = accounts.load('bob')
     f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['alfajores']
+    addr = json.load(f)['mainnet']
 
     ube = interface.IERC20Ex(addr['ube'])
     cyube = interface.IERC20Ex(addr['cyube'])
