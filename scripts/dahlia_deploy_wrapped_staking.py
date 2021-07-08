@@ -10,25 +10,24 @@ def main():
     f = open('scripts/dahlia_addresses.json')
     addr = json.load(f)['mainnet']
 
-    celo = interface.IERC20Ex(addr['celo'])
-    ube = interface.IERC20Ex(addr['ube'])
+    ube_celo_w_staking = WStakingRewards.at(addr['ube_celo_w_staking'])
     proxy_oracle = ProxyOracle.at(addr['proxy_oracle'])
 
 
-    ube_factory = interface.IUniswapV2Factory(addr['ube_factory'])
+    # ube_factory = interface.IUniswapV2Factory(addr['ube_factory'])
 
-    celo_ube_lp = ube_factory.getPair(celo, ube)
+    # celo_ube_lp = ube_factory.getPair(celo, ube)
 
 
-    wstaking = WStakingRewards.deploy(
-        addr['ube_celo_staking'],
-        celo_ube_lp,
-        ube,
-        {'from': deployer}
-    )
+    # wstaking = WStakingRewards.deploy(
+    #     addr['ube_celo_staking'],
+    #     celo_ube_lp,
+    #     ube,
+    #     {'from': deployer}
+    # )
 
     proxy_oracle.setWhitelistERC1155(
-        [wstaking],
+        [ube_celo_w_staking],
         True,
         {'from': deployer},
     )

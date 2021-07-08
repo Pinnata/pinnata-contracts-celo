@@ -27,13 +27,13 @@ def main():
     )
 
     uniswap_spell.getAndApprovePair(celo, ube, {'from': deployer})
-    # uniswap_spell.getAndApprovePair(mcusd, btc, {'from': deployer})
+    uniswap_spell.getAndApprovePair(mcusd, btc, {'from': deployer})
     uniswap_spell.getAndApprovePair(celo, mcusd, {'from': deployer})
     uniswap_spell.getAndApprovePair(scelo, celo, {'from': deployer})
     uniswap_spell.getAndApprovePair(celo, mceur, {'from': deployer})
 
     celo_ube_lp = ube_factory.getPair(celo, ube)
-    # mcusd_btc_lp = ube_factory.getPair(mcusd, btc)
+    mcusd_btc_lp = ube_factory.getPair(mcusd, btc)
     celo_mcusd_lp = ube_factory.getPair(celo, mcusd)
     celo_mceur_lp = ube_factory.getPair(celo, mceur)
     scelo_celo_lp = ube_factory.getPair(scelo, celo)
@@ -41,7 +41,7 @@ def main():
     uniswap_spell.setWhitelistLPTokens([celo_ube_lp], [True], {'from': deployer})
     uniswap_spell.setWhitelistLPTokens([celo_mcusd_lp], [True], {'from': deployer})
     uniswap_spell.setWhitelistLPTokens([scelo_celo_lp], [True], {'from': deployer})
-    # uniswap_spell.setWhitelistLPTokens([mcusd_btc_lp], [True], {'from': deployer})
+    uniswap_spell.setWhitelistLPTokens([mcusd_btc_lp], [True], {'from': deployer})
     uniswap_spell.setWhitelistLPTokens([celo_mceur_lp], [True], {'from': deployer})
 
 
