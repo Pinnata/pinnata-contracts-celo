@@ -2,7 +2,7 @@
   description = "Dahlia development environment.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/release-20.09";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
