@@ -26,6 +26,7 @@ def main():
 
     ubeswap_oracle.addPair(celo, ube)
     ubeswap_oracle.addPair(mcusd, btc)
+    ubeswap_oracle.addPair(celo, btc)
     ubeswap_oracle.addPair(celo, mcusd)
     ubeswap_oracle.addPair(scelo, celo)
     ubeswap_oracle.addPair(celo, mceur)

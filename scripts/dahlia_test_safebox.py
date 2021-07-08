@@ -16,7 +16,7 @@ def main():
     addr = json.load(f)['mainnet']
 
     ube = interface.IERC20Ex(addr['ube'])
-    cyube = interface.IERC20Ex(addr['cyube'])
+    cyube = interface.IERC20Ex(addr['fube'])
     ube_safebox = SafeBox.at(addr['ube_safebox'])
 
     # approve dai
@@ -63,10 +63,9 @@ def main():
     print('====================================')
     print('Case 2. withdraw')
 
-    alice_withdraw_1 = ube_safebox.balanceOf(alice) // 3
-    alice_withdraw_2 = ube_safebox.balanceOf(alice) - alice_withdraw_1
-    bob_withdraw = ube_safebox.balanceOf(bob)
-
+    alice_withdraw_1 = alice_amt // 3
+    alice_withdraw_2 = alice_amt - alice_withdraw_1
+    bob_withdraw = bob_amt
     prevDAIAlice = ube.balanceOf(alice)
     prevDAIBob = ube.balanceOf(bob)
     prevIBDAIAlice = ube_safebox.balanceOf(alice)
@@ -84,6 +83,7 @@ def main():
     print('∆ dai bob', curDAIBob - prevDAIBob)
     print('∆ ibDAI bal alice', curIBDAIAlice - prevIBDAIAlice)
     print('∆ ibDAI bal bob', curIBDAIBob - prevIBDAIBob)
+    print(alice_withdraw_1)
 
     assert almostEqual(curDAIAlice - prevDAIAlice, alice_amt //
                        3), 'incorrect alice withdraw dai amount'

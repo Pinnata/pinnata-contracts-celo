@@ -13,27 +13,27 @@ def main():
     celo = interface.IERC20Ex(addr['celo'])
     ube = interface.IERC20Ex(addr['ube'])
     btc = interface.IERC20Ex(addr['btc'])
-    cycelo = interface.IERC20Ex(addr['cycelo'])
-    cyube = interface.IERC20Ex(addr['cyube'])
-    cybtc = interface.IERC20Ex(addr['cybtc'])
+    fcelo = interface.IERC20Ex(addr['fcelo'])
+    fube = interface.IERC20Ex(addr['fube'])
+    fbtc = interface.IERC20Ex(addr['fbtc'])
     dahlia_bank = HomoraBank.at(addr['dahlia_bank'])
 
     # # deploy safeboxes
 
     SafeBox.deploy(
-        cycelo, 'Interest Bearing Celo', 'dCELO', {'from': deployer})
+        fcelo, 'Interest Bearing Celo', 'dCELO', {'from': deployer})
     SafeBox.deploy(
-        cyube, 'Interest Bearing UBE', 'dUBE', {'from': deployer})
+        fube, 'Interest Bearing UBE', 'dUBE', {'from': deployer})
     SafeBox.deploy(
-        cybtc, 'Interest Bearing BTC', 'dBTC', {'from': deployer})
+        fbtc, 'Interest Bearing BTC', 'dBTC', {'from': deployer})
     
     # add banks
-    dahlia_bank.addBank(celo, cycelo, {'from': deployer})
-    dahlia_bank.addBank(ube, cyube, {'from': deployer})
-    dahlia_bank.addBank(btc, cybtc, {'from': deployer})
+    dahlia_bank.addBank(celo, fcelo, {'from': deployer})
+    dahlia_bank.addBank(ube, fube, {'from': deployer})
+    dahlia_bank.addBank(btc, fbtc, {'from': deployer})
 
     dahlia_bank.setWhitelistTokens([celo], [True], {'from': deployer})
     dahlia_bank.setWhitelistTokens([ube], [True], {'from': deployer})
-    # dahlia_bank.setWhitelistTokens([btc], [True], {'from': deployer})
+    dahlia_bank.setWhitelistTokens([btc], [True], {'from': deployer})
 
     print('Done!')
