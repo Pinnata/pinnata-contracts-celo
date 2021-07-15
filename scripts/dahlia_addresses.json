@@ -30,6 +30,7 @@
         "ube_router": "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121",
         "ube_factory": "0x62d5b84bE28a183aBB507E125B384122D2C25fAE",
         "ube_celo_staking": "0x295D6f96081fEB1569d9Ce005F7f2710042ec6a1",
+        "marzipan_masterchef": "0xC49A227F114d467036182d74a44A65B69fd16061",
         "ube_celo_w_staking": "0xa4C35735C2A59f114aE6De54736402Aa982033e4",
         "dahlia_bank": "0x7DE28D2AC2e4ED81231Af412b8807B9eaF8937Fb",
         "core_oracle": "0x6A537e79BB48435788C2EE06AB9B23aDd36351Ca",
