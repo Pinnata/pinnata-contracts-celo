@@ -24,7 +24,7 @@ contract CoreOracle is IBaseOracle, Governable {
     }
   }
 
-  /// @dev Return the value of the given input as ETH per unit, multiplied by 2**112.
+  /// @dev Return the value of the given input as CELO per unit, multiplied by 2**112.
   /// @param token The ERC-20 token to check the value.
   function getCELOPx(address token) external view override returns (uint) {
     uint px = IBaseOracle(routes[token]).getCELOPx(token);

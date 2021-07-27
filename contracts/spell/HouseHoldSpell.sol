@@ -6,14 +6,13 @@ import 'OpenZeppelin/openzeppelin-contracts@3.4.0/contracts/token/ERC20/IERC20.s
 
 import './BasicSpell.sol';
 import '../../interfaces/IBank.sol';
-import '../../interfaces/IWETH.sol';
 
 contract HouseHoldSpell is BasicSpell {
   constructor(
     IBank _bank,
     address _werc20,
-    address _weth
-  ) public BasicSpell(_bank, _werc20, _weth) {}
+    address _celo
+  ) public BasicSpell(_bank, _werc20, _celo) {}
 
   function borrow(address token, uint amount) external {
     doBorrow(token, amount);

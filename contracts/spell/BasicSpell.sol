@@ -8,7 +8,6 @@ import 'OpenZeppelin/openzeppelin-contracts@3.4.0/contracts/token/ERC20/SafeERC2
 import '../utils/ERC1155NaiveReceiver.sol';
 import '../../interfaces/IBank.sol';
 import '../../interfaces/IWERC20.sol';
-import '../../interfaces/IWETH.sol';
 
 abstract contract BasicSpell is ERC1155NaiveReceiver {
   using SafeERC20 for IERC20;
@@ -101,10 +100,4 @@ abstract contract BasicSpell is ERC1155NaiveReceiver {
       werc20.burn(token, amount);
     }
   }
-
-//TODO: do we need this function
-//   /// @dev Fallback function. Can only receive ETH from WETH contract.
-//   receive() external payable {
-//     require(msg.sender == weth, 'ETH must come from WETH');
-//   }
 }

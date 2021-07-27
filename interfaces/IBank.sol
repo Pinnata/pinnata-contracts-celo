@@ -97,7 +97,7 @@ interface IBank {
     uint amountCall
   ) external;
 
-  function getBorrowETHValue(uint positionId) external view returns (uint);
+  function getBorrowCELOValue(uint positionId) external view returns (uint);
 
   function accrue(address token) external;
 
