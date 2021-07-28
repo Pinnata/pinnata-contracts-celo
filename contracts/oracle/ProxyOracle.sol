@@ -111,12 +111,12 @@ contract ProxyOracle is IOracle, Governable {
       amountOut.mul(tokenFactorIn.liqIncentive).mul(tokenFactorOut.liqIncentive).div(10000 * 10000);
   }
 
-  /// @dev Return the value of the given input as ETH for collateral purpose.
+  /// @dev Return the value of the given input as CELO for collateral purpose.
   /// @param token ERC1155 token address to get collateral value
   /// @param id ERC1155 token id to get collateral value
   /// @param amount Token amount to get collateral value
   /// @param owner Token owner address (currently unused by this implementation)
-  function asETHCollateral(
+  function asCELOCollateral(
     address token,
     uint id,
     uint amount,
@@ -128,23 +128,23 @@ contract ProxyOracle is IOracle, Governable {
     uint amountUnderlying = amount.mul(rateUnderlying).div(2**112);
     TokenFactors memory tokenFactor = tokenFactors[tokenUnderlying];
     require(tokenFactor.liqIncentive != 0, 'bad underlying collateral');
-    uint ethValue = source.getCELOPx(tokenUnderlying).mul(amountUnderlying).div(2**112);
-    return ethValue.mul(tokenFactor.collateralFactor).div(10000);
+    uint celoValue = source.getCELOPx(tokenUnderlying).mul(amountUnderlying).div(2**112);
+    return celoValue.mul(tokenFactor.collateralFactor).div(10000);
   }
 
-  /// @dev Return the value of the given input as ETH for borrow purpose.
+  /// @dev Return the value of the given input as CELO for borrow purpose.
   /// @param token ERC20 token address to get borrow value
   /// @param amount ERC20 token amount to get borrow value
   /// @param owner Token owner address (currently unused by this implementation)
-  function asETHBorrow(
+  function asCELOBorrow(
     address token,
     uint amount,
     address owner
   ) external view override returns (uint) {
     TokenFactors memory tokenFactor = tokenFactors[token];
     require(tokenFactor.liqIncentive != 0, 'bad underlying borrow');
-    uint ethValue = source.getCELOPx(token).mul(amount).div(2**112);
-    return ethValue.mul(tokenFactor.borrowFactor).div(10000);
+    uint celoValue = source.getCELOPx(token).mul(amount).div(2**112);
+    return celoValue.mul(tokenFactor.borrowFactor).div(10000);
   }
 
   /// @dev Return whether the ERC20 token is supported

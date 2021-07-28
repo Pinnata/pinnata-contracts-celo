@@ -364,22 +364,22 @@ contract HomoraBank is Governable, ERC1155NaiveReceiver, IBank {
     }
   }
 
-  /// @dev Return the total collateral value of the given position in ETH.
+  /// @dev Return the total collateral value of the given position in CELO.
   /// @param positionId The position ID to query for the collateral value.
-  function getCollateralETHValue(uint positionId) public view returns (uint) {
+  function getCollateralCELOValue(uint positionId) public view returns (uint) {
     Position storage pos = positions[positionId];
     uint size = pos.collateralSize;
     if (size == 0) {
       return 0;
     } else {
       require(pos.collToken != address(0), 'bad collateral token');
-      return oracle.asETHCollateral(pos.collToken, pos.collId, size, pos.owner);
+      return oracle.asCELOCollateral(pos.collToken, pos.collId, size, pos.owner);
     }
   }
 
-  /// @dev Return the total borrow value of the given position in ETH.
+  /// @dev Return the total borrow value of the given position in CELO.
   /// @param positionId The position ID to query for the borrow value.
-  function getBorrowETHValue(uint positionId) public view override returns (uint) {
+  function getBorrowCELOValue(uint positionId) public view override returns (uint) {
     uint value = 0;
     Position storage pos = positions[positionId];
     address owner = pos.owner;
@@ -391,7 +391,7 @@ contract HomoraBank is Governable, ERC1155NaiveReceiver, IBank {
         uint share = pos.debtShareOf[token];
         Bank storage bank = banks[token];
         uint debt = share.mul(bank.totalDebt).ceilDiv(bank.totalShare);
-        value = value.add(oracle.asETHBorrow(token, debt, owner));
+        value = value.add(oracle.asCELOBorrow(token, debt, owner));
       }
       idx++;
       bitMap >>= 1;
@@ -452,8 +452,8 @@ contract HomoraBank is Governable, ERC1155NaiveReceiver, IBank {
     address debtToken,
     uint amountCall
   ) external override lock poke(debtToken) {
-    uint collateralValue = getCollateralETHValue(positionId);
-    uint borrowValue = getBorrowETHValue(positionId);
+    uint collateralValue = getCollateralCELOValue(positionId);
+    uint borrowValue = getBorrowCELOValue(positionId);
     require(collateralValue < borrowValue, 'position still healthy');
     Position storage pos = positions[positionId];
     (uint amountPaid, uint share) = repayInternal(positionId, debtToken, amountCall);
@@ -488,8 +488,8 @@ contract HomoraBank is Governable, ERC1155NaiveReceiver, IBank {
     POSITION_ID = positionId;
     SPELL = spell;
     HomoraCaster(caster).cast{value: msg.value}(spell, data);
-    uint collateralValue = getCollateralETHValue(positionId);
-    uint borrowValue = getBorrowETHValue(positionId);
+    uint collateralValue = getCollateralCELOValue(positionId);
+    uint borrowValue = getBorrowCELOValue(positionId);
     require(collateralValue >= borrowValue, 'insufficient collateral');
     POSITION_ID = _NO_ID;
     SPELL = _NO_ADDRESS;

@@ -15,7 +15,7 @@ contract UniswapV2Oracle is UsingBaseOracle, IBaseOracle {
 
   constructor(IBaseOracle _base) public UsingBaseOracle(_base) {}
 
-  /// @dev Return the value of the given input as ETH per unit, multiplied by 2**112.
+  /// @dev Return the value of the given input as CELO per unit, multiplied by 2**112.
   /// @param pair The Uniswap pair to check the value.
   function getCELOPx(address pair) external view override returns (uint) {
     address token0 = IUniswapV2Pair(pair).token0();
