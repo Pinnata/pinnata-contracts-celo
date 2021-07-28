@@ -15,7 +15,7 @@ TODO:
 test: bank hack, lp oracle
 finalize deployment address
 
-TL;DR. Here's what V2 will support:
+TL;DR. Here's what v1 will support:
 
 - Multi assets lending and borrowing (with huge leverage for stablecoin farming!)
 - More farming pools beyond just Uniswap (think Balancer, Curve, etc)
@@ -26,7 +26,7 @@ TL;DR. Here's what V2 will support:
 
 ## Protocol Summary
 
-Alpha Homora v2 is an upgrade from Alpha Homora v1, a leveraged yield-farming product. Here are some key features:
+Dahlia v1 is a leveraged yield-farming product. Here are some key features:
 
 <!-- - In v2, vaults (e.g. ibETH) no longer exist. The protocol instead integrates with existing lending protocol. Whenever a user wants to borrow funds (on leverage) to yield farm, Alpha Homora will borrow from the lending protocol. -->
 
@@ -42,19 +42,19 @@ Alpha Homora v2 is an upgrade from Alpha Homora v1, a leveraged yield-farming pr
 
 ## Protocol Components
 
-- HomoraBank
+- DahliaBank
   - Store each position's collateral tokens (in the form of wrapped LP tokens)
   - Users can execute "spells", e.g. opening a new position, closing/adjusting existing position.
 - Caster
   - Intermediate contract that just calls another contract function (low-level call) with provided data (instead of bank), to prevent attack.
   - Doesn't store any funds
-- Spells (e.g. Uniswap/Sushiswap/Curve/...)
+- Spells (e.g. Ubeswap/Sushiswap/Curve)
   - Define how to interact with each pool
   - Execute `borrow`/`repay` assets by interacting with the bank, which will then interact with the lending protocol.
 
 ### Component Interaction Flow
 
-1. User -> HomoraBank.
+1. User -> DahliaBank.
    User calls `execute` to HomoraBank, specifying which spell and function to use, e.g. `addLiquidity` using Uniswap spell.
 2. HomoraBank -> Caster.
    Forward low-level spell call to Caster (doesn't hold funds), to prevent attacks.
@@ -71,7 +71,7 @@ Alpha Homora v2 is an upgrade from Alpha Homora v1, a leveraged yield-farming pr
 
 ### AddLiquidity
 
-1. User calls `execute(0, USDT, WETH, data)` on HomoraBank contract. `data` encodes UniswapSpell function call with arguments (including how much of each asset to supply, to borrow, and slippage control settings).
+1. User calls `execute(0, USDT, WETH, data)` on DahliaBank contract. `data` encodes UniswapSpell function call with arguments (including how much of each asset to supply, to borrow, and slippage control settings).
 2. HomoraBank forwards data call to Caster.
 3. Caster does low-level call (with `data`, which encodes `addLiquidity` function call with arguments) to UniswapSpell.
 4. UniswapSpell executes `addLiquidityWERC20`
@@ -89,7 +89,7 @@ Alpha Homora v2 is an upgrade from Alpha Homora v1, a leveraged yield-farming pr
 
 ## Oracle
 
-Prices are determined in ETH.
+Prices are determined in CELO.
 
-- For regular assets, asset prices can be derived from Uniswap pool (with WETH), or Keep3r.
+- For regular assets, asset prices can be derived from Ubeswap pool (with WETH), or Keep3r.
 - For LP tokens, asset prices will determine the optimal reserve proportion of the underlying assets, which are then used to compute the value of LP tokens. See `UniswapV2Oracle.sol` for example implementation.
