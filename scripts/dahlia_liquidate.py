@@ -22,8 +22,9 @@ def liquidate(bank, admin, dahlia_liquidator):
             print(tokens, debts, index_of_largest)
 
             # find the underlying assets, ubeswap call
-            (_, _, collId, _) = bank.getPositionInfo(i)
-            if hex(collId).lower() != flash_pairs.get(tokens[index_of_largest].lower())[0]:
+            (_, collToken, collId, _) = bank.getPositionInfo(i)
+            under = interface.IERC20Wrapper(collToken).getUnderlyingToken(collId)
+            if under.lower() != flash_pairs.get(tokens[index_of_largest].lower())[0]:
                 lp = interface.IUniswapV2Pair(flash_pairs.get(tokens[index_of_largest].lower())[0])
             else:
                 lp = interface.IUniswapV2Pair(flash_pairs.get(tokens[index_of_largest].lower())[1])
@@ -43,8 +44,6 @@ def liquidate(bank, admin, dahlia_liquidator):
             print(amount0Out, amount1Out)
             lp.swap(amount0Out, amount1Out, dahlia_liquidator, data, {"from": admin})
 
-
-    
 
 def main():
     admin = accounts.load('admin')

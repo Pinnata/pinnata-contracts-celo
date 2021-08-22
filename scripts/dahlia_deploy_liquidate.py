@@ -10,7 +10,6 @@ def main():
     f = open('scripts/dahlia_addresses.json')
     addr = json.load(f)['mainnet']
 
-    DahliaLiquidator.deploy(addr['ube_router'], addr['dahlia_bank'], {"from": deployer})
-
+    DahliaLiquidator.deploy(addr['ube_router'], addr['dahlia_bank'], addr['werc20'], {"from": deployer})
 
     print('Done!')
