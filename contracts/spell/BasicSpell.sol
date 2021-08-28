@@ -101,10 +101,4 @@ abstract contract BasicSpell is ERC1155NaiveReceiver {
       werc20.burn(token, amount);
     }
   }
-
-//TODO: do we need this function
-//   /// @dev Fallback function. Can only receive ETH from WETH contract.
-//   receive() external payable {
-//     require(msg.sender == weth, 'ETH must come from WETH');
-//   }
 }

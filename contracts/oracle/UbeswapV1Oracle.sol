@@ -40,6 +40,10 @@ contract UbeswapV1Oracle is IUbeswapV1Oracle, Ownable {
     return UniswapV2Library.pairFor(factory, tokenA, CELO());
   }
 
+  function pairForMCELO(address tokenA) external pure override returns (address) {
+    return UniswapV2Library.pairFor(factory, tokenA, MCELO());
+  }
+
   function updatePair(address pair) external onlyOwner override returns (bool) {
     return _update(pair);
   }
@@ -126,6 +130,16 @@ contract UbeswapV1Oracle is IUbeswapV1Oracle, Ownable {
       return 0x471EcE3750Da237f93B8E339c536989b8978a438;
     } else if (chainId == 44787) {
       return 0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9;
+    }
+    return address(0);
+  }
+
+  function MCELO() public pure override returns (address) {
+    uint256 chainId = computeChainId();
+    if (chainId == 42220) {
+      return 0x7037F7296B2fc7908de7b57a89efaa8319f0C500;
+    } else if (chainId == 44787) {
+      return 0x86f61EB83e10e914fc6F321F5dD3c2dD4860a003;
     }
     return address(0);
   }

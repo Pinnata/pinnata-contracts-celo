@@ -14,11 +14,13 @@ contract BaseKP3ROracle is Initializable {
   IKeep3rV1Oracle public immutable kp3r;
   address public immutable factory;
   address public immutable celo;
+  address public immutable mcelo; 
 
   constructor(IKeep3rV1Oracle _kp3r) public {
     kp3r = _kp3r;
     factory = _kp3r.factory();
     celo = _kp3r.CELO();
+    mcelo = _kp3r.MCELO();
   }
 
   /// @dev Return the TWAP value price0. Revert if TWAP time range is not within the threshold.

@@ -27,7 +27,6 @@ contract UniswapV2SpellV1 is WhitelistSpell {
     address _werc20,
     IUniswapV2Router02 _router, 
     address _celo
-    // TODO: create dynamic CELO address
   ) public WhitelistSpell(_bank, _werc20, _celo) {
     router = _router;
     factory = IUniswapV2Factory(_router.factory());
