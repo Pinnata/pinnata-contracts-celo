@@ -1,22 +1,25 @@
 from brownie import (
-    accounts, ProxyOracle, CoreOracle,
-    HomoraBank, CurveOracle
+    accounts, ProxyOracle, 
+    CoreOracle, HomoraBank
 )
-from brownie import interface
-from .utils import *
+import json
 
 def main():
-    deployer = accounts.load('admin')
+    deployer = accounts.load('dahlia_admin')
+
+    with open('scripts/test_address.json', 'r') as f:
+        addr = json.load(f)
 
     core_oracle = CoreOracle.deploy({'from': deployer})
     proxy_oracle = ProxyOracle.deploy(core_oracle, {'from': deployer})
 
-    # TODO: use proxy openzeppelin contract
-    # bank_impl = HomoraBank.deploy({'from': deployer})
-    # bank_impl.initialize(proxy_oracle, 0, {'from': deployer})
-    # bank = TransparentUpgradableProxy(bank_impl, deployer, {'from': deployer})
-    
     bank = HomoraBank.deploy({'from': deployer})
     bank.initialize(proxy_oracle, 0, {'from': deployer})
 
-    print('Done!')
+    addr.get('mainnet').update({
+        'core_oracle': core_oracle.address,
+        'proxy_oracle': proxy_oracle.address,
+        'dahlia_bank': bank.address, 
+    })
+
+    print(json.dumps(addr, indent=4), file=open('scripts/test_address.json', 'w'))

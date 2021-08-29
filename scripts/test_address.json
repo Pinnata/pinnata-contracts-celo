@@ -1,0 +1,8 @@
+{
+    "mainnet": {
+        "core_oracle": "0xc726355a4934CFf966F3aC7a7b0c4C52aD22Ecd9",
+        "proxy_oracle": "0xCE82a8b0cd4d0fC062343390404201C4382BC85F",
+        "dahlia_bank": "0xbc820Ae0D1D92c3F0DbBA2331093c1b91A583010"
+    },
+    "alfajores": {}
+}

@@ -46,4 +46,6 @@ interface IUbeswapV1Oracle {
   function workable() external view returns (bool);
 
   function CELO() external pure returns (address);
+
+  function MCELO() external pure returns (address);
 }

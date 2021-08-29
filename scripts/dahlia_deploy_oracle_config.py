@@ -3,7 +3,6 @@ from brownie import (
     CurveOracle, WERC20, UbeswapV1Oracle
 )
 from brownie import interface
-from .utils import *
 import json
 
 def main():
