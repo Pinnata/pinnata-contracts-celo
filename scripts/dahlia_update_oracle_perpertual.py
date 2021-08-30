@@ -6,10 +6,11 @@ import time
 
 def main():
     deployer = accounts.load('dahlia_admin')
-    f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['mainnet']
+    with open('scripts/test_address.json', 'r') as f:
+        addr = json.load(f)
+    mainnet_addr.get('mainnet')
 
-    ubeswap_oracle = UbeswapV1Oracle.at(addr['ube_oracle'])
+    ubeswap_oracle = UbeswapV1Oracle.at(mainnet_addr.get('ube_oracle'))
 
     while True:
         if ubeswap_oracle.workable():
