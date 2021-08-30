@@ -2,7 +2,18 @@
     "mainnet": {
         "core_oracle": "0xc726355a4934CFf966F3aC7a7b0c4C52aD22Ecd9",
         "proxy_oracle": "0xCE82a8b0cd4d0fC062343390404201C4382BC85F",
-        "dahlia_bank": "0xbc820Ae0D1D92c3F0DbBA2331093c1b91A583010"
+        "dahlia_bank": "0xbc820Ae0D1D92c3F0DbBA2331093c1b91A583010",
+        "celo": "0x471ece3750da237f93b8e339c536989b8978a438",
+        "ube": "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec",
+        "mcusd": "0x64defa3544c695db8c535d289d843a189aa26b98",
+        "mceur": "0xa8d0e6799ff3fd19c6459bf02689ae09c4d78ba7",
+        "scelo": "0x2879bfd5e7c4ef331384e908aaa3bd3014b703fa",
+        "ube_router": "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121",
+        "ube_factory": "0x62d5b84bE28a183aBB507E125B384122D2C25fAE",
+        "uni_oracle": "0x3A11dC828B25c1E17997338f1b3bf6AEb74B5b2D",
+        "ube_oracle": "0x146AB221ED8Aef94606Dd32Ccd9059bA276e0480",
+        "kp3r_oracle": "0xE507b16EaC36eF1172aFf27CB54cAC0eB4A6a634",
+        "werc20": "0x71560372c65aC59136287a20194c1D91E64f3c3A"
     },
     "alfajores": {}
 }
