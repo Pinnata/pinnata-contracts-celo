@@ -8,7 +8,7 @@ import json
 def main():
     deployer = accounts.load('dahlia_admin')
 
-    with open('scripts/test_address.json', 'r') as f:
+    with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
 
     mainnet_addr = addr.get('mainnet')
@@ -24,10 +24,10 @@ def main():
     uni_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
     ube_oracle = UbeswapV1Oracle.deploy({'from': deployer})
 
-    ube_oracle.addPair(celo, ube)
-    ube_oracle.addPair(celo, mcusd)
-    ube_oracle.addPair(celo, mceur)
-    ube_oracle.addPair(celo, scelo)
+    ube_oracle.addPair(celo, ube, {'from': deployer})
+    ube_oracle.addPair(celo, mcusd, {'from': deployer})
+    ube_oracle.addPair(celo, mceur, {'from': deployer})
+    ube_oracle.addPair(celo, scelo, {'from': deployer})
 
     kp3r_oracle = ERC20KP3ROracle.deploy(ube_oracle, {'from': deployer})
 
@@ -103,4 +103,4 @@ def main():
         'werc20': werc20.address,
     })
 
-    print(json.dumps(addr, indent=4), file=open('scripts/test_address.json', 'w'))
+    print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

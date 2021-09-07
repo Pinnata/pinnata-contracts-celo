@@ -7,7 +7,7 @@ import json
 def main():
     deployer = accounts.load('dahlia_admin')
 
-    with open('scripts/test_address.json', 'r') as f:
+    with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
 
     core_oracle = CoreOracle.deploy({'from': deployer})
@@ -22,4 +22,4 @@ def main():
         'dahlia_bank': bank.address, 
     })
 
-    print(json.dumps(addr, indent=4), file=open('scripts/test_address.json', 'w'))
+    print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

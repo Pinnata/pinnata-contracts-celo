@@ -7,7 +7,7 @@ import json
 def main():
     deployer = accounts.load('dahlia_admin')
 
-    with open('scripts/test_address.json', 'r') as f:
+    with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
     mainnet_addr = addr.get('mainnet')
 
@@ -43,7 +43,7 @@ def main():
     dahlia_bank.setWhitelistSpells([uniswap_spell], [True], {'from': deployer})
 
     addr.get('mainnet').update({
-        'uni_spell': uni_oracle.address,
+        'uni_spell': uniswap_spell.address,
     })
 
-    print(json.dumps(addr, indent=4), file=open('scripts/test_address.json', 'w'))
+    print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))
