@@ -36,11 +36,11 @@ def main():
         fscelo, 'Interest Bearing sCELO', 'dsCELO', {'from': deployer})
     
     # add banks
-    # dahlia_bank.addBank(celo, fcelo, {'from': deployer})
-    # dahlia_bank.addBank(mcusd, fmcusd, {'from': deployer})
-    # dahlia_bank.addBank(mceur, fmceur, {'from': deployer})
-    # dahlia_bank.addBank(ube, fube, {'from': deployer})
-    # dahlia_bank.addBank(scelo, fscelo, {'from': deployer})
+    dahlia_bank.addBank(celo, fcelo, {'from': deployer})
+    dahlia_bank.addBank(mcusd, fmcusd, {'from': deployer})
+    dahlia_bank.addBank(mceur, fmceur, {'from': deployer})
+    dahlia_bank.addBank(ube, fube, {'from': deployer})
+    dahlia_bank.addBank(scelo, fscelo, {'from': deployer})
 
     dahlia_bank.setWhitelistTokens([celo, mcusd, mceur, ube, scelo], [True, True, True, True, True], {'from': deployer})
 

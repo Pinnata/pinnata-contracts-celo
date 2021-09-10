@@ -2,7 +2,6 @@ from brownie import accounts, interface, Contract
 from brownie import (
     HomoraBank, ProxyOracle, CoreOracle, UniswapV2Oracle, SimpleOracle, UniswapV2SpellV1, WERC20, SafeBox, WStakingRewards
 )
-from .utils import *
 import json
 
 def almostEqual(a, b):
@@ -14,7 +13,7 @@ def lend(bob, token, safebox):
     # approve dai
     token.approve(safebox, 2**256-1, {'from': bob})
 
-    bob_amt = 10**18
+    bob_amt = 10**13
     safebox.deposit(bob_amt, {'from': bob})
 
 
@@ -25,19 +24,19 @@ def withdraw(bob, token, safebox):
 
 
 def main():
-    alice = accounts.load('alice')
-    bob = accounts.load('bob')
+    alice = accounts.load('dahlia_alice')
+    bob = accounts.load('dahlia_bob')
     f = open('scripts/dahlia_addresses.json')
     addr = json.load(f)['mainnet']
 
     celo = interface.IERC20Ex(addr['celo'])
     ube = interface.IERC20Ex(addr['ube'])
     dahlia_bank = HomoraBank.at(addr['dahlia_bank'])
-    uniswap_spell = UniswapV2SpellV1.at(addr['uniswap_spell'])
+    uniswap_spell = UniswapV2SpellV1.at(addr['uni_spell'])
     core_oracle = CoreOracle.at(addr['core_oracle'])
-    celo_safebox = SafeBox.at(addr['celo_safebox'])
-    ube_safebox = SafeBox.at(addr['ube_safebox'])
-    wstaking = WStakingRewards.at(addr['ube_celo_w_staking'])
+    celo_safebox = SafeBox.at(addr['dcelo'])
+    ube_safebox = SafeBox.at(addr['dube'])
+    wstaking = WStakingRewards.at(addr['celo_ube_wstaking'])
 
     # lend(bob, celo, celo_safebox)
     # lend(bob, ube, ube_safebox)
