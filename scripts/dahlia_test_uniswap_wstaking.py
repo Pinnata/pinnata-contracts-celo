@@ -25,7 +25,7 @@ def withdraw(bob, token, safebox):
 
 def main():
     alice = accounts.load('dahlia_alice')
-    bob = accounts.load('dahlia_bob')
+    # bob = accounts.load('dahlia_bob')
     f = open('scripts/dahlia_addresses.json')
     addr = json.load(f)['mainnet']
 
@@ -41,8 +41,8 @@ def main():
     # lend(bob, celo, celo_safebox)
     # lend(bob, ube, ube_safebox)
 
-    celo.approve(dahlia_bank, 2**256-1, {'from': alice})
-    ube.approve(dahlia_bank, 2**256-1, {'from': alice})
+    # celo.approve(dahlia_bank, 2**256-1, {'from': alice})
+    # ube.approve(dahlia_bank, 2**256-1, {'from': alice})
 
     prevABal = celo.balanceOf(alice)
     prevBBal = ube.balanceOf(alice)
@@ -54,26 +54,26 @@ def main():
     print('prev B bal', prevBBal)
 
     # open a position
-    dahlia_bank.execute(
-        0,
-        uniswap_spell,
-        uniswap_spell.addLiquidityWStakingRewards.encode_input(
-            celo,
-            ube,
-            [10**10,
-             10**10,
-             0,
-             0,
-             5 * 10**4,
-             0,
-             0,
-             0],
-            wstaking
-        ),
-        {
-            'from': alice, 
-        }
-    )
+    # dahlia_bank.execute(
+    #     0,
+    #     uniswap_spell,
+    #     uniswap_spell.addLiquidityWStakingRewards.encode_input(
+    #         celo,
+    #         ube,
+    #         [10**10,
+    #          10**10,
+    #          0,
+    #          5 * 10**4,
+    #          5 * 10**4,
+    #          0,
+    #          0,
+    #          0],
+    #         wstaking
+    #     ),
+    #     {
+    #         'from': alice, 
+    #     }
+    # )
 
     curABal = celo.balanceOf(alice)
     curBBal = ube.balanceOf(alice)
@@ -95,7 +95,7 @@ def main():
             ube,
             [2**256-1,
              0,
-             0,
+             2**256-1,
              2**256-1,
              0,
              0,
@@ -105,26 +105,26 @@ def main():
         {'from': alice}
     )
 
-    curABal = celo.balanceOf(alice)
-    curBBal = ube.balanceOf(alice)
+    # curABal = celo.balanceOf(alice)
+    # curBBal = ube.balanceOf(alice)
 
-    finalABal = curABal
-    finalBBal = curBBal
+    # finalABal = curABal
+    # finalBBal = curBBal
 
-    tokenAPrice = core_oracle.getCELOPx(celo)
-    tokenBPrice = core_oracle.getCELOPx(ube)
+    # tokenAPrice = core_oracle.getCELOPx(celo)
+    # tokenBPrice = core_oracle.getCELOPx(ube)
 
-    print('alice delta A Bal', curABal - prevABal)
-    print('alice delta B Bal', curBBal - prevBBal)
+    # print('alice delta A Bal', curABal - prevABal)
+    # print('alice delta B Bal', curBBal - prevBBal)
 
-    print('token A price', tokenAPrice)
-    print('token B price', tokenBPrice)
+    # print('token A price', tokenAPrice)
+    # print('token B price', tokenBPrice)
 
-    assert almostEqual(tokenAPrice * initABal + tokenBPrice * initBBal,
-                       tokenAPrice * finalABal + tokenBPrice * finalBBal), 'too much value lost'
+    # assert almostEqual(tokenAPrice * initABal + tokenBPrice * initBBal,
+    #                    tokenAPrice * finalABal + tokenBPrice * finalBBal), 'too much value lost'
 
-    celo.approve(dahlia_bank, 0, {'from': alice})
-    ube.approve(dahlia_bank, 0, {'from': alice})
+    # celo.approve(dahlia_bank, 0, {'from': alice})
+    # ube.approve(dahlia_bank, 0, {'from': alice})
 
     # withdraw(bob, celo, celo_safebox)
     # withdraw(bob, ube, ube_safebox)
