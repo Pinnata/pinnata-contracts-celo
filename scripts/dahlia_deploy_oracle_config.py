@@ -1,61 +1,60 @@
 from brownie import (
     accounts, ERC20KP3ROracle, UniswapV2Oracle, ProxyOracle, CoreOracle,
-    CurveOracle, WERC20, UbeswapV1Oracle
+    WERC20, UbeswapV1Oracle, network 
 )
 from brownie import interface
-from .utils import *
 import json
 
-def main():
-    deployer = accounts.load('admin')
-    f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['mainnet']
+network.gas_limit(8000000)
 
-    core_oracle = CoreOracle.at(addr['core_oracle'])
-    proxy_oracle = ProxyOracle.at(addr['proxy_oracle'])
-    celo = interface.IERC20Ex(addr['celo'])
-    btc = interface.IERC20Ex(addr['btc'])
-    ube = interface.IERC20Ex(addr['ube'])
-    mcusd = interface.IERC20Ex(addr['mcusd'])
-    mceur = interface.IERC20Ex(addr['mceur'])
-    scelo = interface.IERC20Ex(addr['scelo'])
-    ube_router = interface.IUniswapV2Router02(addr['ube_router'])
+
+def main():
+    deployer = accounts.load('dahlia_admin')
+
+    with open('scripts/dahlia_addresses.json', 'r') as f:
+        addr = json.load(f)
+
+    mainnet_addr = addr.get('mainnet')
+    core_oracle = CoreOracle.at(mainnet_addr.get('core_oracle'))
+    proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
+    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
+    mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
+    mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
+    ube = interface.IERC20Ex(mainnet_addr.get('ube'))
+    scelo = interface.IERC20Ex(mainnet_addr.get('scelo'))
+    ube_router = interface.IUniswapV2Router02(mainnet_addr.get('ube_router'))
 
     uni_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
-    ubeswap_oracle = UbeswapV1Oracle.deploy({'from': deployer})
+    ube_oracle = UbeswapV1Oracle.deploy({'from': deployer})
 
-    ubeswap_oracle.addPair(celo, ube)
-    ubeswap_oracle.addPair(mcusd, btc)
-    ubeswap_oracle.addPair(celo, btc)
-    ubeswap_oracle.addPair(celo, mcusd)
-    ubeswap_oracle.addPair(scelo, celo)
-    ubeswap_oracle.addPair(celo, mceur)
+    ube_oracle.addPair(celo, ube, {'from': deployer})
+    ube_oracle.addPair(celo, mcusd, {'from': deployer})
+    ube_oracle.addPair(celo, mceur, {'from': deployer})
+    ube_oracle.addPair(celo, scelo, {'from': deployer})
 
-    kp3r_oracle = ERC20KP3ROracle.deploy(ubeswap_oracle, {'from': deployer})
+    kp3r_oracle = ERC20KP3ROracle.deploy(ube_oracle, {'from': deployer})
 
     ube_factory_address = ube_router.factory({'from': deployer})
     ube_factory = interface.IUniswapV2Factory(ube_factory_address)
 
     celo_ube_lp = ube_factory.getPair(celo, ube)
-    mcusd_btc_lp = ube_factory.getPair(mcusd, btc)
     celo_mcusd_lp = ube_factory.getPair(celo, mcusd)
     celo_mceur_lp = ube_factory.getPair(celo, mceur)
-    scelo_celo_lp = ube_factory.getPair(scelo, celo)
+    celo_scelo_lp = ube_factory.getPair(celo, scelo)
+    mcusd_mceur_lp = ube_factory.getPair(mcusd, mceur)
 
     core_oracle.setRoute([
         celo,
-        btc,
-        ube,
-        mcusd,
+        mcusd, 
         mceur,
+        ube,
         scelo,
         celo_ube_lp,
-        mcusd_btc_lp,
         celo_mcusd_lp,
-        scelo_celo_lp,
-        celo_mceur_lp
+        celo_mceur_lp,
+        celo_scelo_lp,
+        mcusd_mceur_lp
     ], [
-        kp3r_oracle,
         kp3r_oracle,
         kp3r_oracle,
         kp3r_oracle,
@@ -70,22 +69,20 @@ def main():
 
     proxy_oracle.setTokenFactors([
         celo,
-        btc,
-        ube,
-        mcusd,
+        mcusd, 
         mceur,
+        ube,
         scelo,
         celo_ube_lp,
-        mcusd_btc_lp,
         celo_mcusd_lp,
-        scelo_celo_lp,
-        celo_mceur_lp
+        celo_mceur_lp,
+        celo_scelo_lp,
+        mcusd_mceur_lp
     ], [
         [13000, 7800, 10250],
-        [13000, 7800, 10250],
-        [13000, 7800, 10250],
         [11000, 9000, 10250],
         [11000, 9000, 10250],
+        [13000, 7800, 10250],
         [13000, 7800, 10250],
         [50000, 7800, 10250],
         [50000, 7800, 10250],
@@ -102,4 +99,11 @@ def main():
         {'from': deployer},
     )
 
-    print('Done!')
+    addr.get('mainnet').update({
+        'uni_oracle': uni_oracle.address,
+        'ube_oracle': ube_oracle.address,
+        'kp3r_oracle': kp3r_oracle.address, 
+        'werc20': werc20.address,
+    })
+
+    print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

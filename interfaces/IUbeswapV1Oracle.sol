@@ -13,7 +13,6 @@ interface IUbeswapV1Oracle {
         uint price1Cumulative;
     }
 
-  // TODO: no function for the observation mapping
 
   function factory() external pure returns (address);
 
@@ -27,16 +26,16 @@ interface IUbeswapV1Oracle {
   
   function pairForCELO(address tokenA) external pure returns (address);
 
+  function pairForMCELO(address tokenA) external pure returns (address);
+
   function updatePair(address pair) external returns (bool);
 
   function update(address tokenA, address tokenB) external returns (bool);
 
   function addPair(address tokenA, address tokenB) external;
 
-  // TODO: also think this is causing an error
   function work() external;
   
-  // TODO: pretty sure the error is here, return type does not match the actual contract
   function lastObservation(address pair) external view
     returns (Observation memory);
 
@@ -47,4 +46,6 @@ interface IUbeswapV1Oracle {
   function workable() external view returns (bool);
 
   function CELO() external pure returns (address);
+
+  function MCELO() external pure returns (address);
 }

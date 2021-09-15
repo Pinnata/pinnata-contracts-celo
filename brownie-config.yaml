@@ -3,7 +3,10 @@ networks:
     cmd_settings:
       default_balance: "10000000 ether"
   live:
-    gas_limit: 10000000
+    settings:
+    gas_limit: "auto"
+    gas_price: "auto"
+
 
 dependencies:
   - OpenZeppelin/openzeppelin-contracts@3.4.0

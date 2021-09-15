@@ -1,18 +1,16 @@
 from brownie import (
-    accounts, ERC20KP3ROracle, UniswapV2Oracle, BalancerPairOracle, ProxyOracle, CoreOracle,
-    HomoraBank, CurveOracle, UniswapV2SpellV1, WERC20, WLiquidityGauge, WMasterChef,
-    WStakingRewards, SushiswapSpellV1, BalancerSpellV1, CurveSpellV1, UbeswapV1Oracle, SafeBox
+    accounts, UbeswapV1Oracle
 )
-from brownie import interface
-from .utils import *
 import json
 
 def main():
-    deployer = accounts.load('admin')
-    f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['mainnet']
+    deployer = accounts.load('dahlia_admin')
 
-    ubeswap_oracle = UbeswapV1Oracle.at(addr['ube_oracle'])
+    with open('scripts/dahlia_addresses.json', 'r') as f:
+        addr = json.load(f)
+    mainnet_addr = addr.get('mainnet')
+
+    ubeswap_oracle = UbeswapV1Oracle.at(mainnet_addr.get('ube_oracle'))
 
     if ubeswap_oracle.workable():
         ubeswap_oracle.work({'from': deployer})
