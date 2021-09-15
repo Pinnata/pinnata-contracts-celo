@@ -1,8 +1,11 @@
 from brownie import (
-    accounts, UbeswapV1Oracle
+    accounts, UbeswapV1Oracle, network
 )
 import json
 import time
+
+network.gas_limit(8000000)
+
 
 def main():
     deployer = accounts.load('dahlia_admin')
