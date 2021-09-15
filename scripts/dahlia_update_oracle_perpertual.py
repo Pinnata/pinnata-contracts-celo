@@ -7,6 +7,18 @@ import time
 network.gas_limit(8000000)
 
 
+def repeat(f, *args):
+    """
+    Repeat when geth is not broadcasting (unaccounted error)
+    """
+    while True:
+        try:
+            return f(*args)
+        except KeyError:
+            continue
+
+
+
 def main():
     deployer = accounts.load('oracle_updater')
     with open('scripts/dahlia_addresses.json', 'r') as f:
@@ -16,9 +28,8 @@ def main():
     ubeswap_oracle = UbeswapV1Oracle.at(mainnet_addr.get('ube_oracle'))
 
     while True:
-        if ubeswap_oracle.workable():
-            ubeswap_oracle.work({'from': deployer})
-            print("work")
+        if repeat(ubeswap_oracle.workable):
+            repeat(ubeswap_oracle.work, {'from': deployer})
         else:
             print("no work")
             
