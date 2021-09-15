@@ -8,7 +8,7 @@ network.gas_limit(8000000)
 
 
 def main():
-    deployer = accounts.load('dahlia_admin')
+    deployer = accounts.load('oracle_updater')
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
     mainnet_addr = addr.get('mainnet')

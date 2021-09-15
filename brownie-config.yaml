@@ -1,3 +1,6 @@
+compiler:
+  solc:
+    version: "0.6.12"
 networks:
   development:
     cmd_settings:
