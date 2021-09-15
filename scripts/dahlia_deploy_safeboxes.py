@@ -1,8 +1,14 @@
 from brownie import (
-    accounts, HomoraBank, SafeBox
+    accounts,
+    HomoraBank,
+    SafeBox,
+    Contract,
+    network,
+    interface,
 )
-from brownie import interface
 import json
+
+network.gas_limit(8000000)
 
 def main():
     deployer = accounts.load('dahlia_admin')
@@ -21,7 +27,7 @@ def main():
     fmceur = interface.IERC20Ex(mainnet_addr.get('fmceur'))
     fube = interface.IERC20Ex(mainnet_addr.get('fube'))
     fscelo = interface.IERC20Ex(mainnet_addr.get('fscelo'))
-    dahlia_bank = HomoraBank.at(mainnet_addr.get('dahlia_bank'))
+    dahlia_bank = Contract.from_abi("HomoraBank", mainnet_addr.get('dahlia_bank'), HomoraBank.abi)
 
     # deploy safeboxes
     dcelo = SafeBox.deploy(

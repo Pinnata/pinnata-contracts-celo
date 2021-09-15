@@ -1,7 +1,8 @@
 from brownie import (
     accounts, ProxyOracle, 
-    CoreOracle, HomoraBank
+    CoreOracle, HomoraBank, ProxyAdmin, TransparentUpgradeableProxy, Contract
 )
+
 import json
 
 def main():
@@ -13,13 +14,17 @@ def main():
     core_oracle = CoreOracle.deploy({'from': deployer})
     proxy_oracle = ProxyOracle.deploy(core_oracle, {'from': deployer})
 
-    bank = HomoraBank.deploy({'from': deployer})
-    bank.initialize(proxy_oracle, 0, {'from': deployer})
+    bank_impl = HomoraBank.deploy({'from': deployer})
+    proxy_admin = ProxyAdmin.deploy({'from': deployer})
+    bank = TransparentUpgradeableProxy.deploy(bank_impl.address, proxy_admin.address, b'', {'from': deployer})
+    Contract.from_abi("HomoraBank", bank.address, HomoraBank.abi).initialize(proxy_oracle, 0, {'from': deployer})
 
     addr.get('mainnet').update({
         'core_oracle': core_oracle.address,
         'proxy_oracle': proxy_oracle.address,
         'dahlia_bank': bank.address, 
+        'bank_impl': bank_impl.address,
+        'proxy_admin': proxy_admin.address,
     })
 
     print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

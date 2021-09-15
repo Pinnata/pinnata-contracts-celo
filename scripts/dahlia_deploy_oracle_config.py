@@ -1,9 +1,12 @@
 from brownie import (
     accounts, ERC20KP3ROracle, UniswapV2Oracle, ProxyOracle, CoreOracle,
-    WERC20, UbeswapV1Oracle
+    WERC20, UbeswapV1Oracle, network 
 )
 from brownie import interface
 import json
+
+network.gas_limit(8000000)
+
 
 def main():
     deployer = accounts.load('dahlia_admin')

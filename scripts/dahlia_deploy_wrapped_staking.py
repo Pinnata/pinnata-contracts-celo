@@ -1,8 +1,15 @@
 from brownie import (
-    accounts, WStakingRewards, ProxyOracle
+    accounts,
+    WStakingRewards, 
+    ProxyOracle,
+    interface,
+    network
 )
-from brownie import interface
+
 import json
+
+network.gas_limit(8000000)
+
 
 def main():
     deployer = accounts.load('dahlia_admin')

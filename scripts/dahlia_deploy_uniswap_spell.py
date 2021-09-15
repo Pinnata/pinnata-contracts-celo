@@ -1,8 +1,10 @@
 from brownie import (
-    accounts, HomoraBank, UniswapV2SpellV1, WERC20,
+    accounts, HomoraBank, UniswapV2SpellV1, WERC20, Contract, network
 )
 from brownie import interface
 import json
+
+network.gas_limit(8000000)
 
 def main():
     deployer = accounts.load('dahlia_admin')
@@ -19,7 +21,7 @@ def main():
     ube_router = interface.IUniswapV2Router02(mainnet_addr.get('ube_router'))
     ube_factory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
     werc20 = WERC20.at(mainnet_addr.get('werc20'))
-    dahlia_bank = HomoraBank.at(mainnet_addr.get('dahlia_bank'))
+    dahlia_bank = Contract.from_abi("HomoraBank", mainnet_addr.get('dahlia_bank'), HomoraBank.abi)
 
     uniswap_spell = UniswapV2SpellV1.deploy(
         dahlia_bank, werc20, ube_router, celo,
