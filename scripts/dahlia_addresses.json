@@ -1,5 +1,16 @@
 {
-    "alfajores": {},
+    "alfajores": {
+        "celo": "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9",
+        "cusd": "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1",
+        "ceur": "0x10c892A6EC43a53E45D0B916B4b7D383B1b78C0F",
+        "core_oracle": "0xF59435CA1B0045110281A359506Cc5594DdB380E",
+        "proxy_oracle": "0x9e095253F4e5D6E0828CFF64E0F43Fd6F7C8E309",
+        "dahlia_bank": "0x000531a6B61550cfADb637a625A00236fcDD1bDB",
+        "bank_impl": "0x47abA1f4A2dA915e3817Bc18C44BCC7c4A4Ebb77",
+        "proxy_admin": "0x9De537bEBB47451d55842d13e351A37f6941FCF8",
+        "ufactory": "0x81d62D25Bb1348b285Ac99e533D1bdB5c7eaA3b8",
+        "urouter": "0xA6428Cfb68Fd4dDB2550bf7Ea79f6dbBe8CA86Ad"
+    },
     "mainnet": {
         "celo": "0x471ece3750da237f93b8e339c536989b8978a438",
         "ube": "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec",
