@@ -34,9 +34,9 @@ def setup_uniswap(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceu
     oracle.setTokenFactors(
         [cusd, ceur, lp],
         [
-            [10000, 10000, 10000],
-            [10000, 10000, 10000],
-            [10000, 10000, 10000],
+            [11000, 9000, 10500],
+            [11000, 9000, 10500],
+            [11000, 9000, 10500],
         ],
         {'from': admin},
     )
@@ -55,20 +55,20 @@ def execute_uniswap_werc20(admin, alice, bank, token0, token1, spell, ufactory, 
     bank.setWhitelistSpells([spell], [True], {'from': admin})
     bank.setWhitelistTokens([token0, token1], [True, True], {'from': admin})
     tx = bank.execute(
-        pos_id,
+        0,
         spell,
         spell.addLiquidityWERC20.encode_input(
             token0,  # token 0
             token1,  # token 1
             [
-                10 * 10**6,  # 10 cusd
-                2 * 10**6,  # 2 ceur
+                10000 * 10**6,  # 10000 ceur
+                10000 * 10**6,  # 10000 cusd
                 0,
-                1000 * 10**6,  # 1000 cusd
-                200 * 10**6,  # 200 ceur
+                44999 * 10**6,  # levered to the tits
+                44999 * 10**6,  #
                 0,  # borrow LP tokens
-                0,  # min cusd
                 0,  # min ceur
+                0,  # min cusd
             ],
         ),
         {'from': alice}
@@ -76,9 +76,9 @@ def execute_uniswap_werc20(admin, alice, bank, token0, token1, spell, ufactory, 
 
 
 def setup_bob(admin, bob, bank, ceur, cusd):
-    ceur.mint(bob, 10000 * 10**6, {'from': admin})
+    ceur.mint(bob, 100000 * 10**6, {'from': admin})
     ceur.approve(bank, 2**256-1, {'from': bob})
-    cusd.mint(bob, 10000 * 10**6, {'from': admin})
+    cusd.mint(bob, 100000 * 10**6, {'from': admin})
     cusd.approve(bank, 2**256-1, {'from': bob})
 
 
@@ -99,16 +99,14 @@ def test_liquidate(admin, alice, bob, bank, chain, werc20, ufactory, urouter, si
     with brownie.reverts('position still healthy'):
         bank.liquidate(pos_id, ceur, 10 * 10**18, {'from': bob})
 
-    # change oracle settings
+    # # change oracle settings
     lp = ufactory.getPair(cusd, ceur)
     uniswap_lp_oracle = UniswapV2Oracle.deploy(simple_oracle, {'from': admin})
-    oracle.setTokenFactors(
-        [lp],
-        [
-            [10000, 9900, 10500],
-        ],
-        {'from': admin},
-    )
+    
+    chain.mine(50)
+    chain.sleep(50000)
+    bank.accrue(cusd)
+    bank.accrue(ceur)
 
     print('collateral value', bank.getCollateralCELOValue(pos_id))
     print('borrow value', bank.getBorrowCELOValue(pos_id))
@@ -119,57 +117,7 @@ def test_liquidate(admin, alice, bob, bank, chain, werc20, ufactory, urouter, si
     print('calc bob lp', 100 * 10**6 * simple_oracle.getCELOPx(ceur) //
           uniswap_lp_oracle.getCELOPx(lp) * 105 // 100)
     assert almostEqual(werc20.balanceOfERC20(lp, bob), 100 * 10**6 *
-                       simple_oracle.getCELOPx(ceur) // uniswap_lp_oracle.getCELOPx(lp) * 105 // 100)
+                       simple_oracle.getCELOPx(ceur) // uniswap_lp_oracle.getCELOPx(lp) * 105 * 105 // 100 // 100)
 
     print('collateral value', bank.getCollateralCELOValue(pos_id))
     print('borrow value', bank.getBorrowCELOValue(pos_id))
-
-    oracle.setTokenFactors(
-        [ceur, cusd],
-        [
-            [10700, 10000, 10300],
-            [10200, 10000, 10100],
-        ],
-        {'from': admin},
-    )
-
-    print('collateral value', bank.getCollateralCELOValue(pos_id))
-    print('borrow value', bank.getBorrowCELOValue(pos_id))
-
-    # liquidate 300 cusd
-
-    prevBobBal = werc20.balanceOfERC20(lp, bob)
-    bank.liquidate(pos_id, cusd, 300 * 10**6, {'from': bob})
-    curBobBal = werc20.balanceOfERC20(lp, bob)
-    print('delta bob lp', curBobBal - prevBobBal)
-    print('calc delta bob lp', 300 * 10**6 * simple_oracle.getCELOPx(cusd) //
-          uniswap_lp_oracle.getCELOPx(lp) * 105 * 101 // 100 // 100)
-    assert almostEqual(curBobBal - prevBobBal, 300 * 10**6 * simple_oracle.getCELOPx(cusd) //
-                       uniswap_lp_oracle.getCELOPx(lp) * 105 * 101 // 100 // 100)
-
-    # change cusd price
-    simple_oracle.setCELOPx([cusd], [2**112 * 10**12 // 500])
-
-    print('collateral value', bank.getCollateralCELOValue(pos_id))
-    print('borrow value', bank.getBorrowCELOValue(pos_id))
-
-    # liquidate max cusd (remaining 700)
-    prevBobBal = werc20.balanceOfERC20(lp, bob)
-    _, _, _, stCollSize = bank.getPositionInfo(pos_id)
-    bank.liquidate(pos_id, cusd, 2**256-1, {'from': bob})
-    curBobBal = werc20.balanceOfERC20(lp, bob)
-    _, _, _, enCollSize = bank.getPositionInfo(pos_id)
-    print('delta bob lp', curBobBal - prevBobBal)
-    print('calc delta bob lp', stCollSize - enCollSize)
-    assert almostEqual(curBobBal - prevBobBal, stCollSize - enCollSize)
-
-    # try to liquidate more than available
-    with brownie.reverts():
-        bank.liquidate(pos_id, ceur, 101 * 10**6, {'from': bob})
-
-    # liquidate 100 ceur (remaining 100)
-    prevBobBal = werc20.balanceOfERC20(lp, bob)
-    bank.liquidate(pos_id, ceur, 100 * 10**6, {'from': bob})
-    curBobBal = werc20.balanceOfERC20(lp, bob)
-    print('delta bob lp', curBobBal - prevBobBal)
-    assert almostEqual(curBobBal - prevBobBal, 0)

@@ -1,6 +1,10 @@
 import pytest
 from brownie import interface
 
+def almostEqual(a, b):
+    thresh = 0.01
+    return a <= b + thresh * abs(b) and a >= b - thresh * abs(b)
+
 
 def test_uniswap_add_two_tokens(
     admin, alice, chain, bank, werc20, ufactory, urouter, simple_oracle, oracle, celo, cusd, ceur, UniswapV2SpellV1, UniswapV2Oracle, core_oracle
@@ -50,6 +54,13 @@ def test_uniswap_add_two_tokens(
     spell.setWhitelistLPTokens([lp], [True], {'from': admin})
     bank.setWhitelistSpells([spell], [True], {'from': admin})
     bank.setWhitelistTokens([cusd, ceur], [True, True], {'from': admin})
+
+    prevABal = cusd.balanceOf(alice)
+    prevBBal = ceur.balanceOf(alice)
+
+    initABal = prevABal
+    initBBal = prevBBal
+
     tx = bank.execute(
         0,
         spell,
@@ -60,8 +71,8 @@ def test_uniswap_add_two_tokens(
                 40000 * 10**6,  # 40000 ceur
                 50000 * 10**6,  # 50000 cusd
                 0,
-                1000 * 10**6,  # 1000 ceur
-                200 * 10**6,  # 200 cusd
+                10000 * 10**6,  # 1000 ceur
+                20000 * 10**6,  # 200 cusd
                 0,  # borrow LP tokens
                 0,  # min ceur
                 0,  # min cusd
@@ -70,7 +81,61 @@ def test_uniswap_add_two_tokens(
         {'from': alice}
     )
 
-    position_id = tx.return_value
+    curABal = ceur.balanceOf(alice)
+    curBBal = cusd.balanceOf(alice)
+
+    print('alice delta A Bal', curABal - prevABal)
+    print('alice delta B Bal', curBBal - prevBBal)
+
+    prevABal = cusd.balanceOf(alice)
+    prevBBal = ceur.balanceOf(alice)
+
+    position_id = bank.nextPositionId()
+
+    prevBorrow = bank.getBorrowCELOValue(tx.return_value)
+    chain.mine(50)
+    chain.sleep(50000)
+    bank.accrue(cusd)
+    bank.accrue(ceur)
+    postBorrow = bank.getBorrowCELOValue(tx.return_value)
+    assert (prevBorrow < postBorrow)
+
+        # close the position
+    bank.execute(
+        position_id - 1,
+        spell,
+        spell.removeLiquidityWERC20.encode_input(
+            cusd,
+            ceur,
+            [2**256-1, #lp to remove
+             0, # lp to keep    
+             2**256-1, #repay cusd
+             2**256-1, #repay ceur
+             0,
+             0,
+             0],
+        ),
+        {'from': alice}
+    )
+
+    curABal = cusd.balanceOf(alice)
+    curBBal = ceur.balanceOf(alice)
+
+    finalABal = curABal
+    finalBBal = curBBal
+
+    tokenAPrice = core_oracle.getCELOPx(cusd)
+    tokenBPrice = core_oracle.getCELOPx(ceur)
+
+    print('alice delta A Bal', curABal - prevABal)
+    print('alice delta B Bal', curBBal - prevBBal)
+
+    print('token A price', tokenAPrice)
+    print('token B price', tokenBPrice)
+
+    assert almostEqual(tokenAPrice * initABal + tokenBPrice * initBBal,
+                       tokenAPrice * finalABal + tokenBPrice * finalBBal), 'too much value lost'
+
     print('tx gas used', tx.gas_used)
     print('bank collateral size', bank.getPositionInfo(position_id))
     print('bank collateral value', bank.getCollateralCELOValue(position_id))
@@ -78,7 +143,6 @@ def test_uniswap_add_two_tokens(
 
     print('bank ceur', bank.getBankInfo(ceur))
     print('bank cusd', bank.getBankInfo(cusd))
-
     print('ceur Px', simple_oracle.getCELOPx(ceur))
     print('cusd Px', simple_oracle.getCELOPx(cusd))
 

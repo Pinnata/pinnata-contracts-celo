@@ -39,6 +39,7 @@ def test_accrue(admin, alice, bank, werc20, urouter, ufactory, celo, cusd, ceur,
     print('totalShare', curceurTotalShare)
 
     assert prevceurTotalShare == curceurTotalShare
+    assert prevceurTotalDebt < curceurTotalDebt
 
     ceur_interest = curceurTotalDebt - prevceurTotalDebt
     ceur_fee = ceur_interest * bank.feeBps() // 10000  # 20%
