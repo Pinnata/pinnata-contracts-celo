@@ -1,6 +1,8 @@
-from brownie import (SafeBox, HomoraBank, ERC20KP3ROracle, UniswapV2Oracle)
-from brownie import accounts, interface, chain
-from .utils import *
+from brownie import (
+    interface,
+    ERC20KP3ROracle,
+    UniswapV2Oracle
+)
 import json
 
 def main():
@@ -19,7 +21,7 @@ def main():
 
     print("celo:", kp3r_oracle.getCELOPx(celo))
     print("ube:", kp3r_oracle.getCELOPx(ube))
-    print("btc:", kp3r_oracle.getCELOPx(btc))
+    # print("btc:", kp3r_oracle.getCELOPx(btc))
     print("mcusd:", kp3r_oracle.getCELOPx(mcusd))
     print("mceur:", kp3r_oracle.getCELOPx(mceur))
     print("scelo:", kp3r_oracle.getCELOPx(scelo))

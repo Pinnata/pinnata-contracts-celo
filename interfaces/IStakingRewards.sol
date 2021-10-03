@@ -1,13 +1,30 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity >=0.4.24;
 
+
+// https://docs.synthetix.io/contracts/source/interfaces/istakingrewards
 interface IStakingRewards {
-  function rewardPerToken() external view returns (uint);
+    // Views
+    function lastTimeRewardApplicable() external view returns (uint256);
 
-  function stake(uint amount) external;
+    function rewardPerToken() external view returns (uint256);
 
-  function withdraw(uint amount) external;
+    function earned(address account) external view returns (uint256);
 
-  function getReward() external;
+    function getRewardForDuration() external view returns (uint256);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address account) external view returns (uint256);
+
+    // Mutative
+
+    function stake(uint256 amount) external;
+
+    function withdraw(uint256 amount) external;
+
+    function getReward() external;
+
+    function exit() external;
 }
