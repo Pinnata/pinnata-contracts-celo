@@ -1,4 +1,4 @@
-# Dahlia v1 Contracts
+# Dahlia v1 contracts
 
 ```
 ++++++++++++              +++++        ++++       ++++   ++++           ++++++++++++        ++++++  
@@ -18,7 +18,7 @@ finalize deployment address
 TL;DR. Here's what v1 will support:
 
 - Multi assets lending and borrowing (with huge leverage for stablecoin farming!)
-- More farming pools beyond just Uniswap (think Balancer, Curve, etc)
+- More farming pools beyond just Ubeswap (think Mobius, Curve, etc)
 - Can keep the farming assets and not just dumping
 - No more EOA only = more composability
 - You can bring your own LP tokens too = more flexibility
@@ -28,15 +28,15 @@ TL;DR. Here's what v1 will support:
 
 Dahlia v1 is a leveraged yield-farming product. Here are some key features:
 
-<!-- - In v2, vaults (e.g. ibETH) no longer exist. The protocol instead integrates with existing lending protocol. Whenever a user wants to borrow funds (on leverage) to yield farm, Alpha Homora will borrow from the lending protocol. -->
+<!-- - In v1, the protocol instead integrates with the Foutain of Youth, an exisiting lending protocol on Celo. Whenever a user wants to borrow funds (on leverage) to yield farm, Dahlia will borrow from the lending protocol. -->
 
-- In v2, other assets are borrow-able (not only ETH like in v1), including stablecoins like USDT, USDC, DAI.
-- In v2, users may also borrow supported LP tokens to farm more.
+- In v1, assets that are borrow-able are Celo and stablecoins like cUSD, USDC (from Ethereum), etc.
+- In v1, users may also borrow supported LP tokens to farm more.
 - Users can also bring their own LP tokens and add on to their positions.
 - Each "spell" defines how the protocol interacts with farming pools, e.g. Uniswap spell, Sushiswap spell, Curve spell.
   - Spell functions include e.g. `addLiquidity`, `removeLiquidity`.
   - This is different from v1, where each pool has its own spell (goblin).
-- Reward tokens e.g. UNI, SUSHI were sold and reinvested to users' positions in v1. Instead, users can now claim reward tokens.
+- Users can now claim reward tokens e.g. UBE, MOBI 
 - Adjustable positions - users can adjust their existing positions by supply more assets, borrow more assets, or repay some debts.
   - As long as the collateral credit >= borrow credit. Otherwise, the position is at liquidation risk.
 
@@ -48,31 +48,31 @@ Dahlia v1 is a leveraged yield-farming product. Here are some key features:
 - Caster
   - Intermediate contract that just calls another contract function (low-level call) with provided data (instead of bank), to prevent attack.
   - Doesn't store any funds
-- Spells (e.g. Ubeswap/Sushiswap/Curve)
+- Spells (e.g. Ubeswap/Sushiswap/Mobius/Curve)
   - Define how to interact with each pool
   - Execute `borrow`/`repay` assets by interacting with the bank, which will then interact with the lending protocol.
 
 ### Component Interaction Flow
 
 1. User -> DahliaBank.
-   User calls `execute` to HomoraBank, specifying which spell and function to use, e.g. `addLiquidity` using Uniswap spell.
+   User calls `execute` to DahliaBank, specifying which spell and function to use, e.g. `addLiquidity` using Uniswap spell.
 2. HomoraBank -> Caster.
    Forward low-level spell call to Caster (doesn't hold funds), to prevent attacks.
 3. Caster -> Spell.
    Caster does low-level call to Spell.
-4. Spell may call HomoraBank to e.g. `doBorrow` funds, `doTransmit` funds from users (so users can approve only the bank, not each spell), `doRepay` debt. Funds are then sent to Spell, to execute pool interaction.
+4. Spell may call DahliaBank to e.g. `doBorrow` funds, `doTransmit` funds from users (so users can approve only the bank, not each spell), `doRepay` debt. Funds are then sent to Spell, to execute pool interaction.
 5. Spells -> Pools.
-   Spells interact with Pools (e.g. optimally swap before supplying to Uniswap, or removing liquidity from the pool and pay back some debts).
-6. (Optional) Stake LP tokens in wrapper contracts (e.g. WMasterChef for Sushi, WLiquidityGauge for Curve, WStakingRewards for Uniswap + Balancer).
-7. Spell may put collateral back to HomoraBank.
-   If the spell funtion called is e.g. to open a new position, then the LP tokens will be stored in HomoraBank.
+   Spells interact with Pools (e.g. optimally swap before supplying to Ubeswap, or removing liquidity from the pool and pay back some debts).
+6. (Optional) Stake LP tokens in wrapper contracts (e.g. WMasterChef for Ubeswap, WLiquidityGauge for Mobius, WStakingRewards for Symmetric).
+7. Spell may put collateral back to DahliaBank.
+   If the spell funtion called is e.g. to open a new position, then the LP tokens will be stored in DahliaBank.
 
 ## Example Execution
 
 ### AddLiquidity
 
-1. User calls `execute(0, USDT, WETH, data)` on DahliaBank contract. `data` encodes UniswapSpell function call with arguments (including how much of each asset to supply, to borrow, and slippage control settings).
-2. HomoraBank forwards data call to Caster.
+1. User calls `execute(0, cUSD, Celo, data)` on DahliaBank contract. `data` encodes "UniswapSpell" --this is for ubeswap-- function call with arguments (including how much of each asset to supply, to borrow, and slippage control settings).
+2. DahliaBank forwards data call to Caster.
 3. Caster does low-level call (with `data`, which encodes `addLiquidity` function call with arguments) to UniswapSpell.
 4. UniswapSpell executes `addLiquidityWERC20`
    - `doTransmit` desired amount of assets the user wants to supply
@@ -82,14 +82,16 @@ Dahlia v1 is a leveraged yield-farming product. Here are some key features:
    - `doPutCollateral` wrapped tokens back to HomoraBank
    - Refund leftover assets to the user.
 
-> For **Uniswap** pools with staking rewards, use `addLiquidityWStakingRewards` function.
-> For **Sushiswap** pools with staking in masterchef, use `addLiqudityWMasterChef` function.
-> For **Balancer** pools with staking rewards, use `addLiquidityWStakingRewards` function.
+> For **Ubeswap** pools with staking in masterchef, use `addLiqudityWMasterChef` function.
+> For **SushiSwap** pools with staking in masterchef, use `addLiqudityWMasterChef` function.
+> For **Symmetric** pools with staking rewards, use `addLiquidityWStakingRewards` function.
+> For all **Mobius** pools, use `addLiquidity[N]` (where `N` is the number of underlying tokens). The spell will auto put in Mobius's liquidity gauge.
 > For all **Curve** pools, use `addLiquidity[N]` (where `N` is the number of underlying tokens). The spell will auto put in Curve's liquidity gauge.
+
 
 ## Oracle
 
-Prices are determined in CELO.
+Prices are taking from SortedOracles contract and only avialable for cUSD, cEUR, Celo.
 
-- For regular assets, asset prices can be derived from Ubeswap pool (with WETH), or Keep3r.
+- For regular assets, asset prices can be derived from Ubeswap pool (with UBE) and are secured through a TWAP contract.
 - For LP tokens, asset prices will determine the optimal reserve proportion of the underlying assets, which are then used to compute the value of LP tokens. See `UniswapV2Oracle.sol` for example implementation.
