@@ -85,10 +85,8 @@ def main():
     dahlia_bank.accrue(cusd, {'from': deployer})
     dahlia_bank.accrue(celo, {'from': deployer})
     postBorrow = dahlia_bank.getBorrowCELOValue(position_id)
-    print(prevBorrow, postBorrow)
-    print(dahlia_bank.getPositionDebts(position_id))
 
-    # assert prevBorrow < postBorrow
+    assert prevBorrow < postBorrow
 
     curABal = celo.balanceOf(alice)
     curBBal = cusd.balanceOf(alice)

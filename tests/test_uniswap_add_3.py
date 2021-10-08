@@ -154,8 +154,8 @@ def test_uniswap_add_two_tokens(
     print('token A price', tokenAPrice)
     print('token B price', tokenBPrice)
 
-    # assert almostEqual(tokenAPrice * initABal + tokenBPrice * initBBal,
-    #                    tokenAPrice * finalABal + tokenBPrice * finalBBal), 'too much value lost'
+    assert almostEqual(tokenAPrice * initABal + tokenBPrice * initBBal,
+                       tokenAPrice * finalABal + tokenBPrice * finalBBal), 'too much value lost'
 
     print('tx gas used', tx.gas_used)
     print('bank collateral size', bank.getPositionInfo(position_id))
