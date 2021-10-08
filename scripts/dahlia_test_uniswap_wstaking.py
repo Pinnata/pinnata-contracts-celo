@@ -17,7 +17,7 @@ def almostEqual(a, b):
 def lend(bob, token, safebox):
     token.approve(safebox, 2**256-1, {'from': bob})
 
-    bob_amt = 10**15
+    bob_amt = 10**18
     safebox.deposit(bob_amt, {'from': bob})
 
 
@@ -38,8 +38,8 @@ def main():
     wstaking = WStakingRewards.at(addr['celo_cusd_wstaking'])
     mock = MockERC20.at(addr['mock'])
 
-    lend(bob, celo, celo_safebox)
-    lend(bob, cusd, cusd_safebox)
+    # lend(bob, celo, celo_safebox)
+    # lend(bob, cusd, cusd_safebox)
 
     celo.approve(dahlia_bank, 2**256-1, {'from': alice})
     cusd.approve(dahlia_bank, 2**256-1, {'from': alice})
@@ -60,16 +60,18 @@ def main():
         0,
         uniswap_spell,
         uniswap_spell.addLiquidityWStakingRewards.encode_input(
-            celo,
             cusd,
-            [10**10,
-             6*10**10,
+            celo,
+            [
+             6*10**16,
+             10**16,
              0,
-             1.5*10**10,
-             9*10**10,
+             9*10**16,
+             1.5*10**16,
              0,
              0,
-             0],
+             0
+            ],
             wstaking
         ),
         {
@@ -77,15 +79,16 @@ def main():
         }
     )
 
-    position_id = dahlia_bank.nextPositionId()
-    prevBorrow = dahlia_bank.getBorrowCELOValue(position_id-1)
-    time.sleep(300)
+    position_id = dahlia_bank.nextPositionId()-1
+    prevBorrow = dahlia_bank.getBorrowCELOValue(position_id)
+    time.sleep(30)
     dahlia_bank.accrue(cusd, {'from': deployer})
     dahlia_bank.accrue(celo, {'from': deployer})
-    postBorrow = dahlia_bank.getBorrowCELOValue(position_id-1)
+    postBorrow = dahlia_bank.getBorrowCELOValue(position_id)
     print(prevBorrow, postBorrow)
+    print(dahlia_bank.getPositionDebts(position_id))
 
-    assert prevBorrow < postBorrow
+    # assert prevBorrow < postBorrow
 
     curABal = celo.balanceOf(alice)
     curBBal = cusd.balanceOf(alice)
@@ -98,11 +101,11 @@ def main():
 
     # close the position
     dahlia_bank.execute(
-        position_id - 1,
+        position_id,
         uniswap_spell,
         uniswap_spell.removeLiquidityWStakingRewards.encode_input(
-            celo,
             cusd,
+            celo,
             [2**256-1,
              0,
              2**256-1,
@@ -137,5 +140,5 @@ def main():
 
     assert postRewards > prevRewards
 
-    celo.approve(dahlia_bank, 0, {'from': alice})
-    cusd.approve(dahlia_bank, 0, {'from': alice})
+    # celo.approve(dahlia_bank, 0, {'from': alice})
+    # cusd.approve(dahlia_bank, 0, {'from': alice})
