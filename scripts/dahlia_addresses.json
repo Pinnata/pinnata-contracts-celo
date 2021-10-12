@@ -34,6 +34,7 @@
     "mainnet": {
         "celo": "0x471ece3750da237f93b8e339c536989b8978a438",
         "ube": "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec",
+        "moo": "0x17700282592d6917f6a73d0bf8accf4d578c131e",
         "btc": "0xd629eb00deced2a080b7ec630ef6ac117e614f1b",
         "cusd": "0x765de816845861e75a25fca122bb6898b8b1282a",
         "ceur": "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73",
@@ -56,6 +57,7 @@
         "celo_mceur_staking": "0x08252f2E68826950d31D268DfAE5E691EE8a2426",
         "celo_scelo_staking": "0xd4C9675b0AE1397fC5b2D3356736A02d86347f2d",
         "mcusd_mceur_staking": "0xaf13437122cd537C5D8942f17787cbDBd787fE94",
+        "celo_ube_mstaking": "0x9D87c01672A7D02b2Dc0D0eB7A145C7e13793c3B",
         "core_oracle": "0xb142644fc99e0a70F83523EFf1B0d4F359fe951F",
         "proxy_oracle": "0x9Cd566Ab7Ca94955B278F7D13A1be5963f753DEd",
         "dahlia_bank": "0xb0b2d27b5384B4a53B6960709785Ad32713e4645",
@@ -75,6 +77,8 @@
         "celo_mcusd_wstaking": "0xa2cb40E3D269D48937Ca53BEEaF81F7Ea78AB16C",
         "celo_mceur_wstaking": "0xa8F850e6F794F994785154aC3335256E8165507a",
         "celo_scelo_wstaking": "0x81341B3bd0B080624Dd6b89930787e1cb9b94198",
-        "mcusd_mceur_wstaking": "0x4D9871CD7A4b50407000f412C1aF226a816978B9"
+        "mcusd_mceur_wstaking": "0x4D9871CD7A4b50407000f412C1aF226a816978B9",
+        "mcusd_mceur_wmstaking": "0x4E8771EE2f518Ce7fB4D9fC0c80012c582becd50",
+        "celo_ube_wmstaking": "0x82711cB7faa9bfB9A7adFF449860571ce065193b"
     }
 }
