@@ -5,6 +5,7 @@ from brownie import (
 import json
 
 network.gas_limit(8000000)
+import time
 
 
 def almostEqual(a, b):
@@ -87,11 +88,18 @@ def main():
     prevABal = celo.balanceOf(alice)
     prevBBal = ube.balanceOf(alice)
 
-    position_id = dahlia_bank.nextPositionId()
+    position_id = dahlia_bank.nextPositionId()-1
+    # prevBorrow = dahlia_bank.getBorrowCELOValue(position_id)
+    time.sleep(30)
+    dahlia_bank.accrue(ube, {'from': alice})
+    dahlia_bank.accrue(celo, {'from': alice})
+    # postBorrow = dahlia_bank.getBorrowCELOValue(position_id)
+
+    # assert prevBorrow < postBorrow
 
     # close the position
     dahlia_bank.execute(
-        position_id - 1,
+        position_id,
         uniswap_spell,
         uniswap_spell.removeLiquidityWStakingRewards.encode_input(
             celo,

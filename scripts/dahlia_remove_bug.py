@@ -15,26 +15,26 @@ def main():
     person = accounts.load('dahlia_alice')
     f = open('scripts/dahlia_addresses.json')
     addr = json.load(f)['mainnet']
-    position = 2
+    position = 3
 
     celo = interface.IERC20Ex(addr['celo'])
     mcusd = interface.IERC20Ex(addr['mcusd'])
     mceur = interface.IERC20Ex(addr['mceur'])
     scelo = interface.IERC20Ex(addr['scelo'])
     ube = interface.IERC20Ex(addr['ube'])
-    fcelo = interface.IERC20Ex(addr['fcelo'])
-    fmcusd = interface.IERC20Ex(addr['fmcusd'])
-    fmceur = interface.IERC20Ex(addr['fmceur'])
-    fscelo = interface.IERC20Ex(addr['fscelo'])
-    fube = interface.IERC20Ex(addr['fube'])
+    fcelo = interface.ICErc20(addr['fcelo'])
+    fmcusd = interface.ICErc20(addr['fmcusd'])
+    fmceur = interface.ICErc20(addr['fmceur'])
+    fscelo = interface.ICErc20(addr['fscelo'])
+    fube = interface.ICErc20(addr['fube'])
     dahlia_bank = Contract.from_abi("HomoraBank", addr.get('dahlia_bank'), HomoraBank.abi)
     # dahlia_bank.setFeeBps(10, {'from': deployer})
 
-    dahlia_bank.accrue(celo, {'from': person})
-    dahlia_bank.accrue(mcusd, {'from': person})
-    dahlia_bank.accrue(mceur, {'from': person})
-    dahlia_bank.accrue(scelo, {'from': person})
-    dahlia_bank.accrue(ube, {'from': person})
+    # dahlia_bank.accrue(celo, {'from': person})
+    # dahlia_bank.accrue(mcusd, {'from': person})
+    # dahlia_bank.accrue(mceur, {'from': person})
+    # dahlia_bank.accrue(scelo, {'from': person})
+    # dahlia_bank.accrue(ube, {'from': person})
 
     (owner, collToken, collId, collateralsize) = dahlia_bank.getPositionInfo(position)
     collat = dahlia_bank.getCollateralCELOValue(position)
