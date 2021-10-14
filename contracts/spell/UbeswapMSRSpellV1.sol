@@ -227,11 +227,11 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
 
     // // 9. Refund reward
     address[] memory reward = IWMStakingRewards(wstaking).getReward();
-    // uint depth = IWMStakingRewards(wstaking).depth();
-    // require(depth > 0 && depth <= 8, 'invalid depth');
-    // for (uint i = 0; i < depth; i += 1) {
-    //   doRefund(reward[i]);
-    // }
+    uint depth = IWMStakingRewards(wstaking).depth();
+    require(depth > 0 && depth <= 8, 'invalid depth');
+    for (uint i = 0; i < depth; i += 1) {
+      doRefund(reward[i]);
+    }
   }
 
   struct RepayAmounts {

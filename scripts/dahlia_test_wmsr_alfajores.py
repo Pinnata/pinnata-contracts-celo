@@ -7,12 +7,17 @@ from brownie import (
     Contract,
     HomoraBank,
     UniswapV2SpellV1,
+    CoreOracle,
 )
 
 import json
 import time
 
 network.gas_limit(8000000)
+
+def almostEqual(a, b):
+    thresh = 0.01
+    return a <= b + thresh * abs(b) and a >= b - thresh * abs(b)
 
 def lend(bob, token, safebox):
     token.approve(safebox, 2**256-1, {'from': bob})
@@ -40,6 +45,7 @@ def main():
     dahlia_bank = Contract.from_abi("HomoraBank", alfajores_addr.get('dahlia_bank'), HomoraBank.abi)
     ufactory = interface.IUniswapV2Factory(alfajores_addr.get('ufactory'))
     ubeswap_msr_spell = UniswapV2SpellV1.at(alfajores_addr['ubeswap_msr_spell'])
+    core_oracle = CoreOracle.at(alfajores_addr['core_oracle'])
 
     celo_cusd_wmstaking = WMStakingRewards.at(alfajores_addr.get('celo_cusd_wmstaking'))
     celo_ceur_wmstaking = WMStakingRewards.at(alfajores_addr.get('celo_ceur_wmstaking'))
@@ -54,19 +60,20 @@ def main():
     bPrevGROW = mock.balanceOf(bob)
     bPrevMOM = mock2.balanceOf(bob)
 
-    lend(bob, celo, celo_safebox)
-    lend(bob, cusd, cusd_safebox)
-
-    aPrevLP = celo_cusd_lp.balanceOf(alice)
-    bPrevLP = celo_cusd_lp.balanceOf(bob)
+    # lend(bob, celo, celo_safebox)
+    # lend(bob, cusd, cusd_safebox)
 
     prevABal = celo.balanceOf(alice)
     prevBBal = cusd.balanceOf(alice)
 
+    initABal = prevABal
+    initBBal = prevBBal
+
     celo.approve(dahlia_bank, 2**256-1, {'from': alice})
     cusd.approve(dahlia_bank, 2**256-1, {'from': alice})
 
-    prevRewards = mock2.balanceOf(alice)
+    celo.approve(dahlia_bank, 2**256-1, {'from': bob})
+    cusd.approve(dahlia_bank, 2**256-1, {'from': bob})
 
     # open a position
     dahlia_bank.execute(
@@ -79,8 +86,8 @@ def main():
              6*10**16,
              10**16,
              0,
-             9*10**16,
-             1.5*10**16,
+             9*10**14,
+             1.5*10**14,
              0,
              0,
              0
@@ -92,12 +99,39 @@ def main():
         }
     )
 
-    position_id = dahlia_bank.nextPositionId()-1
-    prevBorrow = dahlia_bank.getBorrowCELOValue(position_id)
+    aposition_id = dahlia_bank.nextPositionId()-1
+
+     # open a position
+    dahlia_bank.execute(
+        0,
+        ubeswap_msr_spell,
+        ubeswap_msr_spell.addLiquidityWStakingRewards.encode_input(
+            cusd,
+            celo,
+            [
+             6*10**15,
+             10**15,
+             0,
+             9*10**13,
+             1.5*10**13,
+             0,
+             0,
+             0
+            ],
+            celo_cusd_wmstaking
+        ),
+        {
+            'from': bob, 
+        }
+    )
+
+    bposition_id = dahlia_bank.nextPositionId()-1
+
+    prevBorrow = dahlia_bank.getBorrowCELOValue(aposition_id)
     time.sleep(30)
     dahlia_bank.accrue(cusd, {'from': alice})
     dahlia_bank.accrue(celo, {'from': alice})
-    postBorrow = dahlia_bank.getBorrowCELOValue(position_id)
+    postBorrow = dahlia_bank.getBorrowCELOValue(aposition_id)
 
     assert prevBorrow < postBorrow
 
@@ -110,9 +144,29 @@ def main():
     prevABal = celo.balanceOf(alice)
     prevBBal = cusd.balanceOf(alice)
 
+    dahlia_bank.execute(
+        bposition_id,
+        ubeswap_msr_spell,
+        ubeswap_msr_spell.removeLiquidityWStakingRewards.encode_input(
+            cusd,
+            celo,
+            [2**256-1,
+             0,
+             2**256-1,
+             2**256-1,
+             0,
+             0,
+             0],
+            celo_cusd_wmstaking
+        ),
+        {'from': bob}
+    )
+
+    time.sleep(15)
+
     # close the position
     dahlia_bank.execute(
-        position_id,
+        aposition_id,
         ubeswap_msr_spell,
         ubeswap_msr_spell.removeLiquidityWStakingRewards.encode_input(
             cusd,
@@ -129,13 +183,17 @@ def main():
         {'from': alice}
     )
 
-    postRewards = mock2.balanceOf(alice)
+    aPostGROW = mock.balanceOf(alice)
+    aPostMOM = mock2.balanceOf(alice)
 
     curABal = celo.balanceOf(alice)
     curBBal = cusd.balanceOf(alice)
 
-    # tokenAPrice = core_oracle.getCELOPx(celo)
-    # tokenBPrice = core_oracle.getCELOPx(cusd)
+    finalABal = curABal
+    finalBBal = curBBal
+
+    tokenAPrice = core_oracle.getCELOPx(celo)
+    tokenBPrice = core_oracle.getCELOPx(cusd)
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -143,37 +201,20 @@ def main():
     # print('token A price', tokenAPrice)
     # print('token B price', tokenBPrice)
 
-    # assert almostEqual(tokenAPrice * initABal + tokenBPrice * initBBal,
-    #                    tokenAPrice * finalABal + tokenBPrice * finalBBal), 'too much value lost'
+    assert almostEqual(tokenAPrice * initABal + tokenBPrice * initBBal,
+                       tokenAPrice * finalABal + tokenBPrice * finalBBal), 'too much value lost'
 
-    assert postRewards > prevRewards
+    assert aPostGROW > aPrevGROW
+    assert aPostMOM > aPrevMOM
 
-    # celo.approve(dahlia_bank, 0, {'from': alice})
-    # cusd.approve(dahlia_bank, 0, {'from': alice})
+    aPostGROW = mock.balanceOf(alice)
+    aPostMOM = mock2.balanceOf(alice)
+    bPostGROW = mock.balanceOf(bob)
+    bPostMOM = mock2.balanceOf(bob)
+    aPostLP = celo_cusd_lp.balanceOf(alice)
+    bPostLP = celo_cusd_lp.balanceOf(bob)
 
-
-    # celo_cusd_wmstaking.mint(3 * 10**10, {'from': alice})
-
-    # time.sleep(30)
-
-    # celo_cusd_wmstaking.mint(10**10, {'from': bob})
-
-    # time.sleep(90)
-
-    # celo_cusd_wmstaking.burn(10, 2**256-1, {'from': bob})
-    # celo_cusd_wmstaking.burn(10, 2**256-1, {'from': alice})
-
-    # aPostGROW = mock.balanceOf(alice)
-    # aPostMOM = mock2.balanceOf(alice)
-    # bPostGROW = mock.balanceOf(bob)
-    # bPostMOM = mock2.balanceOf(bob)
-    # aPostLP = celo_cusd_lp.balanceOf(alice)
-    # bPostLP = celo_cusd_lp.balanceOf(bob)
-
-    # print('alice grow', aPrevGROW, aPostGROW)
-    # print('alice mom', aPrevMOM, aPostMOM)
-    # print('bob grow', bPrevGROW, bPostGROW)
-    # print('bob mom', bPrevMOM, bPostMOM)
-    # print('alice lp', aPrevLP, aPostLP)
-    # print('bob lp', bPrevLP, bPostLP)
-
+    print('alice grow', aPostGROW-aPrevGROW)
+    print('alice mom', aPostMOM-aPrevMOM)
+    print('bob grow', bPostGROW-bPrevGROW)
+    print('bob mom', bPostMOM-bPrevMOM)
