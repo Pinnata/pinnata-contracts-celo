@@ -21,29 +21,33 @@ interface IGetStakingRewards {
     function stakingToken() external view returns(address); 
 }
 
-contract WMoolaStakingRewards is ERC1155('WMoolaStakingRewards'), ReentrancyGuard, IERC20Wrapper {
+contract WMStakingRewards is ERC1155('WMStakingRewards'), ReentrancyGuard, IERC20Wrapper {
   using SafeMath for uint;
   using HomoraMath for uint;
   using SafeERC20 for IERC20;
 
   address public immutable staking; // Staking reward contract address
   address public immutable underlying; // Underlying token address
-  address public immutable reward; // Reward token address
+  uint public immutable depth;
   mapping(uint256 => uint256[8]) public externalRewards;
-  uint public stakingDepth;
+  address[] public reward;
 
   constructor(
     address _staking,
     address _underlying,
-    address _reward,
+    address[] memory _reward,
     uint _depth
   ) public {
+    require(_depth > 0 && _depth <= 8, 'invalid depth');
     staking = _staking;
     underlying = _underlying;
+    depth = _depth;
     reward = _reward;
-    assert (_depth <= 8);
-    stakingDepth = _depth;
     IERC20(_underlying).safeApprove(_staking, uint(-1));
+  }
+
+  function getReward() external view returns (address[] memory) {
+    return reward; 
   }
 
   /// @dev Return the underlying ERC20 for the given ERC1155 token id.
@@ -62,12 +66,12 @@ contract WMoolaStakingRewards is ERC1155('WMoolaStakingRewards'), ReentrancyGuar
     IERC20(underlying).safeTransferFrom(msg.sender, address(this), amount);
     IStakingRewards(staking).stake(amount);
     uint rewardPerToken = IStakingRewards(staking).rewardPerToken();
-    address currentStaking = staking;
-    for (uint i = 0; i < stakingDepth; i += 1) {
-      uint stepReward = IStakingRewards(currentStaking).rewardPerToken();
-      externalRewards[rewardPerToken]][i] = stepReward;
-      if (i < stakingDepth-1) {
-        currentStaking = IGetMoolaStakingRewards(currentStaking).externalStakingRewards();
+    address stepStaking = staking;
+    for (uint i = 0; i < depth; i += 1) {
+      uint stepReward = IStakingRewards(stepStaking).rewardPerToken();
+      externalRewards[rewardPerToken][i] = stepReward;
+      if (i < depth-1) { // only last external reward is not MoolaStakingRewards instance
+        stepStaking = IGetMoolaStakingRewards(stepStaking).externalStakingRewards();
       }
     }
     _mint(msg.sender, rewardPerToken, amount, '');
@@ -85,19 +89,19 @@ contract WMoolaStakingRewards is ERC1155('WMoolaStakingRewards'), ReentrancyGuar
     IStakingRewards(staking).withdraw(amount);
     IStakingRewards(staking).getReward();
     IERC20(underlying).safeTransfer(msg.sender, amount);
-    address currentStaking = staking;
-    address currentStakingReward = reward;
-    for (uint i = 0; i < stakingDepth; i += 1) {
+    address stepStaking = staking;
+    address stepReward = reward[0];
+    for (uint i = 0; i < depth; i += 1) {
       uint stRewardPerToken = externalRewards[id][i];
-      uint enRewardPerToken = IStakingRewards(currentStaking).rewardPerToken();
+      uint enRewardPerToken = IStakingRewards(stepStaking).rewardPerToken();
       uint stReward = stRewardPerToken.mul(amount).divCeil(1e18);
       uint enReward = enRewardPerToken.mul(amount).div(1e18);
-      currentStakingReward = IGetStakingRewards(currentStaking).rewardsToken();
+      stepReward = IGetStakingRewards(stepStaking).rewardsToken();
       if (enReward > stReward) {
-        IERC20(currentStakingReward).safeTransfer(msg.sender, enReward.sub(stReward));
+        IERC20(stepReward).safeTransfer(msg.sender, enReward.sub(stReward));
       }
-      if (i < stakingDepth-1) {
-        currentStaking = IGetMoolaStakingRewards(currentStaking).externalStakingRewards();
+      if (i < depth-1) {
+        stepStaking = IGetMoolaStakingRewards(stepStaking).externalStakingRewards();
       }
     }
     return amount;

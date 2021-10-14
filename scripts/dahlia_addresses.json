@@ -29,7 +29,15 @@
         "mock": "0x32FEC6761d6EC4a2DF5DCe36bf5854Ba0DA6D09b",
         "celo_cusd_staking": "0x1b48CBBB63f01AffC63184bBCbCa0075ac6DAba1",
         "celo_ceur_staking": "0x38EEF2C640dc8dC421C2954FbfBb5139dc2307D9",
-        "cusd_ceur_staking": "0xD4E97Dda77050226281Ad623bD087ECD7F1581Ad"
+        "cusd_ceur_staking": "0xD4E97Dda77050226281Ad623bD087ECD7F1581Ad",
+        "mock2": "0x2F395cc7662b693018b1E8BaBFd20FF5e9507F31",
+        "celo_cusd_wmstaking": "0x9458C59bBF43BB5Eca35962B849F8dA1bFEe1269",
+        "celo_ceur_wmstaking": "0x4915221015741575bf6F7C83537420C70a4B6420",
+        "cusd_ceur_wmstaking": "0x0B9adA6501516621607df0d88a0850bb6C3ffAbe",
+        "celo_cusd_mstaking": "0x5e3ACe9ec5b7E94949E4F1AA6595716278A3691d",
+        "celo_ceur_mstaking": "0xE16A75DEeA0abc57fECcd9c97a5B76aF15df3d17",
+        "cusd_ceur_mstaking": "0xF575047c7fE684bD67287feAA9d5d279386ae043",
+        "ubeswap_msr_spell": "0x28105a1cCb85d7Ca2Ae285D2B78bdFCdbB77dA0A"
     },
     "mainnet": {
         "celo": "0x471ece3750da237f93b8e339c536989b8978a438",

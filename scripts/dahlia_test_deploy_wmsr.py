@@ -1,68 +1,74 @@
 from brownie import (
     accounts,
-    WMoolaStakingRewards, 
-    ProxyOracle,
     interface,
-    network
+    network,
+    MockMoolaStakingRewards,
+    WMStakingRewards,
+    ProxyOracle,
 )
-
 import json
-import time
 
 network.gas_limit(8000000)
 
+zero_add = '0x0000000000000000000000000000000000000000'
 
 def main():
     deployer = accounts.load('dahlia_admin')
-    alice = accounts.load('dahlia_alice')
 
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
-    mainnet_addr = addr.get('mainnet')
 
-    # mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
-    # mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
-    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
-    ube = interface.IERC20Ex(mainnet_addr.get('ube'))
-    ube_factory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
-    proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
-    celo_ube_lp = interface.IERC20Ex(ube_factory.getPair(celo, ube))
-    print(mainnet_addr.get('celo_ube_mstaking'))
+    alfajores_addr = addr.get('alfajores')
 
-    celo_ube_wmstaking = WMoolaStakingRewards.deploy(
-        mainnet_addr.get('celo_ube_mstaking'),
-        celo_ube_lp,
-        celo,
+    celo = interface.IERC20Ex(alfajores_addr.get('celo'))
+    cusd = interface.IERC20Ex(alfajores_addr.get('cusd'))
+    ceur = interface.IERC20Ex(alfajores_addr.get('ceur'))
+    mock = interface.IERC20Ex(alfajores_addr.get('mock'))
+    mock2 = interface.IERC20Ex(alfajores_addr.get('mock2'))
+    celo_cusd_mstaking = MockMoolaStakingRewards.at(alfajores_addr.get('celo_cusd_mstaking'))
+    celo_ceur_mstaking = MockMoolaStakingRewards.at(alfajores_addr.get('celo_ceur_mstaking'))
+    cusd_ceur_mstaking = MockMoolaStakingRewards.at(alfajores_addr.get('cusd_ceur_mstaking'))
+    ufactory = interface.IUniswapV2Factory(alfajores_addr.get('ufactory'))
+    proxy_oracle = ProxyOracle.at(alfajores_addr.get('proxy_oracle'))
+
+    celo_cusd_lp = ufactory.getPair(celo, cusd)
+    celo_ceur_lp = ufactory.getPair(celo, ceur)
+    cusd_ceur_lp = ufactory.getPair(cusd, ceur)
+
+    celo_cusd_wmstaking = WMStakingRewards.deploy(
+        celo_cusd_mstaking,
+        celo_cusd_lp,
+        [mock2, mock, zero_add, zero_add, zero_add, zero_add, zero_add, zero_add],
+        2,
+        {'from': deployer}
+    )
+
+    celo_ceur_wmstaking = WMStakingRewards.deploy(
+        celo_ceur_mstaking,
+        celo_ceur_lp,
+        [mock2, mock, zero_add, zero_add, zero_add, zero_add, zero_add, zero_add],
+        2,
+        {'from': deployer}
+    )
+
+    cusd_ceur_wmstaking = WMStakingRewards.deploy(
+        cusd_ceur_mstaking,
+        cusd_ceur_lp,
+        [mock2, mock, zero_add, zero_add, zero_add, zero_add, zero_add, zero_add],
         2,
         {'from': deployer}
     )
 
     proxy_oracle.setWhitelistERC1155(
-        [celo_ube_wmstaking],
+        [celo_cusd_wmstaking, celo_ceur_wmstaking, cusd_ceur_wmstaking],
         True,
         {'from': deployer},
     )
-    
 
-    prevCelo = celo.balanceOf(alice)
-    prevUbe = ube.balanceOf(alice)
-    # approve
-    amount = celo_ube_lp.balanceOf(alice)
-    print(amount)
-    celo_ube_lp.approve(celo_ube_wmstaking, 2**256-1, {'from': alice})
-    celo_ube_wmstaking.mint(amount-1, {'from': alice})
-    time.sleep(600)
-
-    celo_ube_wmstaking.burn(10, 2**256-1, {'from': alice})
-
-    postCelo = celo.balanceOf(alice)
-    postUbe = ube.balanceOf(alice)
-
-    print(postCelo, prevCelo)
-    print(postUbe, prevUbe)
-
-    addr.get('mainnet').update({
-        'celo_ube_wmstaking': celo_ube_wmstaking.address
+    addr.get('alfajores').update({
+        'celo_cusd_wmstaking': celo_cusd_wmstaking.address,
+        'celo_ceur_wmstaking': celo_ceur_wmstaking.address,
+        'cusd_ceur_wmstaking': cusd_ceur_wmstaking.address,
     })
 
     print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

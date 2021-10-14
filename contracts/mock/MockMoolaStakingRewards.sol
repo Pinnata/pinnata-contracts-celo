@@ -15,7 +15,7 @@ import "../../interfaces/IGetStakingRewards.sol";
 import "../../interfaces/IMoolaStakingRewards.sol";
 import "./MockStaking.sol";
 
-contract MoolaStakingRewards is IMoolaStakingRewards, RewardsDistributionRecipient, ReentrancyGuard {
+contract MockMoolaStakingRewards is IMoolaStakingRewards, RewardsDistributionRecipient, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 

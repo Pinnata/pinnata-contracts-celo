@@ -5,7 +5,7 @@ from brownie import (
     MockERC20,
     MockStakingRewards,
     MockMoolaStakingRewards,
-    WStakingRewards,
+    WMoolaStakingRewards,
     ProxyOracle,
 )
 import json
@@ -36,17 +36,17 @@ def main():
 
     mock2 = MockERC20.deploy('Mother', 'MOM', 18, {'from': deployer})
 
-    mock.mint(celo_cusd_staking, 1000*10**18, {'from': deployer})
-    mock.mint(celo_ceur_staking, 1000*10**18, {'from': deployer})
-    mock.mint(cusd_ceur_staking, 1000*10**18, {'from': deployer})
+    # mock.mint(celo_cusd_staking, 1000*10**18, {'from': deployer})
+    # mock.mint(celo_ceur_staking, 1000*10**18, {'from': deployer})
+    # mock.mint(cusd_ceur_staking, 1000*10**18, {'from': deployer})
 
-    celo_cusd_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
-    celo_ceur_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
-    cusd_ceur_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
+    # celo_cusd_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
+    # celo_ceur_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
+    # cusd_ceur_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
 
-    celo_cusd_staking.notifyRewardAmount(500*10**18, {'from': deployer})
-    celo_ceur_staking.notifyRewardAmount(500*10**18, {'from': deployer})
-    cusd_ceur_staking.notifyRewardAmount(500*10**18, {'from': deployer})
+    # celo_cusd_staking.notifyRewardAmount(500*10**18, {'from': deployer})
+    # celo_ceur_staking.notifyRewardAmount(500*10**18, {'from': deployer})
+    # cusd_ceur_staking.notifyRewardAmount(500*10**18, {'from': deployer})
 
     celo_cusd_multi_staking = MockMoolaStakingRewards.deploy(deployer, deployer, mock2, celo_cusd_staking, [mock], celo_cusd_lp, {'from': deployer})
     celo_ceur_multi_staking = MockMoolaStakingRewards.deploy(deployer, deployer, mock2, celo_ceur_staking, [mock], celo_ceur_lp, {'from': deployer})
@@ -60,45 +60,48 @@ def main():
     celo_ceur_multi_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
     cusd_ceur_multi_staking.setRewardsDuration(60*60*24*7, {'from': deployer})
 
-    celo_cusd_multi_staking.notifyRewardAmount(500*10**18, {'from': deployer})
-    celo_ceur_multi_staking.notifyRewardAmount(500*10**18, {'from': deployer})
-    cusd_ceur_multi_staking.notifyRewardAmount(500*10**18, {'from': deployer})
+    celo_cusd_multi_staking.notifyRewardAmount(100*10**18, {'from': deployer})
+    celo_ceur_multi_staking.notifyRewardAmount(100*10**18, {'from': deployer})
+    cusd_ceur_multi_staking.notifyRewardAmount(100*10**18, {'from': deployer})
 
-    celo_cusd_wstaking = WStakingRewards.deploy(
-        celo_cusd_staking,
+    celo_cusd_wmstaking = WMoolaStakingRewards.deploy(
+        celo_cusd_multi_staking,
         celo_cusd_lp,
-        mock,
+        mock2,
+        2,
         {'from': deployer}
     )
 
-    celo_ceur_wstaking = WStakingRewards.deploy(
-        celo_ceur_staking,
+    celo_ceur_wmstaking = WMoolaStakingRewards.deploy(
+        celo_ceur_multi_staking,
         celo_ceur_lp,
-        mock,
+        mock2,
+        2,
         {'from': deployer}
     )
 
-    cusd_ceur_wstaking = WStakingRewards.deploy(
-        cusd_ceur_staking,
+    cusd_ceur_wmstaking = WMoolaStakingRewards.deploy(
+        cusd_ceur_multi_staking,
         cusd_ceur_lp,
-        mock,
+        mock2,
+        2,
         {'from': deployer}
     )
 
     proxy_oracle.setWhitelistERC1155(
-        [celo_cusd_wstaking, celo_ceur_wstaking, cusd_ceur_wstaking],
+        [celo_cusd_wmstaking, celo_ceur_wmstaking, cusd_ceur_wmstaking],
         True,
         {'from': deployer},
     )
 
     addr.get('alfajores').update({
-        'mock': mock.address,
-        'celo_cusd_staking': celo_cusd_staking.address,
-        'celo_ceur_staking': celo_ceur_staking.address,
-        'cusd_ceur_staking': cusd_ceur_staking.address,
-        'celo_cusd_wstaking': celo_cusd_wstaking.address,
-        'celo_ceur_wstaking': celo_ceur_wstaking.address,
-        'cusd_ceur_wstaking': cusd_ceur_wstaking.address,
+        'mock2': mock2.address,
+        'celo_cusd_mstaking': celo_cusd_multi_staking.address,
+        'celo_ceur_mstaking': celo_ceur_multi_staking.address,
+        'cusd_ceur_mstaking': cusd_ceur_multi_staking.address,
+        'celo_cusd_wmstaking': celo_cusd_wmstaking.address,
+        'celo_ceur_wmstaking': celo_ceur_wmstaking.address,
+        'cusd_ceur_wmstaking': cusd_ceur_wmstaking.address,
     })
 
     print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))
