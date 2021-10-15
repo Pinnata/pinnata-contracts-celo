@@ -1,10 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/ownership/Ownable.sol";
+import 'OpenZeppelin/openzeppelin-contracts@2.3.0/contracts/math/SafeMath.sol';
+import 'OpenZeppelin/openzeppelin-contracts@2.3.0/contracts/ownership/Ownable.sol';
 
-import "../interfaces/IPriceOracleGetter.sol";
-import "../libraries/EthAddressLib.sol";
+import "../../interfaces/IPriceOracleGetter.sol";
 
 interface ISortedOracles {
     function medianRate(address) external view returns (uint256, uint256);
@@ -69,9 +68,6 @@ contract CeloProxyPriceProvider is IPriceOracleGetter, Ownable, UsingRegistry {
     /// @notice Gets an asset price by address
     /// @param _asset The asset address
     function getAssetPrice(address _asset) public view returns(uint256) {
-        if (_asset == EthAddressLib.ethAddress()) {
-            return 1 ether;
-        }
         if (_asset == getGoldToken()) {
             return 1 ether;
         }
