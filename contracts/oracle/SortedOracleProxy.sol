@@ -1,8 +1,6 @@
 pragma solidity ^0.5.0;
 
 import 'OpenZeppelin/openzeppelin-contracts@2.3.0/contracts/math/SafeMath.sol';
-import 'OpenZeppelin/openzeppelin-contracts@2.3.0/contracts/ownership/Ownable.sol';
-
 import "../../interfaces/IPriceOracleGetter.sol";
 
 interface ISortedOracles {
@@ -32,38 +30,9 @@ contract UsingRegistry {
 /// @title CeloProxyPriceProvider
 /// @author Moola
 /// @notice Proxy smart contract to get the price of an asset from a price source, with Celo SortedOracles
-///         smart contracts as primary option
-/// - If the returned price by a SortedOracles is <= 0, the call is forwarded to a fallbackOracle
-/// - Owned by the Aave governance system, allowed to add sources for assets, replace them
-///   and change the fallbackOracle
-contract CeloProxyPriceProvider is IPriceOracleGetter, Ownable, UsingRegistry {
+///         smart contracts as the only option
+contract CeloProxyPriceProvider is IPriceOracleGetter, UsingRegistry {
     using SafeMath for uint256;
-
-    event AssetSourceUpdated(address indexed asset, address indexed source);
-    event FallbackOracleUpdated(address indexed fallbackOracle);
-
-    IPriceOracleGetter private fallbackOracle;
-
-    /// @notice Constructor
-    /// @param _fallbackOracle The address of the fallback oracle to use if the data of an
-    ///        aggregator is not consistent
-    constructor(address _fallbackOracle) public {
-        internalSetFallbackOracle(_fallbackOracle);
-    }
-
-    /// @notice Sets the fallbackOracle
-    /// - Callable only by the Aave governance
-    /// @param _fallbackOracle The address of the fallbackOracle
-    function setFallbackOracle(address _fallbackOracle) external onlyOwner {
-        internalSetFallbackOracle(_fallbackOracle);
-    }
-
-    /// @notice Internal function to set the fallbackOracle
-    /// @param _fallbackOracle The address of the fallbackOracle
-    function internalSetFallbackOracle(address _fallbackOracle) internal {
-        fallbackOracle = IPriceOracleGetter(_fallbackOracle);
-        emit FallbackOracleUpdated(_fallbackOracle);
-    }
 
     /// @notice Gets an asset price by address
     /// @param _asset The asset address
@@ -81,19 +50,12 @@ contract CeloProxyPriceProvider is IPriceOracleGetter, Ownable, UsingRegistry {
         return _divisor.mul(1 ether).div(_price);
     }
 
-    /// @notice Gets a list of prices from a list of assets addresses
-    /// @param _assets The list of assets addresses
-    function getAssetsPrices(address[] calldata _assets) external view returns(uint256[] memory) {
-        uint256[] memory prices = new uint256[](_assets.length);
-        for (uint256 i = 0; i < _assets.length; i++) {
-            prices[i] = getAssetPrice(_assets[i]);
-        }
-        return prices;
-    }
-
-    /// @notice Gets the address of the fallback oracle
-    /// @return address The addres of the fallback oracle
-    function getFallbackOracle() external view returns(address) {
-        return address(fallbackOracle);
+    /// @dev Return the value of the given input as CELO per unit, multiplied by 2**112.
+    /// @param token The ERC-20 token to check the value.
+    function getCELOPx(address token) external view returns (uint) {
+        uint unscaledPrice = getAssetPrice(token);
+        uint px = (unscaledPrice * 2**112) / 10**18;
+        require(px != 0, 'no px');
+        return px;
     }
 }
