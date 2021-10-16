@@ -1,8 +1,13 @@
 from brownie import (
-    accounts, ERC20KP3ROracle, UniswapV2Oracle, ProxyOracle, CoreOracle,
-    WERC20, UbeswapV1Oracle, network 
+    accounts,
+    network,
+    interface,
+    UniswapV2Oracle,
+    ProxyOracle,
+    CoreOracle,
+    SimpleOracle,
+    WERC20,
 )
-from brownie import interface
 import json
 
 network.gas_limit(8000000)
@@ -14,54 +19,35 @@ def main():
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
 
-    mainnet_addr = addr.get('mainnet')
-    core_oracle = CoreOracle.at(mainnet_addr.get('core_oracle'))
-    proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
-    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
-    mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
-    mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
-    ube = interface.IERC20Ex(mainnet_addr.get('ube'))
-    scelo = interface.IERC20Ex(mainnet_addr.get('scelo'))
-    ube_router = interface.IUniswapV2Router02(mainnet_addr.get('ube_router'))
+    alfajores_addr = addr.get('alfajores')
+
+    celo = interface.IERC20Ex(alfajores_addr.get('celo'))
+    cusd = interface.IERC20Ex(alfajores_addr.get('cusd'))
+    ceur = interface.IERC20Ex(alfajores_addr.get('ceur'))
+    core_oracle = CoreOracle.at(alfajores_addr.get('core_oracle'))
+    proxy_oracle = ProxyOracle.at(alfajores_addr.get('proxy_oracle'))
+    ufactory = interface.IUniswapV2Factory(alfajores_addr.get('ufactory'))
 
     uni_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
-    ube_oracle = UbeswapV1Oracle.deploy({'from': deployer})
+    simple_oracle = SimpleOracle.deploy({'from': deployer})
 
-    ube_oracle.addPair(celo, ube, {'from': deployer})
-    ube_oracle.addPair(celo, mcusd, {'from': deployer})
-    ube_oracle.addPair(celo, mceur, {'from': deployer})
-    ube_oracle.addPair(celo, scelo, {'from': deployer})
+    simple_oracle.setCELOPx([celo, cusd, ceur], [2**112, 2**112 / 6, 2**112 / 5])
 
-    kp3r_oracle = ERC20KP3ROracle.deploy(ube_oracle, {'from': deployer})
-
-    ube_factory_address = ube_router.factory({'from': deployer})
-    ube_factory = interface.IUniswapV2Factory(ube_factory_address)
-
-    celo_ube_lp = ube_factory.getPair(celo, ube)
-    celo_mcusd_lp = ube_factory.getPair(celo, mcusd)
-    celo_mceur_lp = ube_factory.getPair(celo, mceur)
-    celo_scelo_lp = ube_factory.getPair(celo, scelo)
-    mcusd_mceur_lp = ube_factory.getPair(mcusd, mceur)
+    celo_cusd_lp = ufactory.getPair(celo, cusd)
+    celo_ceur_lp = ufactory.getPair(celo, ceur)
+    cusd_ceur_lp = ufactory.getPair(cusd, ceur)
 
     core_oracle.setRoute([
         celo,
-        mcusd, 
-        mceur,
-        ube,
-        scelo,
-        celo_ube_lp,
-        celo_mcusd_lp,
-        celo_mceur_lp,
-        celo_scelo_lp,
-        mcusd_mceur_lp
+        cusd,
+        ceur,
+        celo_cusd_lp,
+        celo_ceur_lp,
+        cusd_ceur_lp,
     ], [
-        kp3r_oracle,
-        kp3r_oracle,
-        kp3r_oracle,
-        kp3r_oracle,
-        kp3r_oracle,
-        uni_oracle,
-        uni_oracle,
+        simple_oracle, 
+        simple_oracle, 
+        simple_oracle,
         uni_oracle,
         uni_oracle,
         uni_oracle,
@@ -69,23 +55,15 @@ def main():
 
     proxy_oracle.setTokenFactors([
         celo,
-        mcusd, 
-        mceur,
-        ube,
-        scelo,
-        celo_ube_lp,
-        celo_mcusd_lp,
-        celo_mceur_lp,
-        celo_scelo_lp,
-        mcusd_mceur_lp
+        cusd,
+        ceur,
+        celo_cusd_lp,
+        celo_ceur_lp,
+        cusd_ceur_lp,
     ], [
         [13000, 7800, 10250],
         [11000, 9000, 10250],
         [11000, 9000, 10250],
-        [13000, 7800, 10250],
-        [13000, 7800, 10250],
-        [50000, 7800, 10250],
-        [50000, 7800, 10250],
         [50000, 7800, 10250],
         [50000, 7800, 10250],
         [50000, 7800, 10250],
@@ -99,10 +77,9 @@ def main():
         {'from': deployer},
     )
 
-    addr.get('mainnet').update({
+    addr.get('alfajores').update({
         'uni_oracle': uni_oracle.address,
-        'ube_oracle': ube_oracle.address,
-        'kp3r_oracle': kp3r_oracle.address, 
+        'simple_oracle': simple_oracle.address,
         'werc20': werc20.address,
     })
 

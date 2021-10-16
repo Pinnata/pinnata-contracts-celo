@@ -61,6 +61,27 @@ def test_uniswap_add_two_tokens(
     initABal = prevABal
     initBBal = prevBBal
 
+    for _ in range(40):
+        tx = bank.execute(
+            0,
+            spell,
+            spell.addLiquidityWERC20.encode_input(
+                ceur,  # token 0
+                cusd,  # token 1
+                [
+                    10000 * 10**6,  # 10000 ceur
+                    10000 * 10**6,  # 10000 cusd
+                    0,
+                    4500 * 10**6,  # 1000 ceur
+                    4500 * 10**6,  # 200 cusd
+                    0,  # borrow LP tokens
+                    0,  # min ceur
+                    0,  # min cusd
+                ],
+            ),
+            {'from': alice}
+        )
+
     tx = bank.execute(
         0,
         spell,
@@ -68,11 +89,11 @@ def test_uniswap_add_two_tokens(
             ceur,  # token 0
             cusd,  # token 1
             [
-                10000 * 10**6,  # 10000 ceur
-                12000 * 10**6,  # 10000 cusd
+                2000 * 10**5,  # 10000 ceur
+                2000 * 10**5,  # 10000 cusd
                 0,
-                30000 * 10**6,  # 1000 ceur
-                15000 * 10**6,  # 200 cusd
+                4000 * 10**5,  # 1000 ceur
+                5000 * 10**5,  # 200 cusd
                 0,  # borrow LP tokens
                 0,  # min ceur
                 0,  # min cusd
@@ -94,7 +115,7 @@ def test_uniswap_add_two_tokens(
 
     prevBorrow = bank.getBorrowCELOValue(tx.return_value)
     chain.mine(50)
-    chain.sleep(50000)
+    chain.sleep(500)
     bank.accrue(cusd)
     bank.accrue(ceur)
     postBorrow = bank.getBorrowCELOValue(tx.return_value)

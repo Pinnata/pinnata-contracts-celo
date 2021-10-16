@@ -1,9 +1,17 @@
 from brownie import (
-    accounts, ProxyOracle, 
-    CoreOracle, HomoraBank, ProxyAdmin, TransparentUpgradeableProxy, Contract
+    accounts,
+    network,
+    ProxyOracle,
+    CoreOracle,
+    HomoraBank,
+    ProxyAdmin,
+    TransparentUpgradeableProxy,
+    Contract
 )
 
 import json
+
+network.gas_limit(8000000)
 
 def main():
     deployer = accounts.load('dahlia_admin')
@@ -19,7 +27,7 @@ def main():
     bank = TransparentUpgradeableProxy.deploy(bank_impl.address, proxy_admin.address, b'', {'from': deployer})
     Contract.from_abi("HomoraBank", bank.address, HomoraBank.abi).initialize(proxy_oracle, 0, {'from': deployer})
 
-    addr.get('mainnet').update({
+    addr.get('alfajores').update({
         'core_oracle': core_oracle.address,
         'proxy_oracle': proxy_oracle.address,
         'dahlia_bank': bank.address, 

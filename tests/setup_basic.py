@@ -38,7 +38,6 @@ def core_oracle(a, CoreOracle):
     contract = CoreOracle.deploy({'from': a[0]})
     return contract
 
-
 @pytest.fixture(scope='function')
 def oracle(a, werc20, ProxyOracle, core_oracle):
     contract = ProxyOracle.deploy(core_oracle, {'from': a[0]})

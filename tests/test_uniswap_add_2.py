@@ -93,8 +93,8 @@ def test_uniswap_add_two_tokens(
     position_id = bank.nextPositionId()
 
     prevBorrow = bank.getBorrowCELOValue(tx.return_value)
-    chain.mine(50)
-    chain.sleep(50000)
+    chain.mine(1)
+    chain.sleep(5)
     bank.accrue(cusd)
     bank.accrue(ceur)
     postBorrow = bank.getBorrowCELOValue(tx.return_value)
