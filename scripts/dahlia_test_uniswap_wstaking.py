@@ -7,6 +7,7 @@ import json
 import time
 
 network.gas_limit(8000000)
+import time
 
 
 def almostEqual(a, b):
@@ -96,6 +97,15 @@ def main():
 
     prevABal = celo.balanceOf(alice)
     prevBBal = cusd.balanceOf(alice)
+
+    position_id = dahlia_bank.nextPositionId()-1
+    # prevBorrow = dahlia_bank.getBorrowCELOValue(position_id)
+    time.sleep(30)
+    dahlia_bank.accrue(cusd, {'from': alice})
+    dahlia_bank.accrue(celo, {'from': alice})
+    # postBorrow = dahlia_bank.getBorrowCELOValue(position_id)
+
+    # assert prevBorrow < postBorrow
 
     # close the position
     dahlia_bank.execute(

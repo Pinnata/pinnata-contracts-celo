@@ -4,46 +4,37 @@ from brownie import (
     interface,
     Contract,
     HomoraBank,
-    MockERC20,
-    UniswapV2SpellV1,
-    WStakingRewards, 
     network
 )
 import json
 
 network.gas_limit(8000000)
 
-
-def almostEqual(a, b):
-    thresh = 0.01
-    return a <= b + thresh * abs(b) and a >= b - thresh * abs(b)
-
-
-def lend(bob, token, safebox):
-    token.approve(safebox, 2**256-1, {'from': bob})
-
-    bob_amt = 10**15
-    safebox.deposit(bob_amt, {'from': bob})
-
-
 def main():
     deployer = accounts.load('dahlia_admin')
     person = accounts.load('dahlia_alice')
     f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['alfajores']
-    position = 11
+    addr = json.load(f)['mainnet']
+    position = 3
 
     celo = interface.IERC20Ex(addr['celo'])
-    cusd = interface.IERC20Ex(addr['cusd'])
-    ceur = interface.IERC20Ex(addr['ceur'])
+    mcusd = interface.IERC20Ex(addr['mcusd'])
+    mceur = interface.IERC20Ex(addr['mceur'])
+    scelo = interface.IERC20Ex(addr['scelo'])
+    ube = interface.IERC20Ex(addr['ube'])
     fcelo = interface.ICErc20(addr['fcelo'])
-    fcusd = interface.ICErc20(addr['fcusd'])
-    fceur = interface.ICErc20(addr['fceur'])
+    fmcusd = interface.ICErc20(addr['fmcusd'])
+    fmceur = interface.ICErc20(addr['fmceur'])
+    fscelo = interface.ICErc20(addr['fscelo'])
+    fube = interface.ICErc20(addr['fube'])
     dahlia_bank = Contract.from_abi("HomoraBank", addr.get('dahlia_bank'), HomoraBank.abi)
+    # dahlia_bank.setFeeBps(10, {'from': deployer})
 
-    dahlia_bank.accrue(celo, {'from': person})
-    dahlia_bank.accrue(cusd, {'from': person})
-    dahlia_bank.accrue(ceur, {'from': person})
+    # dahlia_bank.accrue(celo, {'from': person})
+    # dahlia_bank.accrue(mcusd, {'from': person})
+    # dahlia_bank.accrue(mceur, {'from': person})
+    # dahlia_bank.accrue(scelo, {'from': person})
+    # dahlia_bank.accrue(ube, {'from': person})
 
     (owner, collToken, collId, collateralsize) = dahlia_bank.getPositionInfo(position)
     collat = dahlia_bank.getCollateralCELOValue(position)
@@ -56,5 +47,7 @@ def main():
     print("collateral size:", collateralsize)
 
     assert dahlia_bank.getBankInfo(celo)[3] == fcelo.borrowBalanceStored(dahlia_bank.address)
-    assert dahlia_bank.getBankInfo(cusd)[3] == fcusd.borrowBalanceStored(dahlia_bank.address)
-    assert dahlia_bank.getBankInfo(ceur)[3] == fceur.borrowBalanceStored(dahlia_bank.address)
+    assert dahlia_bank.getBankInfo(mcusd)[3] == fmcusd.borrowBalanceStored(dahlia_bank.address)
+    assert dahlia_bank.getBankInfo(mceur)[3] == fmceur.borrowBalanceStored(dahlia_bank.address)
+    assert dahlia_bank.getBankInfo(scelo)[3] == fscelo.borrowBalanceStored(dahlia_bank.address)
+    assert dahlia_bank.getBankInfo(ube)[3] == fube.borrowBalanceStored(dahlia_bank.address)
