@@ -14,4 +14,5 @@ interface IWStakingRewards is IERC1155, IERC20Wrapper {
   function burn(uint id, uint amount) external returns (uint);
 
   function reward() external returns (address);
+
 }

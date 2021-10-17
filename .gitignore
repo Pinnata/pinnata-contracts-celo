@@ -1,7 +1,7 @@
 __pycache__
 .history
 .hypothesis/
-build/
+build
 reports/
-node_modules/
+node_modules
 solc-input-contracts.json
