@@ -1,4 +1,3 @@
-from os import EX_CANTCREAT
 from brownie import (
     accounts,
     interface,
