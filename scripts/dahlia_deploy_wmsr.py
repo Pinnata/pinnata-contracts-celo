@@ -1,16 +1,14 @@
 from brownie import (
     accounts,
-    WMoolaStakingRewards, 
+    WMStakingRewards, 
     ProxyOracle,
     interface,
-    network
+    network,
 )
 
 import json
-import time
 
 network.gas_limit(8000000)
-
 
 def main():
     deployer = accounts.load('dahlia_admin')
@@ -20,49 +18,55 @@ def main():
         addr = json.load(f)
     mainnet_addr = addr.get('mainnet')
 
-    # mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
-    # mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
+    mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
+    mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
     celo = interface.IERC20Ex(mainnet_addr.get('celo'))
-    ube = interface.IERC20Ex(mainnet_addr.get('ube'))
     ube_factory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
     proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
-    celo_ube_lp = interface.IERC20Ex(ube_factory.getPair(celo, ube))
-    print(mainnet_addr.get('celo_ube_mstaking'))
+    celo_mcusd_mstaking = mainnet_addr.get('celo_mcusd_mstaking')
+    celo_mceur_mstaking = mainnet_addr.get('celo_mceur_mstaking')
+    mcusd_mceur_mstaking = mainnet_addr.get('mcusd_mceur_mstaking')
+    ube = mainnet_addr.get('ube')
+    moo = mainnet_addr.get('moo')
 
-    celo_ube_wmstaking = WMoolaStakingRewards.deploy(
-        mainnet_addr.get('celo_ube_mstaking'),
-        celo_ube_lp,
-        celo,
+    celo_mcusd_lp = ube_factory.getPair(celo, mcusd)
+    celo_mceur_lp = ube_factory.getPair(celo, mceur)
+    mcusd_mceur_lp = ube_factory.getPair(mcusd, mceur)
+
+    celo_mcusd_wmstaking = WMStakingRewards.deploy(
+        celo_mcusd_mstaking,
+        celo_mcusd_lp,
+        [celo, ube],
         2,
         {'from': deployer}
     )
 
+    celo_mceur_wmstaking = WMStakingRewards.deploy(
+        celo_mceur_mstaking,
+        celo_mceur_lp,
+        [celo, ube],
+        2,
+        {'from': deployer}
+    )
+
+    mcusd_mceur_wmstaking = WMStakingRewards.deploy(
+        mcusd_mceur_mstaking,
+        mcusd_mceur_lp,
+        [celo, ube, moo],
+        3,
+        {'from': deployer}
+    )
+
     proxy_oracle.setWhitelistERC1155(
-        [celo_ube_wmstaking],
+        [celo_mcusd_wmstaking, celo_mceur_wmstaking, mcusd_mceur_wmstaking],
         True,
         {'from': deployer},
     )
     
-
-    prevCelo = celo.balanceOf(alice)
-    prevUbe = ube.balanceOf(alice)
-    # approve
-    amount = celo_ube_lp.balanceOf(alice)
-    print(amount)
-    celo_ube_lp.approve(celo_ube_wmstaking, 2**256-1, {'from': alice})
-    celo_ube_wmstaking.mint(amount-1, {'from': alice})
-    time.sleep(600)
-
-    celo_ube_wmstaking.burn(10, 2**256-1, {'from': alice})
-
-    postCelo = celo.balanceOf(alice)
-    postUbe = ube.balanceOf(alice)
-
-    print(postCelo, prevCelo)
-    print(postUbe, prevUbe)
-
     addr.get('mainnet').update({
-        'celo_ube_wmstaking': celo_ube_wmstaking.address
+        'celo_mcusd_wmstaking': celo_mcusd_wmstaking.address,
+        'celo_mceur_wmstaking': celo_mceur_wmstaking.address,
+        'mcusd_mceur_wmstaking': mcusd_mceur_wmstaking.address,
     })
 
     print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

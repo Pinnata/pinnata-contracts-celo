@@ -16,16 +16,16 @@ def main():
 
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
-    alfajores_addr = addr.get('alfajores')
+    mainnet_addr = addr.get('mainnet')
 
-    celo = interface.IERC20Ex(alfajores_addr.get('celo'))
-    cusd = interface.IERC20Ex(alfajores_addr.get('cusd'))
-    ceur = interface.IERC20Ex(alfajores_addr.get('ceur'))
-    urouter = interface.IUniswapV2Router02(alfajores_addr.get('urouter'))
-    ufactory = interface.IUniswapV2Factory(alfajores_addr.get('ufactory'))
+    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
+    cusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
+    ceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
+    urouter = interface.IUniswapV2Router02(mainnet_addr.get('ube_router'))
+    ufactory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
 
-    werc20 = WERC20.at(alfajores_addr.get('werc20'))
-    dahlia_bank = Contract.from_abi("HomoraBank", alfajores_addr.get('dahlia_bank'), HomoraBank.abi)
+    werc20 = WERC20.at(mainnet_addr.get('werc20'))
+    dahlia_bank = Contract.from_abi("HomoraBank", mainnet_addr.get('dahlia_bank'), HomoraBank.abi)
 
     ubeswap_spell = UbeswapMSRSpellV1.deploy(
         dahlia_bank, werc20, urouter, celo,
@@ -44,7 +44,7 @@ def main():
 
     dahlia_bank.setWhitelistSpells([ubeswap_spell], [True], {'from': deployer})
 
-    addr.get('alfajores').update({
+    addr.get('mainnet').update({
         'ubeswap_msr_spell': ubeswap_spell.address,
     })
 

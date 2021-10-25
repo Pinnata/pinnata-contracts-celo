@@ -27,7 +27,7 @@ def main():
     bank = TransparentUpgradeableProxy.deploy(bank_impl.address, proxy_admin.address, b'', {'from': deployer})
     Contract.from_abi("HomoraBank", bank.address, HomoraBank.abi).initialize(proxy_oracle, 0, {'from': deployer})
 
-    addr.get('alfajores').update({
+    addr.get('mainnet').update({
         'core_oracle': core_oracle.address,
         'proxy_oracle': proxy_oracle.address,
         'dahlia_bank': bank.address, 
