@@ -49,6 +49,21 @@
         "ube_factory": "0x62d5b84bE28a183aBB507E125B384122D2C25fAE",
         "celo_mcusd_mstaking": "0xcca933D2ffEDCa69495435049a878C4DC34B079d",
         "celo_mceur_mstaking": "0x728C650D1Fb4da2D18ccF4DF45Af70c5AEb09f81",
-        "cusd_mceur_mstaking": "0x2Ca16986bEA18D562D26354b4Ff4C504F14fB01c"
+        "cusd_mceur_mstaking": "0x2Ca16986bEA18D562D26354b4Ff4C504F14fB01c",
+        "core_oracle": "0x97bbBA7Ec9B3Abdcd0bEcf27fa82b00eC98025D4",
+        "proxy_oracle": "0x1125183117cE3C76Df2884E09Ea2A4eF581B6438",
+        "dahlia_bank": "0xB81c88ef1987fFdC2F4Eb3344705d0D82eF24fe9",
+        "bank_impl": "0xA5A63276df1953855D9CCfbE74dcCcB01163C5B3",
+        "proxy_admin": "0x4B1126DE15b162ac958B8C8714F4842F6E820443",
+        "uni_oracle": "0xefb9064e389Ee1c04c8475DF494cbdcB4D4A0815",
+        "sorted_oracle": "0xd6Bce6645f0FD8a9d1b3090fFF3F865082d912fd",
+        "moola_proxy_oracle": "0x193DD365791c703ac5353cFc76959CD64115D469",
+        "werc20": "0xa4F9c46Eca23739D8C7ec51F984c7b873F39D793",
+        "Comptroller": "0x0693ce711Dd88F22A6A8bfcc732f24aab191971b",
+        "Major and stable rates": "0x80FE663BB1f8DAC9B86A098975791f6a0C513AB3",
+        "Governance and seed rates": "0xB0ECF1155d01C8c96817f2b3F76F8E87206eB3Dd",
+        "fcelo": "0xf267efE4Af0DfF494dBA99E706aEF5E4fc3eab47",
+        "fmcusd": "0x1889cC772d5F03f217e40e3542Fb11B472fd4871",
+        "fmceur": "0x1D7EA081283151B34B4D4abBd54000374a84b1D7"
     }
 }

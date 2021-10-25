@@ -27,7 +27,7 @@ def main():
     mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
     core_oracle = CoreOracle.at(mainnet_addr.get('core_oracle'))
     proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
-    ufactory = interface.IUniswapV2Factory(mainnet_addr.get('ufactory'))
+    ufactory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
 
     uni_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
 
