@@ -90,7 +90,7 @@ contract WMStakingRewards is ERC1155('WMStakingRewards'), ReentrancyGuard, IERC2
     IStakingRewards(staking).getReward();
     IERC20(underlying).safeTransfer(msg.sender, amount);
     address stepStaking = staking;
-    address stepReward = reward[0];
+    address stepReward;
     for (uint i = 0; i < depth; i += 1) {
       uint stRewardPerToken = externalRewards[id][i];
       uint enRewardPerToken = IStakingRewards(stepStaking).rewardPerToken();

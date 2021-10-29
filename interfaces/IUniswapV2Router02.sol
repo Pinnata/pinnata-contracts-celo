@@ -1,6 +1,6 @@
-pragma solidity >=0.6.2;
+// SPDX-License-Identifier: MIT
 
-// https://github.com/Uniswap/uniswap-v2-periphery/blob/master/contracts/interfaces/IUniswapV2Router02.sol
+pragma solidity >=0.6.2;
 
 import './IUniswapV2Router01.sol';
 
@@ -12,4 +12,6 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
     address to,
     uint deadline
   ) external;
+
+    function pairFor(address tokenA, address tokenB) external view returns (address);
 }

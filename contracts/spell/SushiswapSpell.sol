@@ -11,25 +11,33 @@ import '../utils/HomoraMath.sol';
 import '../../interfaces/IUniswapV2Factory.sol';
 import '../../interfaces/IUniswapV2Router02.sol';
 import '../../interfaces/IUniswapV2Pair.sol';
-import '../../interfaces/IWMStakingRewards.sol';
+import '../../interfaces/IWMiniCheck.sol';
 
-contract UbeswapMSRSpellV1 is WhitelistSpell {
+contract SushiswapSpellV1 is WhitelistSpell {
   using SafeMath for uint;
   using HomoraMath for uint;
 
-  IUniswapV2Factory public immutable factory; // Uniswap factory
-  IUniswapV2Router02 public immutable router; // Uniswap router
+  IUniswapV2Factory public immutable factory; // Sushiswap factory
+  IUniswapV2Router02 public immutable router; // Sushiswap router
 
   mapping(address => mapping(address => address)) public pairs; // Mapping from tokenA to (mapping from tokenB to LP token)
+
+  IWMiniChef public immutable wminichef; // Wrapped miniChef
+
+  address public immutable sushi; // Sushi token address
 
   constructor(
     IBank _bank,
     address _werc20,
-    IUniswapV2Router02 _router, 
+    IUniswapV2Router02 _router,
+    address _wminichef,
     address _celo
   ) public WhitelistSpell(_bank, _werc20, _celo) {
     router = _router;
     factory = IUniswapV2Factory(_router.factory());
+    wminichef = IWMiniChef(_wminichef);
+    IWMiniChef(_wminichef).setApprovalForAll(address(_bank), true);
+    sushi = address(IWMiniChef(_wminichef).SUSHI());
   }
 
   /// @dev Return the LP token for the token pairs (can be in any order)
@@ -104,7 +112,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     uint amtBMin; // Desired tokenB amount (slippage control)
   }
 
-  /// @dev Add liquidity to Uniswap pool
+  /// @dev Add liquidity to Sushiswap pool
   /// @param tokenA Token A for the pair
   /// @param tokenB Token B for the pair
   /// @param amt Amounts of tokens to supply, borrow, and get.
@@ -146,7 +154,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     if (swapAmt > 0) {
       address[] memory path = new address[](2);
       (path[0], path[1]) = isReversed ? (tokenB, tokenA) : (tokenA, tokenB);
-      router.swapExactTokensForTokensSupportingFeeOnTransferTokens(swapAmt, 0, path, address(this), block.timestamp);
+      router.swapExactTokensForTokens(swapAmt, 0, path, address(this), block.timestamp);
     }
 
     // 5. Add liquidity
@@ -166,7 +174,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     }
   }
 
-  /// @dev Add liquidity to Uniswap pool, with no staking rewards (use WERC20 wrapper)
+  /// @dev Add liquidity to Sushiswap pool, with no staking rewards (use WERC20 wrapper)
   /// @param tokenA Token A for the pair
   /// @param tokenB Token B for the pair
   /// @param amt Amounts of tokens to supply, borrow, and get.
@@ -187,18 +195,20 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     doRefund(tokenB);
   }
 
-  /// @dev Add liquidity to Uniswap pool, with staking rewards
+  /// @dev Add liquidity to Sushiswap pool, with staking to miniChef
   /// @param tokenA Token A for the pair
   /// @param tokenB Token B for the pair
   /// @param amt Amounts of tokens to supply, borrow, and get.
-  /// @param wstaking Wrapped staking rewards address
-  function addLiquidityWStakingRewards(
+  /// @param pid Pool id
+  function addLiquidityWMiniChef(
     address tokenA,
     address tokenB,
     Amounts calldata amt,
-    address wstaking
+    uint pid
   ) external payable {
     address lp = getAndApprovePair(tokenA, tokenB);
+    address lpToken = wminichef.chef().lpToken(pid);
+    require(lpToken == lp, 'incorrect lp token');
 
     // 1-5. add liquidity
     addLiquidityInternal(tokenA, tokenB, amt, lp);
@@ -206,32 +216,25 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     // 6. Take out collateral
     (, address collToken, uint collId, uint collSize) = bank.getCurrentPositionInfo();
     if (collSize > 0) {
-      require(IWMStakingRewards(collToken).getUnderlyingToken(collId) == lp, 'incorrect underlying');
-      require(collToken == wstaking, 'collateral token & wstaking mismatched');
-      bank.takeCollateral(wstaking, collId, collSize);
-      IWMStakingRewards(wstaking).burn(collId, collSize);
+      (uint decodedPid, ) = wminichef.decodeId(collId);
+      require(pid == decodedPid, 'incorrect pid');
+      require(collToken == address(wminichef), 'collateral token & wminirchef mismatched');
+      bank.takeCollateral(address(wminichef), collId, collSize);
+      wminichef.burn(collId, collSize);
     }
 
     // 7. Put collateral
-    ensureApprove(lp, wstaking);
+    ensureApprove(lp, address(wminichef));
     uint amount = IERC20(lp).balanceOf(address(this));
-    uint id = IWMStakingRewards(wstaking).mint(amount);
-    if (!IWMStakingRewards(wstaking).isApprovedForAll(address(this), address(bank))) {
-      IWMStakingRewards(wstaking).setApprovalForAll(address(bank), true);
-    }
-    bank.putCollateral(address(wstaking), id, amount);
+    uint id = wminichef.mint(pid, amount);
+    bank.putCollateral(address(wminichef), id, amount);
 
     // 8. Refund leftovers to users
     doRefund(tokenA);
     doRefund(tokenB);
 
-    // 9. Refund reward
-    address[] memory reward = IWMStakingRewards(wstaking).getReward();
-    uint depth = IWMStakingRewards(wstaking).depth();
-    require(depth > 0 && depth <= 8, 'invalid depth');
-    for (uint i = 0; i < depth; i += 1) {
-      doRefund(reward[i]);
-    }
+    // 9. Refund sushi
+    doRefund(sushi);
   }
 
   struct RepayAmounts {
@@ -244,7 +247,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     uint amtBMin; // Desired tokenB amount
   }
 
-  /// @dev Remove liquidity from Uniswap pool
+  /// @dev Remove liquidity from Sushiswap pool
   /// @param tokenA Token A for the pair
   /// @param tokenB Token B for the pair
   /// @param amt Amounts of tokens to take out, withdraw, repay, and get.
@@ -297,9 +300,9 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     if (amtA < amtADesired && amtB > amtBDesired) {
       address[] memory path = new address[](2);
       (path[0], path[1]) = (tokenB, tokenA);
-      router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-        amtB.sub(amtBDesired),
+      router.swapTokensForExactTokens(
         amtADesired.sub(amtA),
+        amtB.sub(amtBDesired),
         path,
         address(this),
         block.timestamp
@@ -307,9 +310,9 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     } else if (amtA > amtADesired && amtB < amtBDesired) {
       address[] memory path = new address[](2);
       (path[0], path[1]) = (tokenA, tokenB);
-      router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-        amtA.sub(amtADesired),
+      router.swapTokensForExactTokens(
         amtBDesired.sub(amtB),
+        amtA.sub(amtADesired),
         path,
         address(this),
         block.timestamp
@@ -332,7 +335,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     doRefund(lp);
   }
 
-  /// @dev Remove liquidity from Uniswap pool, with no staking rewards (use WERC20 wrapper)
+  /// @dev Remove liquidity from Sushiswap pool, with no staking rewards (use WERC20 wrapper)
   /// @param tokenA Token A for the pair
   /// @param tokenB Token B for the pair
   /// @param amt Amounts of tokens to take out, withdraw, repay, and get.
@@ -350,61 +353,50 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     removeLiquidityInternal(tokenA, tokenB, amt, lp);
   }
 
-  /// @dev Remove liquidity from Uniswap pool, from staking rewards
+  /// @dev Remove liquidity from Sushiswap pool, from miniChef staking
   /// @param tokenA Token A for the pair
   /// @param tokenB Token B for the pair
   /// @param amt Amounts of tokens to take out, withdraw, repay, and get.
-  function removeLiquidityWStakingRewards(
+  function removeLiquidityWMiniChef(
     address tokenA,
     address tokenB,
-    RepayAmounts calldata amt,
-    address wstaking
+    RepayAmounts calldata amt
   ) external {
     address lp = getAndApprovePair(tokenA, tokenB);
     (, address collToken, uint collId, ) = bank.getCurrentPositionInfo();
+    require(IWMiniChef(collToken).getUnderlyingToken(collId) == lp, 'incorrect underlying');
+    require(collToken == address(wminichef), 'collateral token & wminichef mismatched');
 
     // 1. Take out collateral
-    require(IWMStakingRewards(collToken).getUnderlyingToken(collId) == lp, 'incorrect underlying');
-    require(collToken == wstaking, 'collateral token & wstaking mismatched');
-    bank.takeCollateral(wstaking, collId, amt.amtLPTake);
-    IWMStakingRewards(wstaking).burn(collId, amt.amtLPTake);
+    bank.takeCollateral(address(wminichef), collId, amt.amtLPTake);
+    wminichef.burn(collId, amt.amtLPTake);
 
     // 2-8. remove liquidity
     removeLiquidityInternal(tokenA, tokenB, amt, lp);
 
-    // 9. Refund reward
-    address[] memory reward = IWMStakingRewards(wstaking).getReward();
-    uint depth = IWMStakingRewards(wstaking).depth();
-    require(depth > 0 && depth <= 8, 'invalid depth');
-    for (uint i = 0; i < depth; i += 1) {
-      doRefund(reward[i]);
-    }
+    // 9. Refund sushi
+    doRefund(sushi);
   }
 
-  /// @dev Harvest staking reward tokens to in-exec position's owner
-  /// @param wstaking Wrapped staking rewards address
-  function harvestWStakingRewards(address wstaking) external {
+  /// @dev Harvest SUSHI reward tokens to in-exec position's owner
+  function harvestWMiniChef() external {
     (, address collToken, uint collId, ) = bank.getCurrentPositionInfo();
-    address lp = IWMStakingRewards(wstaking).getUnderlyingToken(collId);
+    (uint pid, ) = wminichef.decodeId(collId);
+    address lp = wminichef.getUnderlyingToken(collId);
     require(whitelistedLpTokens[lp], 'lp token not whitelisted');
-    require(collToken == wstaking, 'collateral token & wstaking mismatched');
+    require(collToken == address(wminichef), 'collateral token & wminichef mismatched');
 
     // 1. Take out collateral
-    bank.takeCollateral(wstaking, collId, uint(-1));
-    IWMStakingRewards(wstaking).burn(collId, uint(-1));
+    bank.takeCollateral(address(wminichef), collId, uint(-1));
+    wminichef.burn(collId, uint(-1));
 
     // 2. put collateral
     uint amount = IERC20(lp).balanceOf(address(this));
-    ensureApprove(lp, wstaking);
-    uint id = IWMStakingRewards(wstaking).mint(amount);
-    bank.putCollateral(wstaking, id, amount);
+    ensureApprove(lp, address(wminichef));
+    uint id = wminichef.mint(pid, amount);
+    bank.putCollateral(address(wminichef), id, amount);
 
-    // 3. Refund reward
-    address[] memory reward = IWMStakingRewards(wstaking).getReward();
-    uint depth = IWMStakingRewards(wstaking).depth();
-    require(depth > 0 && depth <= 8, 'invalid depth');
-    for (uint i = 0; i < depth; i += 1) {
-      doRefund(reward[i]);
-    }
+    // 3. Refund sushi
+    doRefund(sushi);
   }
 }

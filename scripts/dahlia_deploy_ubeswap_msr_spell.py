@@ -19,8 +19,8 @@ def main():
     mainnet_addr = addr.get('mainnet')
 
     celo = interface.IERC20Ex(mainnet_addr.get('celo'))
-    cusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
-    ceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
+    mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
+    mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
     urouter = interface.IUniswapV2Router02(mainnet_addr.get('ube_router'))
     ufactory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
 
@@ -32,13 +32,13 @@ def main():
         {'from': deployer},
     )
 
-    ubeswap_spell.getAndApprovePair(celo, cusd, {'from': deployer})
-    ubeswap_spell.getAndApprovePair(celo, ceur, {'from': deployer})
-    ubeswap_spell.getAndApprovePair(cusd, ceur, {'from': deployer})
+    ubeswap_spell.getAndApprovePair(celo, mcusd, {'from': deployer})
+    ubeswap_spell.getAndApprovePair(celo, mceur, {'from': deployer})
+    ubeswap_spell.getAndApprovePair(mcusd, mceur, {'from': deployer})
 
-    celo_cusd_lp = ufactory.getPair(celo, cusd)
-    celo_ceur_lp = ufactory.getPair(celo, ceur)
-    cusd_ceur_lp = ufactory.getPair(cusd, ceur)
+    celo_cusd_lp = ufactory.getPair(celo, mcusd)
+    celo_ceur_lp = ufactory.getPair(celo, mceur)
+    cusd_ceur_lp = ufactory.getPair(mcusd, mceur)
 
     ubeswap_spell.setWhitelistLPTokens([celo_cusd_lp, celo_ceur_lp, cusd_ceur_lp], [True, True, True], {'from': deployer})
 

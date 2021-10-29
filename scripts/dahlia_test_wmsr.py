@@ -22,7 +22,7 @@ def almostEqual(a, b):
 def lend(bob, token, safebox):
     token.approve(safebox, 2**256-1, {'from': bob})
 
-    bob_amt = 10**18
+    bob_amt = 10**16
     safebox.deposit(bob_amt, {'from': bob})
 
 def main():
@@ -53,29 +53,30 @@ def main():
     celo_mceur_wmstaking = WMStakingRewards.at(mainnet_addr.get('celo_mceur_wmstaking'))
     mcusd_mceur_wmstaking = WMStakingRewards.at(mainnet_addr.get('mcusd_mceur_wmstaking'))
 
-    celo_mcusd_lp = interface.IERC20Ex(ufactory.getPair(celo, mcusd))
-    celo_mceur_lp = interface.IERC20Ex(ufactory.getPair(celo, mceur))
-    mcusd_mceur_lp = interface.IERC20Ex(ufactory.getPair(mcusd, mceur))
-
     a_prev_ube = ube.balanceOf(alice)
-    # aPrevMOM = mock2.balanceOf(alice)
+    a_prev_moo = moo.balanceOf(alice)
     b_prev_ube = ube.balanceOf(bob)
-    # bPrevMOM = mock2.balanceOf(bob)
+    b_prev_moo = moo.balanceOf(bob)
 
-    lend(bob, celo, celo_safebox)
-    lend(bob, mcusd, mcusd_safebox)
+    # lend(bob, celo, celo_safebox)
+    # lend(bob, mcusd, mcusd_safebox)
+    # lend(bob, mceur, mceur_safebox)
 
-    prevABal = celo.balanceOf(alice)
-    prevBBal = mcusd.balanceOf(alice)
+    prevABal = mcusd.balanceOf(alice)
+    prevBBal = mceur.balanceOf(alice)
 
     initABal = prevABal
     initBBal = prevBBal
 
-    celo.approve(dahlia_bank, 2**256-1, {'from': alice})
-    mcusd.approve(dahlia_bank, 2**256-1, {'from': alice})
+    # celo.approve(dahlia_bank, 2**256-1, {'from': alice})
+    # mcusd.approve(dahlia_bank, 2**256-1, {'from': alice})
+    # mceur.approve(dahlia_bank, 2**256-1, {'from': alice})
 
-    celo.approve(dahlia_bank, 2**256-1, {'from': bob})
-    mcusd.approve(dahlia_bank, 2**256-1, {'from': bob})
+    # celo.approve(dahlia_bank, 2**256-1, {'from': bob})
+    # mcusd.approve(dahlia_bank, 2**256-1, {'from': bob})
+    # mceur.approve(dahlia_bank, 2**256-1, {'from': bob})
+
+    print(prevABal, prevBBal)
 
     # open a position
     dahlia_bank.execute(
@@ -83,18 +84,18 @@ def main():
         ubeswap_msr_spell,
         ubeswap_msr_spell.addLiquidityWStakingRewards.encode_input(
             mcusd,
-            celo,
+            mceur,
             [
-             6*10**16,
+             10**16,
              10**16,
              0,
-             9*10**14,
-             1.5*10**14,
+             10**13,
+             10**13,
              0,
              0,
              0
             ],
-            celo_mcusd_wmstaking
+            mcusd_mceur_wmstaking
         ),
         {
             'from': alice, 
@@ -103,24 +104,27 @@ def main():
 
     aposition_id = dahlia_bank.nextPositionId()-1
 
+    print(mcusd.balanceOf(bob)/ 10 ** 16)
+    print(mceur.balanceOf(bob)/ 10 ** 16)
+
      # open a position
     dahlia_bank.execute(
         0,
         ubeswap_msr_spell,
         ubeswap_msr_spell.addLiquidityWStakingRewards.encode_input(
             mcusd,
-            celo,
+            mceur,
             [
-             6*10**15,
+             10**15,
              10**15,
              0,
-             9*10**13,
-             1.5*10**13,
+             10**12,
+             10**12,
              0,
              0,
              0
             ],
-            celo_mcusd_wmstaking
+            mcusd_mceur_wmstaking
         ),
         {
             'from': bob, 
@@ -132,26 +136,27 @@ def main():
     prevBorrow = dahlia_bank.getBorrowCELOValue(aposition_id)
     time.sleep(30)
     dahlia_bank.accrue(mcusd, {'from': alice})
-    dahlia_bank.accrue(celo, {'from': alice})
+    dahlia_bank.accrue(mceur, {'from': alice})
     postBorrow = dahlia_bank.getBorrowCELOValue(aposition_id)
 
-    assert prevBorrow < postBorrow
+    print(prevBorrow / 10 ** 18)
+    print(postBorrow / 10 ** 18)
 
-    curABal = celo.balanceOf(alice)
-    curBBal = mcusd.balanceOf(alice)
+    curABal = mcusd.balanceOf(alice)
+    curBBal = mceur.balanceOf(alice)
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
 
-    prevABal = celo.balanceOf(alice)
-    prevBBal = mcusd.balanceOf(alice)
+    prevABal = mcusd.balanceOf(alice)
+    prevBBal = mceur.balanceOf(alice)
 
     dahlia_bank.execute(
         bposition_id,
         ubeswap_msr_spell,
         ubeswap_msr_spell.removeLiquidityWStakingRewards.encode_input(
             mcusd,
-            celo,
+            mceur,
             [2**256-1,
              0,
              2**256-1,
@@ -159,7 +164,7 @@ def main():
              0,
              0,
              0],
-            celo_mcusd_wmstaking
+            mcusd_mceur_wmstaking
         ),
         {'from': bob}
     )
@@ -172,7 +177,7 @@ def main():
         ubeswap_msr_spell,
         ubeswap_msr_spell.removeLiquidityWStakingRewards.encode_input(
             mcusd,
-            celo,
+            mceur,
             [2**256-1,
              0,
              2**256-1,
@@ -180,22 +185,21 @@ def main():
              0,
              0,
              0],
-            celo_mcusd_wmstaking
+            mcusd_mceur_wmstaking
         ),
         {'from': alice}
     )
 
     a_post_ube = ube.balanceOf(alice)
-    # aPostMOM = mock2.balanceOf(alice)
 
-    curABal = celo.balanceOf(alice)
-    # curBBal = cusd.balanceOf(alice)
+    curABal = mcusd.balanceOf(alice)
+    curBBal = mceur.balanceOf(alice)
 
     finalABal = curABal
     finalBBal = curBBal
 
-    tokenAPrice = core_oracle.getCELOPx(celo)
-    tokenBPrice = core_oracle.getCELOPx(mcusd)
+    tokenAPrice = core_oracle.getCELOPx(mcusd)
+    tokenBPrice = core_oracle.getCELOPx(mceur)
 
     print('alice delta A Bal', curABal - prevABal)
     print('alice delta B Bal', curBBal - prevBBal)
@@ -209,11 +213,11 @@ def main():
     assert a_post_ube > a_prev_ube
 
     a_post_ube = ube.balanceOf(alice)
-    # aPostMOM = mock2.balanceOf(alice)
+    a_post_moo = moo.balanceOf(alice)
     b_post_ube = ube.balanceOf(bob)
-    # bPostMOM = mock2.balanceOf(bob)
+    b_post_moo = moo.balanceOf(bob)
 
-    print('alice grow', a_post_ube-a_prev_ube)
-    # print('alice mom', aPostMOM-aPrevMOM)
-    print('bob grow', b_post_ube-b_prev_ube)
-    # print('bob mom', bPostMOM-bPrevMOM)
+    print('alice ube', a_post_ube-a_prev_ube)
+    print('alice moo', a_post_moo-a_prev_moo)
+    print('bob ube', b_post_ube-b_prev_ube)
+    print('bob moo', b_post_moo-b_prev_moo)

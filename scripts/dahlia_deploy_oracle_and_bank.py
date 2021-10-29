@@ -25,7 +25,7 @@ def main():
     bank_impl = HomoraBank.deploy({'from': deployer})
     proxy_admin = ProxyAdmin.deploy({'from': deployer})
     bank = TransparentUpgradeableProxy.deploy(bank_impl.address, proxy_admin.address, b'', {'from': deployer})
-    Contract.from_abi("HomoraBank", bank.address, HomoraBank.abi).initialize(proxy_oracle, 0, {'from': deployer})
+    Contract.from_abi("HomoraBank", bank.address, HomoraBank.abi).initialize(proxy_oracle, 10, {'from': deployer})
 
     addr.get('mainnet').update({
         'core_oracle': core_oracle.address,
