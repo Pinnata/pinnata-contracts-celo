@@ -1,45 +1,48 @@
 from brownie import (
-    accounts, HomoraBank, SushiswapSpellV1, WERC20,
+    accounts,
+    HomoraBank,
+    SushiswapSpellV1,
+    WERC20,
+    Contract,
+    network,
+    interface,
 )
-from brownie import interface
-from .utils import *
 import json
 
+network.gas_limit(8000000)
+
 def main():
-    deployer = accounts.load('admin')
-    f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['mainnet']
+    deployer = accounts.load('dahlia_admin')
 
-    celo = interface.IERC20Ex(addr['celo'])
-    cusd = interface.IERC20Ex(addr['cusd'])
-    ceur = interface.IERC20Ex(addr['ceur'])
-    mzpn = interface.IERC20Ex(addr['mzpn'])
-    ube_router = interface.IUniswapV2Router02(addr['ube_router'])
-    ube_factory = interface.IUniswapV2Factory(addr['ube_factory'])
-    werc20 = WERC20.at(addr['werc20'])
-    dahlia_bank = HomoraBank.at(addr['dahlia_bank'])
+    with open('scripts/dahlia_addresses.json', 'r') as f:
+        addr = json.load(f)
+    mainnet_addr = addr.get('mainnet')
 
-    sushiswap_spell = SushiswapSpellV1.deploy(
-        dahlia_bank, werc20, ube_router, addr['marzipan_masterchef'], celo,
+    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
+    cusd = interface.IERC20Ex(mainnet_addr.get('cusd'))
+    ceur = interface.IERC20Ex(mainnet_addr.get('ceur'))
+    sushi_router = interface.IUniswapV2Router02(mainnet_addr.get('sushi_router'))
+    sushi_factory = interface.IUniswapV2Factory(mainnet_addr.get('sushi_factory'))
+    wminichef = mainnet_addr.get('wminichef')
+
+    werc20 = WERC20.at(mainnet_addr.get('werc20'))
+    dahlia_bank = Contract.from_abi("HomoraBank", mainnet_addr.get('dahlia_bank'), HomoraBank.abi)
+
+    sushi_spell = SushiswapSpellV1.deploy(
+        dahlia_bank, werc20, sushi_router, wminichef, celo,
         {'from': deployer},
     )
 
-    sushiswap_spell.getAndApprovePair(celo, mzpn, {'from': deployer})
-    sushiswap_spell.getAndApprovePair(cusd, mzpn, {'from': deployer})
-    sushiswap_spell.getAndApprovePair(ceur, mzpn, {'from': deployer})
-    sushiswap_spell.getAndApprovePair(celo, cusd, {'from': deployer})
+    sushi_spell.getAndApprovePair(cusd, ceur, {'from': deployer})
 
-    celo_mzpn_lp = ube_factory.getPair(celo, mzpn)
-    cusd_mzpn_lp = ube_factory.getPair(cusd, mzpn)
-    ceur_mzpn_lp = ube_factory.getPair(ceur, mzpn)
-    celo_cusd_lp = ube_factory.getPair(celo, cusd)
+    cusd_ceur_lp = sushi_factory.getPair(cusd, ceur)
 
-    sushiswap_spell.setWhitelistLPTokens([celo_mzpn_lp], [True], {'from': deployer})
-    sushiswap_spell.setWhitelistLPTokens([cusd_mzpn_lp], [True], {'from': deployer})
-    sushiswap_spell.setWhitelistLPTokens([ceur_mzpn_lp], [True], {'from': deployer})
-    sushiswap_spell.setWhitelistLPTokens([celo_cusd_lp], [True], {'from': deployer})
+    sushi_spell.setWhitelistLPTokens([cusd_ceur_lp], [True], {'from': deployer})
 
+    dahlia_bank.setWhitelistSpells([sushi_spell], [True], {'from': deployer})
 
-    dahlia_bank.setWhitelistSpells([sushiswap_spell], [True], {'from': deployer})
+    addr.get('mainnet').update({
+        'sushi_spell': sushi_spell.address,
+    })
 
-    print('Done!')
+    print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

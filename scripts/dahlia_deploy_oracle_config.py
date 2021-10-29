@@ -22,51 +22,35 @@ def main():
 
     mainnet_addr = addr.get('mainnet')
 
-    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
-    mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
-    mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
+    cusd = interface.IERC20Ex(mainnet_addr.get('cusd'))
+    ceur = interface.IERC20Ex(mainnet_addr.get('ceur'))
     core_oracle = CoreOracle.at(mainnet_addr.get('core_oracle'))
     proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
-    ufactory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
+    sushi_factory = interface.IUniswapV2Factory(mainnet_addr.get('sushi_factory'))
 
-    uni_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
+    sushi_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
 
     sorted_oracle = CeloProxyPriceProvider.deploy({'from': deployer})
-    moola_proxy_oracle = MoolaProxyOracle.deploy(sorted_oracle, {'from': deployer})
 
-    celo_mcusd_lp = ufactory.getPair(celo, mcusd)
-    celo_mceur_lp = ufactory.getPair(celo, mceur)
-    mcusd_mceur_lp = ufactory.getPair(mcusd, mceur)
+    cusd_ceur_lp = sushi_factory.getPair(cusd, ceur)
 
     core_oracle.setRoute([
-        celo,
-        mcusd,
-        mceur,
-        celo_mcusd_lp,
-        celo_mceur_lp,
-        mcusd_mceur_lp,
+        cusd,
+        ceur,
+        cusd_ceur_lp,
     ], [
         sorted_oracle, 
-        moola_proxy_oracle, 
-        moola_proxy_oracle,
-        uni_oracle,
-        uni_oracle,
-        uni_oracle,
+        sorted_oracle,
+        sushi_oracle
     ], {'from': deployer})
 
     proxy_oracle.setTokenFactors([
-        celo,
-        mcusd,
-        mceur,
-        celo_mcusd_lp,
-        celo_mceur_lp,
-        mcusd_mceur_lp,
+        cusd,
+        ceur,
+        cusd_ceur_lp,
     ], [
-        [13000, 7800, 10250],
         [11000, 9000, 10250],
         [11000, 9000, 10250],
-        [50000, 7800, 10250],
-        [50000, 7800, 10250],
         [50000, 7800, 10250],
     ], {'from': deployer})
 
@@ -79,9 +63,8 @@ def main():
     )
 
     addr.get('mainnet').update({
-        'uni_oracle': uni_oracle.address,
+        'sushi_oracle': sushi_oracle.address,
         'sorted_oracle': sorted_oracle.address,
-        'moola_proxy_oracle': moola_proxy_oracle.address,
         'werc20': werc20.address,
     })
 

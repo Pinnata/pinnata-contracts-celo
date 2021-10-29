@@ -8,7 +8,7 @@ import '../utils/HomoraMath.sol';
 import '../../interfaces/IERC20Wrapper.sol';
 import '../../interfaces/IMiniChefV2.sol';
 
-contract WMiniChef is ERC1155('WMiniChef'), ReentrancyGuard, IERC20Wrapper {
+contract WMiniChefV2 is ERC1155('WMiniChefV2'), ReentrancyGuard, IERC20Wrapper {
   using SafeMath for uint;
   using HomoraMath for uint;
   using SafeERC20 for IERC20;
@@ -77,7 +77,7 @@ contract WMiniChef is ERC1155('WMiniChef'), ReentrancyGuard, IERC20Wrapper {
     }
     (uint pid, uint stSushiPerShare) = decodeId(id);
     _burn(msg.sender, id, amount);
-    chef.withdraw(pid, amount, address(this));
+    chef.withdrawAndHarvest(pid, amount, address(this));
     address lpToken = chef.lpToken(pid);
     (uint enSushiPerShare, , ) = chef.poolInfo(pid);
     IERC20(lpToken).safeTransfer(msg.sender, amount);

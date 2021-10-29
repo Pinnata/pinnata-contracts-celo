@@ -11,7 +11,7 @@ import '../utils/HomoraMath.sol';
 import '../../interfaces/IUniswapV2Factory.sol';
 import '../../interfaces/IUniswapV2Router02.sol';
 import '../../interfaces/IUniswapV2Pair.sol';
-import '../../interfaces/IWMiniCheck.sol';
+import '../../interfaces/IWMiniChefV2.sol';
 
 contract SushiswapSpellV1 is WhitelistSpell {
   using SafeMath for uint;
@@ -22,7 +22,7 @@ contract SushiswapSpellV1 is WhitelistSpell {
 
   mapping(address => mapping(address => address)) public pairs; // Mapping from tokenA to (mapping from tokenB to LP token)
 
-  IWMiniChef public immutable wminichef; // Wrapped miniChef
+  IWMiniChefV2 public immutable wminichef; // Wrapped miniChef
 
   address public immutable sushi; // Sushi token address
 
@@ -35,9 +35,9 @@ contract SushiswapSpellV1 is WhitelistSpell {
   ) public WhitelistSpell(_bank, _werc20, _celo) {
     router = _router;
     factory = IUniswapV2Factory(_router.factory());
-    wminichef = IWMiniChef(_wminichef);
-    IWMiniChef(_wminichef).setApprovalForAll(address(_bank), true);
-    sushi = address(IWMiniChef(_wminichef).SUSHI());
+    wminichef = IWMiniChefV2(_wminichef);
+    IWMiniChefV2(_wminichef).setApprovalForAll(address(_bank), true);
+    sushi = address(IWMiniChefV2(_wminichef).sushi());
   }
 
   /// @dev Return the LP token for the token pairs (can be in any order)
@@ -364,7 +364,7 @@ contract SushiswapSpellV1 is WhitelistSpell {
   ) external {
     address lp = getAndApprovePair(tokenA, tokenB);
     (, address collToken, uint collId, ) = bank.getCurrentPositionInfo();
-    require(IWMiniChef(collToken).getUnderlyingToken(collId) == lp, 'incorrect underlying');
+    require(IWMiniChefV2(collToken).getUnderlyingToken(collId) == lp, 'incorrect underlying');
     require(collToken == address(wminichef), 'collateral token & wminichef mismatched');
 
     // 1. Take out collateral
