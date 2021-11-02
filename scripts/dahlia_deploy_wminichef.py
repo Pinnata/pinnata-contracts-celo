@@ -17,7 +17,6 @@ def main():
         addr = json.load(f)
     mainnet_addr = addr.get('mainnet')
 
-    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
     proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
     minichef = mainnet_addr.get('minichef')
 
