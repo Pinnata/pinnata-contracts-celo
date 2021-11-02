@@ -19,26 +19,26 @@ def main():
 
     cusd = interface.IERC20Ex(mainnet_addr.get('cusd'))
     ceur = interface.IERC20Ex(mainnet_addr.get('ceur'))
-    # fcusd = interface.IERC20Ex(mainnet_addr.get('fcusd'))
-    # fceur = interface.IERC20Ex(mainnet_addr.get('fceur'))
+    fcusd = interface.IERC20Ex(mainnet_addr.get('fcusd'))
+    fceur = interface.IERC20Ex(mainnet_addr.get('fceur'))
     dahlia_bank = Contract.from_abi("HomoraBank", mainnet_addr.get('dahlia_bank'), HomoraBank.abi)
 
-    # # deploy safeboxes
-    # dcusd = SafeBox.deploy(
-    #     fcusd, 'Interest Bearing cUSD', 'dcUSD', {'from': deployer})
-    # dceur = SafeBox.deploy(
-    #     fceur, 'Interest Bearing cEUR', 'dcEUR', {'from': deployer})
+    # deploy safeboxes
+    dcusd = SafeBox.deploy(
+        fcusd, 'Interest Bearing cUSD', 'dcUSD', {'from': deployer})
+    dceur = SafeBox.deploy(
+        fceur, 'Interest Bearing cEUR', 'dcEUR', {'from': deployer})
     
-    # # add banks
-    # dahlia_bank.addBank(cusd, fcusd, {'from': deployer})
-    # dahlia_bank.addBank(ceur, fceur, {'from': deployer})
+    # add banks
+    dahlia_bank.addBank(cusd, fcusd, {'from': deployer})
+    dahlia_bank.addBank(ceur, fceur, {'from': deployer})
 
 
     dahlia_bank.setWhitelistTokens([cusd, ceur], [True, True], {'from': deployer})
 
-    # addr.get('mainnet').update({
-    #     'dcusd': dcusd.address,
-    #     'dceur': dceur.address,
-    # })
+    addr.get('mainnet').update({
+        'dcusd': dcusd.address,
+        'dceur': dceur.address,
+    })
 
     print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

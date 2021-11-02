@@ -25,19 +25,22 @@ contract SushiswapSpellV1 is WhitelistSpell {
   IWMiniChefV2 public immutable wminichef; // Wrapped miniChef
 
   address public immutable sushi; // Sushi token address
+  address public immutable rewardToken;
 
   constructor(
     IBank _bank,
     address _werc20,
     IUniswapV2Router02 _router,
     address _wminichef,
-    address _celo
+    address _celo,
+    address _rewardToken
   ) public WhitelistSpell(_bank, _werc20, _celo) {
     router = _router;
     factory = IUniswapV2Factory(_router.factory());
     wminichef = IWMiniChefV2(_wminichef);
     IWMiniChefV2(_wminichef).setApprovalForAll(address(_bank), true);
     sushi = address(IWMiniChefV2(_wminichef).sushi());
+    rewardToken = _rewardToken;
   }
 
   /// @dev Return the LP token for the token pairs (can be in any order)
@@ -235,6 +238,7 @@ contract SushiswapSpellV1 is WhitelistSpell {
 
     // 9. Refund sushi
     doRefund(sushi);
+    doRefund(rewardToken);
   }
 
   struct RepayAmounts {
@@ -376,6 +380,7 @@ contract SushiswapSpellV1 is WhitelistSpell {
 
     // 9. Refund sushi
     doRefund(sushi);
+    doRefund(rewardToken);
   }
 
   /// @dev Harvest SUSHI reward tokens to in-exec position's owner
@@ -398,5 +403,6 @@ contract SushiswapSpellV1 is WhitelistSpell {
 
     // 3. Refund sushi
     doRefund(sushi);
+    doRefund(rewardToken);
   }
 }
