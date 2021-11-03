@@ -19,6 +19,7 @@ interface IMiniChefV2 {
 
     function poolInfo(uint pid) external view returns (uint128 accSushiPerShare, uint64 lastTimeReward, uint64 allocPoint);
     function sushiPerSecond() external view returns (uint);
+    function totalAllocPoint() external view returns (uint);
     function lpToken(uint pid) external view returns (address);
     function poolLength() external view returns (uint256);
     function updatePool(uint256 pid) external;
