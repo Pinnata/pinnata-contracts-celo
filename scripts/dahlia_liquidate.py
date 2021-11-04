@@ -10,41 +10,43 @@ flash_pairs = {
 
 def liquidate(bank, admin, dahlia_liquidator):
     positions = bank.nextPositionId()
+    debts = []
     for i in range(1, positions):
         collat = bank.getCollateralCELOValue(i)
         borrow = bank.getBorrowCELOValue(i)
-        print("collateral value: ", collat)
-        print("borrow value: ", borrow)
+        if collat > 0:
+            print("debt", borrow/collat)
+            debts.append(borrow/collat)
         if borrow > collat:
             (tokens, debts) = bank.getPositionDebts(i)
             largest = max(debts)
             index_of_largest = debts.index(largest)
             print(tokens, debts, index_of_largest)
 
-            # find the underlying assets, ubeswap call
-            (_, collToken, collId, _) = bank.getPositionInfo(i)
-            under = interface.IERC20Wrapper(collToken).getUnderlyingToken(collId)
-            if under.lower() != flash_pairs.get(tokens[index_of_largest].lower())[0]:
-                lp = interface.IUniswapV2Pair(flash_pairs.get(tokens[index_of_largest].lower())[0])
-            else:
-                lp = interface.IUniswapV2Pair(flash_pairs.get(tokens[index_of_largest].lower())[1])
+            # # find the underlying assets, ubeswap call
+            # (_, collToken, collId, _) = bank.getPositionInfo(i)
+            # under = interface.IERC20Wrapper(collToken).getUnderlyingToken(collId)
+            # if under.lower() != flash_pairs.get(tokens[index_of_largest].lower())[0]:
+            #     lp = interface.IUniswapV2Pair(flash_pairs.get(tokens[index_of_largest].lower())[0])
+            # else:
+            #     lp = interface.IUniswapV2Pair(flash_pairs.get(tokens[index_of_largest].lower())[1])
 
-            amount0Out = 0
-            amount1Out = 0
-            if lp.token0() == tokens[index_of_largest]:
-                amount0Out = debts[index_of_largest]
-            elif lp.token1() == tokens[index_of_largest]:
-                amount1Out = debts[index_of_largest]
+            # amount0Out = 0
+            # amount1Out = 0
+            # if lp.token0() == tokens[index_of_largest]:
+            #     amount0Out = debts[index_of_largest]
+            # elif lp.token1() == tokens[index_of_largest]:
+            #     amount1Out = debts[index_of_largest]
 
-            data = encode_single('uint256', i)
-            print(amount0Out, amount1Out)
-            lp.swap(amount0Out, amount1Out, dahlia_liquidator, data, {"from": admin})
-
+            # data = encode_single('uint256', i)
+            # print(amount0Out, amount1Out)
+            # lp.swap(amount0Out, amount1Out, dahlia_liquidator, data, {"from": admin})
+    print(max(debts))
 
 def main():
     admin = accounts.load('dahlia_admin')
     f = open('scripts/dahlia_addresses.json')
     addr = json.load(f)['mainnet']
     bank = Contract.from_abi("HomoraBank", addr.get('dahlia_bank'), HomoraBank.abi)
-    dahlia_liquidator = addr['dahlia_liquidator']
+    dahlia_liquidator = None #addr['dahlia_liquidator']
     liquidate(bank, admin, dahlia_liquidator)
