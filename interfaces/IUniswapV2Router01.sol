@@ -1,6 +1,6 @@
-pragma solidity >=0.6.2;
+// SPDX-License-Identifier: MIT
 
-// https://github.com/Uniswap/uniswap-v2-periphery/blob/master/contracts/interfaces/IUniswapV2Router01.sol
+pragma solidity >=0.6.2;
 
 interface IUniswapV2Router01 {
   function factory() external pure returns (address);
@@ -14,14 +14,7 @@ interface IUniswapV2Router01 {
     uint amountBMin,
     address to,
     uint deadline
-  )
-    external
-    returns (
-      uint amountA,
-      uint amountB,
-      uint liquidity
-    );
-
+  ) external returns (uint amountA, uint amountB, uint liquidity);
   function removeLiquidity(
     address tokenA,
     address tokenB,
@@ -31,7 +24,6 @@ interface IUniswapV2Router01 {
     address to,
     uint deadline
   ) external returns (uint amountA, uint amountB);
-
   function removeLiquidityWithPermit(
     address tokenA,
     address tokenB,
@@ -40,12 +32,8 @@ interface IUniswapV2Router01 {
     uint amountBMin,
     address to,
     uint deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
+    bool approveMax, uint8 v, bytes32 r, bytes32 s
   ) external returns (uint amountA, uint amountB);
-
   function swapExactTokensForTokens(
     uint amountIn,
     uint amountOutMin,
@@ -53,7 +41,6 @@ interface IUniswapV2Router01 {
     address to,
     uint deadline
   ) external returns (uint[] memory amounts);
-
   function swapTokensForExactTokens(
     uint amountOut,
     uint amountInMax,
@@ -62,31 +49,9 @@ interface IUniswapV2Router01 {
     uint deadline
   ) external returns (uint[] memory amounts);
 
-  function quote(
-    uint amountA,
-    uint reserveA,
-    uint reserveB
-  ) external pure returns (uint amountB);
-
-  function getAmountOut(
-    uint amountIn,
-    uint reserveIn,
-    uint reserveOut
-  ) external pure returns (uint amountOut);
-
-  function getAmountIn(
-    uint amountOut,
-    uint reserveIn,
-    uint reserveOut
-  ) external pure returns (uint amountIn);
-
-  function getAmountsOut(uint amountIn, address[] calldata path)
-    external
-    view
-    returns (uint[] memory amounts);
-
-  function getAmountsIn(uint amountOut, address[] calldata path)
-    external
-    view
-    returns (uint[] memory amounts);
+  function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
+  function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
+  function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) external pure returns (uint amountIn);
+  function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
+  function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }

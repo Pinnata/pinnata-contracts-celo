@@ -75,7 +75,7 @@ def main():
     celo_cusd_wmstaking = WMStakingRewards.deploy(
         celo_cusd_multi_staking,
         celo_cusd_lp,
-        [mock2, mock, zero_add, zero_add, zero_add, zero_add, zero_add, zero_add],
+        [mock2, mock],
         2,
         {'from': deployer}
     )

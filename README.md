@@ -11,10 +11,6 @@
 ++++++++++++.        ++++       ++++   ++++       ++++   ++++++++++++   ++++++++++++   ++++        ++++
 ```
 
-TODO:
-test: bank hack, lp oracle
-finalize deployment address
-
 TL;DR. Here's what v1 will support:
 
 - Multi assets lending and borrowing (with huge leverage for stablecoin farming!)
@@ -95,3 +91,8 @@ Prices are taking from SortedOracles contract and only avialable for cUSD, cEUR,
 
 - For regular assets, asset prices can be derived from Ubeswap pool (with UBE) and are secured through a TWAP contract.
 - For LP tokens, asset prices will determine the optimal reserve proportion of the underlying assets, which are then used to compute the value of LP tokens. See `UniswapV2Oracle.sol` for example implementation.
+
+
+0x1bAbC24Ce769FB93DF2A312f66373a62D4115bd4
+0x5162d7A8c3aE7e49AAeE31Bd0BF18F89b2626182
+0xCbfb4C355D75993B2Be90e3876050b65fda7352d

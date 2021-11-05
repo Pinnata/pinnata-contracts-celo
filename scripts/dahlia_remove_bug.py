@@ -1,40 +1,34 @@
-from os import error
+
 from brownie import (
     accounts,
     interface,
     Contract,
     HomoraBank,
-    network
+    network,
+    SushiswapSpellV1,
 )
 import json
 
 network.gas_limit(8000000)
 
 def main():
-    deployer = accounts.load('dahlia_admin')
     person = accounts.load('dahlia_alice')
     f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['alfajores']
-    position = 1013
+    addr = json.load(f)['mainnet']
+    position = 1
 
-    celo = interface.IERC20Ex(addr['celo'])
-    mcusd = interface.IERC20Ex(addr['mcusd'])
-    mceur = interface.IERC20Ex(addr['mceur'])
-    scelo = interface.IERC20Ex(addr['scelo'])
-    ube = interface.IERC20Ex(addr['ube'])
-    fcelo = interface.ICErc20(addr['fcelo'])
-    fmcusd = interface.ICErc20(addr['fmcusd'])
-    fmceur = interface.ICErc20(addr['fmceur'])
-    fscelo = interface.ICErc20(addr['fscelo'])
-    fube = interface.ICErc20(addr['fube'])
+    # celo = interface.IERC20Ex(addr['celo'])
+    cusd = interface.IERC20Ex(addr['cusd'])
+    ceur = interface.IERC20Ex(addr['ceur'])
+    # fcelo = interface.ICErc20(addr['fcelo'])
+    fcusd = interface.ICErc20(addr['fcusd'])
+    fceur = interface.ICErc20(addr['fceur'])
     dahlia_bank = Contract.from_abi("HomoraBank", addr.get('dahlia_bank'), HomoraBank.abi)
-    # dahlia_bank.setFeeBps(10, {'from': deployer})
+    sushi_spell = SushiswapSpellV1.at(addr['sushi_spell'])
 
     # dahlia_bank.accrue(celo, {'from': person})
-    # dahlia_bank.accrue(mcusd, {'from': person})
-    # dahlia_bank.accrue(mceur, {'from': person})
-    # dahlia_bank.accrue(scelo, {'from': person})
-    # dahlia_bank.accrue(ube, {'from': person})
+    # dahlia_bank.accrue(cusd, {'from': person})
+    # dahlia_bank.accrue(ceur, {'from': person})
 
     (owner, collToken, collId, collateralsize) = dahlia_bank.getPositionInfo(position)
     collat = dahlia_bank.getCollateralCELOValue(position)
@@ -46,8 +40,23 @@ def main():
     print("collId:", collId)
     print("collateral size:", collateralsize)
 
-    assert dahlia_bank.getBankInfo(celo)[3] == fcelo.borrowBalanceStored(dahlia_bank.address)
-    assert dahlia_bank.getBankInfo(mcusd)[3] == fmcusd.borrowBalanceStored(dahlia_bank.address)
-    assert dahlia_bank.getBankInfo(mceur)[3] == fmceur.borrowBalanceStored(dahlia_bank.address)
-    assert dahlia_bank.getBankInfo(scelo)[3] == fscelo.borrowBalanceStored(dahlia_bank.address)
-    assert dahlia_bank.getBankInfo(ube)[3] == fube.borrowBalanceStored(dahlia_bank.address)
+    # assert dahlia_bank.getBankInfo(celo)[3] == fcelo.borrowBalanceStored(dahlia_bank.address)
+    # assert dahlia_bank.getBankInfo(cusd)[3] == fcusd.borrowBalanceStored(dahlia_bank.address)
+    # assert dahlia_bank.getBankInfo(ceur)[3] == fceur.borrowBalanceStored(dahlia_bank.address)
+
+    dahlia_bank.execute(
+        position,
+        sushi_spell,
+        sushi_spell.removeLiquidityWMiniChef.encode_input(
+            cusd,
+            ceur,
+            [2**256-1,
+             0,
+             2**256-1,
+             2**256-1,
+             0,
+             0,
+             0],
+        ),
+        {'from': person}
+    )

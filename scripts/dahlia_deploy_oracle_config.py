@@ -5,8 +5,9 @@ from brownie import (
     UniswapV2Oracle,
     ProxyOracle,
     CoreOracle,
-    SimpleOracle,
     WERC20,
+    CeloProxyPriceProvider,
+    MoolaProxyOracle,
 )
 import json
 
@@ -19,53 +20,37 @@ def main():
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
 
-    alfajores_addr = addr.get('alfajores')
+    mainnet_addr = addr.get('mainnet')
 
-    celo = interface.IERC20Ex(alfajores_addr.get('celo'))
-    cusd = interface.IERC20Ex(alfajores_addr.get('cusd'))
-    ceur = interface.IERC20Ex(alfajores_addr.get('ceur'))
-    core_oracle = CoreOracle.at(alfajores_addr.get('core_oracle'))
-    proxy_oracle = ProxyOracle.at(alfajores_addr.get('proxy_oracle'))
-    ufactory = interface.IUniswapV2Factory(alfajores_addr.get('ufactory'))
+    cusd = interface.IERC20Ex(mainnet_addr.get('cusd'))
+    ceur = interface.IERC20Ex(mainnet_addr.get('ceur'))
+    core_oracle = CoreOracle.at(mainnet_addr.get('core_oracle'))
+    proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
+    sushi_factory = interface.IUniswapV2Factory(mainnet_addr.get('sushi_factory'))
 
-    uni_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
-    simple_oracle = SimpleOracle.deploy({'from': deployer})
+    sushi_oracle = UniswapV2Oracle.deploy(core_oracle, {'from': deployer})
 
-    simple_oracle.setCELOPx([celo, cusd, ceur], [2**112, 2**112 / 6, 2**112 / 5])
+    sorted_oracle = CeloProxyPriceProvider.deploy({'from': deployer})
 
-    celo_cusd_lp = ufactory.getPair(celo, cusd)
-    celo_ceur_lp = ufactory.getPair(celo, ceur)
-    cusd_ceur_lp = ufactory.getPair(cusd, ceur)
+    cusd_ceur_lp = sushi_factory.getPair(cusd, ceur)
 
     core_oracle.setRoute([
-        celo,
         cusd,
         ceur,
-        celo_cusd_lp,
-        celo_ceur_lp,
         cusd_ceur_lp,
     ], [
-        simple_oracle, 
-        simple_oracle, 
-        simple_oracle,
-        uni_oracle,
-        uni_oracle,
-        uni_oracle,
+        sorted_oracle, 
+        sorted_oracle,
+        sushi_oracle
     ], {'from': deployer})
 
     proxy_oracle.setTokenFactors([
-        celo,
         cusd,
         ceur,
-        celo_cusd_lp,
-        celo_ceur_lp,
         cusd_ceur_lp,
     ], [
-        [13000, 7800, 10250],
         [11000, 9000, 10250],
         [11000, 9000, 10250],
-        [50000, 7800, 10250],
-        [50000, 7800, 10250],
         [50000, 7800, 10250],
     ], {'from': deployer})
 
@@ -77,9 +62,9 @@ def main():
         {'from': deployer},
     )
 
-    addr.get('alfajores').update({
-        'uni_oracle': uni_oracle.address,
-        'simple_oracle': simple_oracle.address,
+    addr.get('mainnet').update({
+        'sushi_oracle': sushi_oracle.address,
+        'sorted_oracle': sorted_oracle.address,
         'werc20': werc20.address,
     })
 

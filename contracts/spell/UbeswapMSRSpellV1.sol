@@ -146,7 +146,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     if (swapAmt > 0) {
       address[] memory path = new address[](2);
       (path[0], path[1]) = isReversed ? (tokenB, tokenA) : (tokenA, tokenB);
-      router.swapExactTokensForTokens(swapAmt, 0, path, address(this), block.timestamp);
+      router.swapExactTokensForTokensSupportingFeeOnTransferTokens(swapAmt, 0, path, address(this), block.timestamp);
     }
 
     // 5. Add liquidity
@@ -225,7 +225,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     doRefund(tokenA);
     doRefund(tokenB);
 
-    // // 9. Refund reward
+    // 9. Refund reward
     address[] memory reward = IWMStakingRewards(wstaking).getReward();
     uint depth = IWMStakingRewards(wstaking).depth();
     require(depth > 0 && depth <= 8, 'invalid depth');
@@ -297,9 +297,9 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     if (amtA < amtADesired && amtB > amtBDesired) {
       address[] memory path = new address[](2);
       (path[0], path[1]) = (tokenB, tokenA);
-      router.swapTokensForExactTokens(
-        amtADesired.sub(amtA),
+      router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
         amtB.sub(amtBDesired),
+        amtADesired.sub(amtA),
         path,
         address(this),
         block.timestamp
@@ -307,9 +307,9 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     } else if (amtA > amtADesired && amtB < amtBDesired) {
       address[] memory path = new address[](2);
       (path[0], path[1]) = (tokenA, tokenB);
-      router.swapTokensForExactTokens(
-        amtBDesired.sub(amtB),
+      router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
         amtA.sub(amtADesired),
+        amtBDesired.sub(amtB),
         path,
         address(this),
         block.timestamp
