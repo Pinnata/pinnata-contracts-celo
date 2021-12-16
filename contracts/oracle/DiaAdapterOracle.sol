@@ -14,7 +14,7 @@ contract DiaAdapterOracle is IBaseOracle, Governable {
 
   constructor (address _diaOracle, uint256 _maxDelay) public {
     __Governable__init();
-    diaOracle = diaOracle;
+    diaOracle = _diaOracle;
     maxDelay = _maxDelay;
   }
 
@@ -30,10 +30,9 @@ contract DiaAdapterOracle is IBaseOracle, Governable {
   /// @param token The ERC-20 token to check the value.
   function getCELOPx(address token) external view override returns (uint) {
     (uint128 celoPrice, uint128 celoTimestamp) = DIAOracle(diaOracle).getValue("CELO/USD");
-    // require(celoTimestamp >= block.timestamp.sub(maxDelay), "delayed celo update time");
-    return 1;
-    // (uint128 price, uint128 timestamp) = diaOracle.getValue(query[token]);
-    // require(timestamp >= block.timestamp.sub(maxDelay), "delayed update time");
-    // return uint(price).mul(2**112).div(celoPrice);
+    require(celoTimestamp >= block.timestamp.sub(maxDelay), "delayed celo update time");
+    (uint128 price, uint128 timestamp) = DIAOracle(diaOracle).getValue(query[token]);
+    require(timestamp >= block.timestamp.sub(maxDelay), "delayed update time");
+    return uint(price).mul(2**112).div(celoPrice);
   }
 }
