@@ -1,27 +1,44 @@
 from brownie import (
-    accounts, HomoraBank, SafeBox
+    accounts,
+    HomoraBank,
+    SafeBox,
+    Contract,
+    network,
+    interface,
 )
-from brownie import interface
-from .utils import *
 import json
 
+network.gas_limit(8000000)
+
 def main():
-    deployer = accounts.load('admin')
-    f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['mainnet']
+    deployer = accounts.load('dahlia_admin')
 
-    mzpn = interface.IERC20Ex(addr['mzpn'])
-    fmzpn = interface.IERC20Ex(addr['fbtc'])
-    dahlia_bank = HomoraBank.at(addr['dahlia_bank'])
+    with open('scripts/dahlia_addresses.json', 'r') as f:
+        addr = json.load(f)
+    sub_addr = addr.get('alpha')
 
-    # # deploy safeboxes
+    cusd = interface.IERC20Ex(sub_addr.get('cusd'))
+    ceur = interface.IERC20Ex(sub_addr.get('ceur'))
+    fcusd = interface.IERC20Ex(sub_addr.get('fcusd'))
+    fceur = interface.IERC20Ex(sub_addr.get('fceur'))
+    dahlia_bank = Contract.from_abi("HomoraBank", sub_addr.get('dahlia_bank'), HomoraBank.abi)
 
-    SafeBox.deploy(
-        fmzpn, 'Interest Bearing Marzipan', 'dMZPN', {'from': deployer})
+    # deploy safeboxes
+    dcusd = SafeBox.deploy(
+        fcusd, 'Interest Bearing cUSD', 'dcUSD', {'from': deployer})
+    dceur = SafeBox.deploy(
+        fceur, 'Interest Bearing cEUR', 'dcEUR', {'from': deployer})
     
     # add banks
-    dahlia_bank.addBank(mzpn, fmzpn, {'from': deployer})
+    dahlia_bank.addBank(cusd, fcusd, {'from': deployer})
+    dahlia_bank.addBank(ceur, fceur, {'from': deployer})
 
-    dahlia_bank.setWhitelistTokens([mzpn], [True], {'from': deployer})
 
-    print('Done!')
+    dahlia_bank.setWhitelistTokens([cusd, ceur], [True, True], {'from': deployer})
+
+    addr.get('mainnet').update({
+        'dcusd': dcusd.address,
+        'dceur': dceur.address,
+    })
+
+    print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))
