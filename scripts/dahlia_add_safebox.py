@@ -17,28 +17,33 @@ def main():
         addr = json.load(f)
     sub_addr = addr.get('alpha')
 
-    cusd = interface.IERC20Ex(sub_addr.get('cusd'))
-    ceur = interface.IERC20Ex(sub_addr.get('ceur'))
-    fcusd = interface.IERC20Ex(sub_addr.get('fcusd'))
-    fceur = interface.IERC20Ex(sub_addr.get('fceur'))
+    celo = interface.IERC20Ex(sub_addr.get('celo'))
+    ube = interface.IERC20Ex(sub_addr.get('ube'))
+    mobi = interface.IERC20Ex(sub_addr.get('mobi'))
+    fcelo = interface.IERC20Ex(sub_addr.get('fcelo'))
+    fube = interface.IERC20Ex(sub_addr.get('fube'))
+    fmobi = interface.IERC20Ex(sub_addr.get('fmobi'))
     dahlia_bank = Contract.from_abi("HomoraBank", sub_addr.get('dahlia_bank'), HomoraBank.abi)
 
     # deploy safeboxes
-    dcusd = SafeBox.deploy(
-        fcusd, 'Interest Bearing cUSD', 'dcUSD', {'from': deployer})
-    dceur = SafeBox.deploy(
-        fceur, 'Interest Bearing cEUR', 'dcEUR', {'from': deployer})
+    dcelo = SafeBox.deploy(
+      fcelo, 'Interest Bearing CELO', 'dCELO', {'from': deployer})
+    dmobi = SafeBox.deploy(
+      fmobi, 'Interest Bearing MOBI', 'dMOBI', {'from': deployer})
+    dube = SafeBox.deploy(
+      fube, 'Interest Bearing UBE', 'dUBE', {'from': deployer})
     
     # add banks
-    dahlia_bank.addBank(cusd, fcusd, {'from': deployer})
-    dahlia_bank.addBank(ceur, fceur, {'from': deployer})
+    dahlia_bank.addBank(celo, fcelo, {'from': deployer})
+    dahlia_bank.addBank(ube, fube, {'from': deployer})
+    dahlia_bank.addBank(mobi, fmobi, {'from': deployer})
 
+    dahlia_bank.setWhitelistTokens([celo, ube, mobi], [True, True, True], {'from': deployer})
 
-    dahlia_bank.setWhitelistTokens([cusd, ceur], [True, True], {'from': deployer})
-
-    addr.get('mainnet').update({
-        'dcusd': dcusd.address,
-        'dceur': dceur.address,
+    addr.get('alpha').update({
+        'dcelo': dcelo.address,
+        'dube': dube.address,
+        'dmobi': dmobi.address,
     })
 
     print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

@@ -75,13 +75,19 @@
         "Governance and seed rates": "0xFa040C5Ac629377eD73E45183359e5324F80E925",
         "fcusd": "0x69eCb11951ca3E64970500Cee2bf3117a396e8CA",
         "fceur": "0xe77D39899fC4d261093e8e4A314e8290429Dc448",
+        "fcelo": "0x8D8a405B0E213f2b9F1204F132CaCFdaB6563616",
+        "fube": "0xD04E6E4995654d64049f4efce44dea44b5a3A86a",
+        "fmobi": "0x891aE70E2c6C10c2CDFBbaa324187f1AbdA54133",
         "dcusd": "0x85271d63FaBBEbb6194c2A1FFC2F55047E4cb839",
         "dceur": "0xfc6eE763CefaF7FFc25ceE9251d50FB8890992F9",
         "wminichef": "0x88EFB15fBeb0A542e9B05443e2578817Bb773E16",
         "wrewarder": "0x817066c015397edaCfC5618ce2062C6893a26c6C",
         "sushi_spell": "0xCb5cF76c3D1A5a8A0D80312A76eF0b3C965b4Ad1",
         "dahlia_liquidator": "0x660017EF69C022853A1092568e0dE45C2c52bD9b",
-        "dia_oracle": "0x29689D6bFABc152BA2AAfdbFedd1b27B4f1eD793"
+        "dia_oracle": "0x29689D6bFABc152BA2AAfdbFedd1b27B4f1eD793",
+        "dcelo": "0x24B162B4Bb738b09757A099650c588daC28E9e2d",
+        "dube": "0x97931360B98DD11fA0Bc8AD4FB8Ce44D856CA927",
+        "dmobi": "0x39d90818304992270bd131471EF3ACd20a4aaE2A"
     },
     "mainnet": {
         "celo": "0x471ece3750da237f93b8e339c536989b8978a438",
