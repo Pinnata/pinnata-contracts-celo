@@ -8,9 +8,11 @@ from brownie import (
     Contract,
     UbeswapMSRSpellV1,
     HomoraBank,
+    SafeBox
 )
 
 import json
+import time
 
 network.gas_limit(8000000)
 
@@ -23,57 +25,48 @@ def lend(bob, token, safebox):
 def main():
     deployer = accounts.load('dahlia_admin')
     alice = accounts.load('dahlia_alice')
-    # bob = accounts.load('dahlia_bob')
+    bob = accounts.load('dahlia_bob')
 
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
-    mainnet_addr = addr.get('mainnet')
+    sub_addr = addr.get('alpha')
 
-    mcusd = interface.IERC20Ex(mainnet_addr.get('mcusd'))
-    mceur = interface.IERC20Ex(mainnet_addr.get('mceur'))
-    celo = interface.IERC20Ex(mainnet_addr.get('celo'))
-    ube = mainnet_addr.get('ube')
-    moo = mainnet_addr.get('moo')
-    ube_factory = interface.IUniswapV2Factory(mainnet_addr.get('ube_factory'))
-    ube_router = interface.IUniswapV2Router02(mainnet_addr.get('ube_router'))
-    proxy_oracle = ProxyOracle.at(mainnet_addr.get('proxy_oracle'))
-    celo_mcusd_mstaking = mainnet_addr.get('celo_mcusd_mstaking')
-    celo_mceur_mstaking = mainnet_addr.get('celo_mceur_mstaking')
-    mcusd_mceur_mstaking = mainnet_addr.get('mcusd_mceur_mstaking')
+    ube = interface.IERC20Ex(sub_addr.get('ube'))
+    mobi = interface.IERC20Ex(sub_addr.get('mobi'))
+    celo = interface.IERC20Ex(sub_addr.get('celo'))
+    ube_factory = interface.IUniswapV2Factory(sub_addr.get('ube_factory'))
+    ube_router = interface.IUniswapV2Router02(sub_addr.get('ube_router'))
+    proxy_oracle = ProxyOracle.at(sub_addr.get('proxy_oracle'))
+    celo_mobi_mstaking = sub_addr.get('celo_mobi_mstaking')
+    celo_ube_mstaking = sub_addr.get('celo_ube_mstaking')
 
-    werc20 = WERC20.at(mainnet_addr.get('werc20'))
-    dahlia_bank = Contract.from_abi("HomoraBank", mainnet_addr.get('dahlia_bank'), HomoraBank.abi)
+    werc20 = WERC20.at(sub_addr.get('werc20'))
+    dahlia_bank = Contract.from_abi("HomoraBank", sub_addr.get('dahlia_bank'), HomoraBank.abi)
 
-    celo_mcusd_lp = ube_factory.getPair(celo, mcusd)
-    celo_mceur_lp = ube_factory.getPair(celo, mceur)
-    mcusd_mceur_lp = ube_factory.getPair(mcusd, mceur)
+    celo_mobi_lp = ube_factory.getPair(celo, mobi)
+    celo_ube_lp = ube_factory.getPair(celo, ube)
 
-    celo_mcusd_wmstaking = WMStakingRewards.deploy(
-        celo_mcusd_mstaking,
-        celo_mcusd_lp,
-        [celo, ube],
-        2,
-        {'from': deployer}
-    )
+    celo_safebox = SafeBox.at(sub_addr.get('dcelo'))
+    mobi_safebox = SafeBox.at(sub_addr.get('dmobi'))
 
-    celo_mceur_wmstaking = WMStakingRewards.deploy(
-        celo_mceur_mstaking,
-        celo_mceur_lp,
-        [celo, ube],
-        2,
-        {'from': deployer}
-    )
-
-    mcusd_mceur_wmstaking = WMStakingRewards.deploy(
-        mcusd_mceur_mstaking,
-        mcusd_mceur_lp,
-        [celo, ube, moo],
+    celo_mobi_wmstaking = WMStakingRewards.deploy(
+        celo_mobi_mstaking,
+        celo_mobi_lp,
+        [celo, ube, mobi],
         3,
         {'from': deployer}
     )
 
+    celo_ube_wmstaking = WMStakingRewards.deploy(
+        celo_ube_mstaking,
+        celo_ube_lp,
+        [celo, ube],
+        2,
+        {'from': deployer}
+    )
+
     proxy_oracle.setWhitelistERC1155(
-        [celo_mceur_wmstaking, mcusd_mceur_wmstaking],
+        [celo_mobi_wmstaking, celo_ube_wmstaking],
         True,
         {'from': deployer},
     )
@@ -83,26 +76,25 @@ def main():
         {'from': deployer},
     )
 
-    ubeswap_spell.getAndApprovePair(celo, mcusd, {'from': deployer})
-    ubeswap_spell.getAndApprovePair(celo, mceur, {'from': deployer})
-    ubeswap_spell.getAndApprovePair(mcusd, mceur, {'from': deployer})
+    ubeswap_spell.getAndApprovePair(celo, mobi, {'from': deployer})
+    ubeswap_spell.getAndApprovePair(celo, ube, {'from': deployer})
 
-    ubeswap_spell.setWhitelistLPTokens([celo_mceur_lp, mcusd_mceur_lp], [True, True], {'from': deployer})
+    ubeswap_spell.setWhitelistLPTokens([celo_mobi_lp, celo_ube_lp], [True, True], {'from': deployer})
 
     dahlia_bank.setWhitelistSpells([ubeswap_spell], [True], {'from': deployer})
 
     celo.approve(dahlia_bank, 2**256-1, {'from': alice})
-    mcusd.approve(dahlia_bank, 2**256-1, {'from': alice})
+    mobi.approve(dahlia_bank, 2**256-1, {'from': alice})
 
-    celo.approve(dahlia_bank, 2**256-1, {'from': bob})
-    mcusd.approve(dahlia_bank, 2**256-1, {'from': bob})
+    lend(bob, celo, celo_safebox)
+    lend(bob, mobi, mobi_safebox)
 
     # open a position
     dahlia_bank.execute(
         0,
         ubeswap_spell,
         ubeswap_spell.addLiquidityWStakingRewards.encode_input(
-            mcusd,
+            mobi,
             celo,
             [
              6*10**14,
@@ -114,17 +106,17 @@ def main():
              0,
              0
             ],
-            celo_mcusd_wmstaking
+            celo_mobi_wmstaking
         ),
         {
             'from': alice, 
         }
     )
     
-    addr.get('mainnet').update({
-        # 'celo_mcusd_wmstaking': celo_mcusd_wmstaking.address,
-        'celo_mceur_wmstaking': celo_mceur_wmstaking.address,
-        'mcusd_mceur_wmstaking': mcusd_mceur_wmstaking.address,
+    addr.get('alpha').update({
+        'celo_mobi_wmstaking': celo_mobi_wmstaking.address,
+        'celo_ube_wmstaking': celo_ube_wmstaking.address,
+        'ubeswap_spell': ubeswap_spell.address,
     })
 
     print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))

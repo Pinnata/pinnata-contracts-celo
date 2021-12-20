@@ -87,7 +87,12 @@
         "dia_oracle": "0x29689D6bFABc152BA2AAfdbFedd1b27B4f1eD793",
         "dcelo": "0x24B162B4Bb738b09757A099650c588daC28E9e2d",
         "dube": "0x97931360B98DD11fA0Bc8AD4FB8Ce44D856CA927",
-        "dmobi": "0x39d90818304992270bd131471EF3ACd20a4aaE2A"
+        "dmobi": "0x39d90818304992270bd131471EF3ACd20a4aaE2A",
+        "celo_mobi_mstaking": "0xb450940c5297e9b5e7167FAC5903fD1e90b439b8",
+        "celo_ube_mstaking": "0x9D87c01672A7D02b2Dc0D0eB7A145C7e13793c3B",
+        "celo_mobi_wmstaking": "0xa7C1c812b6c434D2f08cB2b3A4D825Cdf323aeCf",
+        "celo_ube_wmstaking": "0x29dA8B9a1835Ea8E87d20262Cd28a8794254d25B",
+        "ubeswap_spell": "0x2c0A65a28e860e423c82eCac8220Db2a2C505053"
     },
     "mainnet": {
         "celo": "0x471ece3750da237f93b8e339c536989b8978a438",
