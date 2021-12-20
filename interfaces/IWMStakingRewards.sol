@@ -13,6 +13,8 @@ interface IWMStakingRewards is IERC1155, IERC20Wrapper {
   /// @dev Burn ERC1155 token to redeem ERC20 token back.
   function burn(uint id, uint amount) external returns (uint);
 
+  function emergencyBurn(uint id, uint amount) external returns (uint);
+
   function getReward() external view returns (address[] calldata);
 
   function depth() external view returns (uint);

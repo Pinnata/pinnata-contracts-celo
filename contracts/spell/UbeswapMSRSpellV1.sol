@@ -228,6 +228,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     // 9. Refund reward
     address[] memory reward = IWMStakingRewards(wstaking).getReward();
     uint depth = IWMStakingRewards(wstaking).depth();
+    require(depth == reward.length, 'invalid');
     require(depth > 0 && depth <= 8, 'invalid depth');
     for (uint i = 0; i < depth; i += 1) {
       doRefund(reward[i]);
@@ -375,10 +376,34 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     // 9. Refund reward
     address[] memory reward = IWMStakingRewards(wstaking).getReward();
     uint depth = IWMStakingRewards(wstaking).depth();
+    require(depth == reward.length, 'invalid');
     require(depth > 0 && depth <= 8, 'invalid depth');
     for (uint i = 0; i < depth; i += 1) {
       doRefund(reward[i]);
     }
+  }
+
+    /// @dev Remove liquidity from Uniswap pool, from staking rewards
+  /// @param tokenA Token A for the pair
+  /// @param tokenB Token B for the pair
+  /// @param amt Amounts of tokens to take out, withdraw, repay, and get.
+  function removeLiquidityWStakingRewardsEmergency(
+    address tokenA,
+    address tokenB,
+    RepayAmounts calldata amt,
+    address wstaking
+  ) external {
+    address lp = getAndApprovePair(tokenA, tokenB);
+    (, address collToken, uint collId, ) = bank.getCurrentPositionInfo();
+
+    // 1. Take out collateral
+    require(IWMStakingRewards(collToken).getUnderlyingToken(collId) == lp, 'incorrect underlying');
+    require(collToken == wstaking, 'collateral token & wstaking mismatched');
+    bank.takeCollateral(wstaking, collId, amt.amtLPTake);
+    IWMStakingRewards(wstaking).emergencyBurn(collId, amt.amtLPTake);
+
+    // 2-8. remove liquidity
+    removeLiquidityInternal(tokenA, tokenB, amt, lp);
   }
 
   /// @dev Harvest staking reward tokens to in-exec position's owner
@@ -402,6 +427,7 @@ contract UbeswapMSRSpellV1 is WhitelistSpell {
     // 3. Refund reward
     address[] memory reward = IWMStakingRewards(wstaking).getReward();
     uint depth = IWMStakingRewards(wstaking).depth();
+    require(depth == reward.length, 'invalid');
     require(depth > 0 && depth <= 8, 'invalid depth');
     for (uint i = 0; i < depth; i += 1) {
       doRefund(reward[i]);
