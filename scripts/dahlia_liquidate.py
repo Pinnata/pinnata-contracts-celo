@@ -46,7 +46,7 @@ def liquidate(bank, admin, dahlia_liquidator):
 def main():
     admin = accounts.load('dahlia_admin')
     f = open('scripts/dahlia_addresses.json')
-    addr = json.load(f)['mainnet']
+    addr = json.load(f)['alpha']
     bank = Contract.from_abi("HomoraBank", addr.get('dahlia_bank'), HomoraBank.abi)
     dahlia_liquidator = None #addr['dahlia_liquidator']
     liquidate(bank, admin, dahlia_liquidator)
