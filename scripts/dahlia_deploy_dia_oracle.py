@@ -16,7 +16,7 @@ def main():
 
   with open('scripts/dahlia_addresses.json', 'r') as f:
     addr = json.load(f)
-  sub_addr = addr.get('alpha')
+  sub_addr = addr.get('mainnet')
 
   celo = sub_addr.get('celo')
   ube = sub_addr.get('ube')
@@ -67,7 +67,7 @@ def main():
   ], {'from': deployer})
 
 
-  addr.get('alpha').update({
+  addr.get('mainnet').update({
       'dia_oracle': dia_oracle.address,
   })
 

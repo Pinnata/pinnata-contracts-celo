@@ -39,6 +39,7 @@ contract WMStakingRewards is ERC1155('WMStakingRewards'), ReentrancyGuard, IERC2
     uint _depth
   ) public {
     require(_depth > 0 && _depth <= 8, 'invalid depth');
+    require(_depth == _reward.length, 'invalid reward depth');
     staking = _staking;
     underlying = _underlying;
     depth = _depth;
@@ -104,6 +105,16 @@ contract WMStakingRewards is ERC1155('WMStakingRewards'), ReentrancyGuard, IERC2
         stepStaking = IGetMoolaStakingRewards(stepStaking).externalStakingRewards();
       }
     }
+    return amount;
+  }
+
+    function emerygencyBurn(uint id, uint amount) external nonReentrant returns (uint) {
+    if (amount == uint(-1)) {
+      amount = balanceOf(msg.sender, id);
+    }
+    _burn(msg.sender, id, amount);
+    IStakingRewards(staking).withdraw(amount);
+    IERC20(underlying).safeTransfer(msg.sender, amount);
     return amount;
   }
 }
