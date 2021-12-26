@@ -130,6 +130,17 @@
         "wminichef": "0xE583FeC0B218bB89CbB24d76D2A6D901E082DAAA",
         "wrewarder": "0xa2226b9B5067054d38fcA7a24f186b78e0FE9606",
         "sushi_spell": "0x4163A7dB783D3d6d761Bd9060EcDe42D1C2D8c74",
-        "dia_adapter": "0xD259672E3c795695CEab5b8590a22Ffdec99EDab"
+        "dia_adapter": "0xD259672E3c795695CEab5b8590a22Ffdec99EDab",
+        "fcelo": "0x80deb0129CA54b01Cf9f0C83A380C6f770012A80",
+        "fube": "0x442DA9e592fFB6ECdD789aF5132b635807347537",
+        "fmobi": "0xf8fe2ffd85fD6419F4cCe2bEb6c5fcf1cc3e8cFE",
+        "dcelo": "0x7a6d627b0464dd33C988AE3a99aa6372191E7EB2",
+        "dube": "0x37a022Bd03A8b0F66ea68996410E0F70EC395C5e",
+        "dmobi": "0xEfbD2788A0dea9EB959a61CE0098Be6499fB0d78",
+        "celo_mobi_mstaking": "0xb450940c5297e9b5e7167FAC5903fD1e90b439b8",
+        "celo_ube_mstaking": "0x9D87c01672A7D02b2Dc0D0eB7A145C7e13793c3B",
+        "celo_mobi_wmstaking": "0xFab4224Ce8E71e2f8F95f63a088d828d5B570e12",
+        "celo_ube_wmstaking": "0x1B9dF6fd569778f48E7db3eB000C93a80920EA23",
+        "ubeswap_spell": "0x7B775b2AF169D1249db545Cd89754D3C70FAd069"
     }
 }

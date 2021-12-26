@@ -15,7 +15,7 @@ def main():
 
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
-    sub_addr = addr.get('alpha')
+    sub_addr = addr.get('mainnet')
 
     celo = interface.IERC20Ex(sub_addr.get('celo'))
     ube = interface.IERC20Ex(sub_addr.get('ube'))
@@ -40,7 +40,7 @@ def main():
 
     dahlia_bank.setWhitelistTokens([celo, ube, mobi], [True, True, True], {'from': deployer})
 
-    addr.get('alpha').update({
+    addr.get('mainnet').update({
         'dcelo': dcelo.address,
         'dube': dube.address,
         'dmobi': dmobi.address,

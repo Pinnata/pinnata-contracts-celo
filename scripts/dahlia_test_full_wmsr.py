@@ -29,7 +29,7 @@ def main():
 
     with open('scripts/dahlia_addresses.json', 'r') as f:
         addr = json.load(f)
-    sub_addr = addr.get('alpha')
+    sub_addr = addr.get('mainnet')
 
     ube = interface.IERC20Ex(sub_addr.get('ube'))
     mobi = interface.IERC20Ex(sub_addr.get('mobi'))
@@ -113,7 +113,7 @@ def main():
         }
     )
     
-    addr.get('alpha').update({
+    addr.get('mainnet').update({
         'celo_mobi_wmstaking': celo_mobi_wmstaking.address,
         'celo_ube_wmstaking': celo_ube_wmstaking.address,
         'ubeswap_spell': ubeswap_spell.address,
