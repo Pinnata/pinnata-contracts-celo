@@ -20,7 +20,7 @@ def main():
   with open('scripts/dahlia_addresses.json', 'r') as f:
     addr = json.load(f)
 
-  sub_addr = addr.get('alpha')
+  sub_addr = addr.get('mainnet')
 
   celo = interface.IERC20(sub_addr.get('celo'))
 

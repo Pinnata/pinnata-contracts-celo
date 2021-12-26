@@ -68,7 +68,7 @@ def main():
 
 
   addr.get('mainnet').update({
-      'dia_oracle': dia_oracle.address,
+      'dia_adapter': dia_oracle.address,
   })
 
   print(json.dumps(addr, indent=4), file=open('scripts/dahlia_addresses.json', 'w'))
