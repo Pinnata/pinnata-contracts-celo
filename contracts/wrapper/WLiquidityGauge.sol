@@ -38,7 +38,7 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
   }
 
   /// @dev Encode pid, mobiPerShare to a ERC1155 token id
-  /// @param pid Curve pool id (10-bit)
+  /// @param pid Mobi pool id (16-bit)
   /// @param mobiPerShare MOBI amount per share, multiplied by 1e18 (240-bit)
   function encodeId(
     uint pid,
