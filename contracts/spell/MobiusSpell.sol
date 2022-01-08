@@ -16,7 +16,6 @@ contract CurveSpellV1 is WhitelistSpell {
   using SafeMath for uint;
   using HomoraMath for uint;
 
-  ICurveRegistry public immutable registry; // Curve registry
   IWLiquidityGauge public immutable wgauge; // Wrapped liquidity gauge
   address public immutable mobi; // MOBI token address
   mapping(address => address[]) public ulTokens; // Mapping from LP token address -> underlying token addresses
@@ -30,26 +29,26 @@ contract CurveSpellV1 is WhitelistSpell {
   ) public WhitelistSpell(_bank, _werc20, _celo) {
     wgauge = IWLiquidityGauge(_wgauge);
     IWLiquidityGauge(_wgauge).setApprovalForAll(address(_bank), true);
-    registry = IWLiquidityGauge(_wgauge).registry();
     mobi = address(IWLiquidityGauge(_wgauge).mobi());
+  }
+  /// @dev Adds a new pool to the spell
+  /// @param poolAddress address of the pool to add
+  function addPool(address poolAddress) external onlyGov {
+    ICurvePool pool = ICurvePool(poolAddress);
+    address lpToken = pool.getLpToken();
+    poolOf[lpToken] = poolAddress;
+    uint n = pool.getBalances().length;
+    ulTokens[lpToken] = new address[](n);
+
+    for (uint8 i = 0; i < n; i++) {
+      ulTokens[lpToken][i] = pool.getToken(i);
+    }
   }
 
   /// @dev Return pool address given LP token and update pool info if not exist.
   /// @param lp LP token to find the corresponding pool.
   function getPool(address lp) public returns (address) {
     address pool = poolOf[lp];
-    if (pool == address(0)) {
-      require(lp != address(0), 'no lp token');
-      pool = registry.get_pool_from_lp_token(lp);
-      require(pool != address(0), 'no corresponding pool for lp token');
-      poolOf[lp] = pool;
-      (uint n, ) = registry.get_n_coins(pool);
-      address[8] memory tokens = registry.get_coins(pool);
-      ulTokens[lp] = new address[](n);
-      for (uint i = 0; i < n; i++) {
-        ulTokens[lp][i] = tokens[i];
-      }
-    }
     return pool;
   }
 
@@ -117,7 +116,7 @@ contract CurveSpellV1 is WhitelistSpell {
       suppliedAmts[i] = IERC20(tokens[i]).balanceOf(address(this));
     }
     if (suppliedAmts[0] > 0 || suppliedAmts[1] > 0) {
-      ICurvePool(pool).add_liquidity(suppliedAmts, minLPMint);
+      ICurvePool(pool).addLiquidity(suppliedAmts, minLPMint);
     }
 
     // 5. Put collateral
@@ -187,7 +186,7 @@ contract CurveSpellV1 is WhitelistSpell {
       suppliedAmts[i] = IERC20(tokens[i]).balanceOf(address(this));
     }
     if (suppliedAmts[0] > 0 || suppliedAmts[1] > 0 || suppliedAmts[2] > 0) {
-      ICurvePool(pool).add_liquidity(suppliedAmts, minLPMint);
+      ICurvePool(pool).addLiquidity(suppliedAmts, minLPMint);
     }
 
     // 5. put collateral
@@ -257,7 +256,7 @@ contract CurveSpellV1 is WhitelistSpell {
       suppliedAmts[i] = IERC20(tokens[i]).balanceOf(address(this));
     }
     if (suppliedAmts[0] > 0 || suppliedAmts[1] > 0 || suppliedAmts[2] > 0 || suppliedAmts[3] > 0) {
-      ICurvePool(pool).add_liquidity(suppliedAmts, minLPMint);
+      ICurvePool(pool).addLiquidity(suppliedAmts, minLPMint);
     }
 
     // 5. Put collateral
@@ -321,14 +320,14 @@ contract CurveSpellV1 is WhitelistSpell {
     uint amtLPToRemove;
     if (amtsDesired[0] > 0 || amtsDesired[1] > 0) {
       amtLPToRemove = IERC20(lp).balanceOf(address(this)).sub(amtLPWithdraw);
-      ICurvePool(pool).remove_liquidity_imbalance(amtsDesired, amtLPToRemove);
+      ICurvePool(pool).removeLiquidityImbalance(amtsDesired, amtLPToRemove);
     }
 
     // 4. Compute leftover amount to remove. Remove balancedly.
     amtLPToRemove = IERC20(lp).balanceOf(address(this)).sub(amtLPWithdraw);
     if (amtLPToRemove > 0) {
       uint[2] memory mins;
-      ICurvePool(pool).remove_liquidity(amtLPToRemove, mins);
+      ICurvePool(pool).removeLiquidity(amtLPToRemove, mins);
     }
     // 5. Repay
     for (uint i = 0; i < 2; i++) {
@@ -392,14 +391,14 @@ contract CurveSpellV1 is WhitelistSpell {
     uint amtLPToRemove;
     if (amtsDesired[0] > 0 || amtsDesired[1] > 0 || amtsDesired[2] > 0) {
       amtLPToRemove = IERC20(lp).balanceOf(address(this)).sub(amtLPWithdraw);
-      ICurvePool(pool).remove_liquidity_imbalance(amtsDesired, amtLPToRemove);
+      ICurvePool(pool).removeLiquidityImbalance(amtsDesired, amtLPToRemove);
     }
 
     // 4. Compute leftover amount to remove. Remove balancedly.
     amtLPToRemove = IERC20(lp).balanceOf(address(this)).sub(amtLPWithdraw);
     if (amtLPToRemove > 0) {
       uint[3] memory mins;
-      ICurvePool(pool).remove_liquidity(amtLPToRemove, mins);
+      ICurvePool(pool).removeLiquidity(amtLPToRemove, mins);
     }
 
     // 5. Repay
@@ -464,14 +463,14 @@ contract CurveSpellV1 is WhitelistSpell {
     uint amtLPToRemove;
     if (amtsDesired[0] > 0 || amtsDesired[1] > 0 || amtsDesired[2] > 0 || amtsDesired[3] > 0) {
       amtLPToRemove = IERC20(lp).balanceOf(address(this)).sub(amtLPWithdraw);
-      ICurvePool(pool).remove_liquidity_imbalance(amtsDesired, amtLPToRemove);
+      ICurvePool(pool).removeLiquidityImbalance(amtsDesired, amtLPToRemove);
     }
 
     // 4. Compute leftover amount to remove. Remove balancedly.
     amtLPToRemove = IERC20(lp).balanceOf(address(this)).sub(amtLPWithdraw);
     if (amtLPToRemove > 0) {
       uint[4] memory mins;
-      ICurvePool(pool).remove_liquidity(amtLPToRemove, mins);
+      ICurvePool(pool).removeLiquidity(amtLPToRemove, mins);
     }
 
     // 5. Repay

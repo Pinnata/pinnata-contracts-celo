@@ -154,7 +154,25 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
     if (enMobi > stMobi) {
       mobi.safeTransfer(msg.sender, enMobi.sub(stMobi));
     }
+    transferExternalRewards(gauge, amount, msg.sender);
     return pid;
+  }
+
+  /// @dev Transfers the accrued external rewards to the recipient
+  /// @param gauge Mobius gauge to reward for
+  /// @param amtBurned The amount of erc1155 burned
+  /// @param recipient The recipient for the transfer
+  function transferExternalRewards(GaugeInfo storage gauge, uint amtBurned, address recipient) internal {
+    if (gauge.externalRewardTokens.length == 0) return;
+    address[] memory externalTokens = gauge.externalRewardTokens;
+    uint[] memory externalPerShare = gauge.accExternalRewards;
+
+    for (uint8 i = 0; i < externalTokens.length; i++) {
+      uint toTransfer = externalPerShare[i].mul(amount).divCeil(1e18);
+      if (toTransfer > 0) {
+        IERC20Wrapper(externTokens[i]).safeTransfer(recipient, toTransfer);
+      }
+    }
   }
 
   /// @dev Mint MOBI reward for mobius gauge
