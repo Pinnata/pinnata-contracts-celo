@@ -24,6 +24,8 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
     ILiquidityGauge impl; // Gauge implementation
     uint accMobiPerShare; // Accumulated MOBI per share
     uint id; // Pool Id
+    address[] externalRewardTokens; // Address of external rewars given out by gauge
+    uint[] accExternalRewards; // Accumulated external rewards per share
   }
 
   IERC20 public immutable mobi; // MOBI token
@@ -83,6 +85,21 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
     return 2**112;
   }
 
+  /// @dev updates the external reward tokens for given gauge.
+  function updateGaugeExternalRewards(address poolAddress) public onlyGov {
+    GaugeInfo storage info = gauges[poolAddress];
+    ILiquidityGauge gauge = ILiquidityGauge(info.impl);
+    address[] memory externalRewards = gauge.reward_tokens();
+    uint[] memory accumExternal = new uint[](externalRewards.length);
+
+    for (uint i = 0; i < info.externalRewardTokens.length) {
+      accumExternal[i] = info.accExternalRewards[i];
+    }
+
+    info.externalRewardTokens = externalRewards;
+    info.accExternalRewards = accumExternal;
+  }
+
   /// @dev Register gauge to storage given pool address and gauge address
   /// @param poolAddress Pool address
   /// @param gaugeAddress Gauge address
@@ -94,6 +111,7 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
     GaugeInfo memory info = GaugeInfo({impl: ILiquidityGauge(gaugeAddress), accMobiPerShare: 0, id: nextPoolId});
     gauges[poolAddress] = info;
     idToGauges[nextPoolId++] = info;
+    updateGaugeExternalRewards(poolAddress);
   }
 
   /// @dev Mint ERC1155 token for the given ERC20 token
@@ -128,6 +146,7 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
     ILiquidityGauge impl = gauge.impl;
     require(address(impl) != address(0), 'gauge not registered');
     mintMobi(gauge);
+    redeemExternalRewards(gauge);
     impl.withdraw(amount);
     IERC20(impl.lp_token()).safeTransfer(msg.sender, amount);
     uint stMobi = stMobiPerShare.mul(amount).divCeil(1e18);
@@ -138,8 +157,8 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
     return pid;
   }
 
-  /// @dev Mint CRV reward for curve gauge
-  /// @param gauge Curve gauge to mint reward
+  /// @dev Mint MOBI reward for mobius gauge
+  /// @param gauge Mobius gauge to mint reward
   function mintMobi(GaugeInfo storage gauge) internal {
     ILiquidityGauge impl = gauge.impl;
     uint balanceBefore = mobi.balanceOf(address(this));
@@ -149,6 +168,27 @@ contract WLiquidityGauge is ERC1155('WLiquidityGauge'), ReentrancyGuard, IERC20W
     uint supply = impl.balanceOf(address(this));
     if (gain > 0 && supply > 0) {
       gauge.accMobiPerShare = gauge.accMobiPerShare.add(gain.mul(1e18).div(supply));
+    }
+  }
+  /// @dev redeems external rewards for a mobius gauge
+  /// @param gauge Mobius gauge to redeem external rewards for
+  function redeemExternalRewards(GaugeInfo storage gauge) internal {
+    if (gauge.externalRewardTokens.length == 0) return;
+    ILiquidityGauge impl = gauge.impl;
+    address[] memory externalRewardTokens = gauge.externalRewardTokens;
+    uint[] memory externalRewardGains = new uint[](externalRewardTokens.length);
+
+    for (uint8 i = 0; i < externalRewardTokens.length; i++) {
+      externalRewardGains[i] = IERC20Wrapper(externalRewardTokens[i]).balanceOf(address(this));
+    }
+
+    impl.claim_rewards();
+    uint supply = impl.balanceOf(address(this));
+    if (supply < 0) return;
+
+    for (uint8 i = 0; i < externalRewardTokens.length; i++) {
+      externalRewardGains[i] = externalRewardGains[i].sub(IERC20Wrapper(externalRewardTokens[i]).balanceOf(address(this)));
+      gauge.accExternalRewards[i] = gauge.accExternalRewards[i].add(externalRewardGains[i].mul(1e18).div(supply));
     }
   }
 }
